@@ -96,7 +96,7 @@
     </bcf:option>
     <bcf:option type="singlevalued">
       <bcf:key>maxbibnames</bcf:key>
-      <bcf:value>99</bcf:value>
+      <bcf:value>3</bcf:value>
     </bcf:option>
     <bcf:option type="singlevalued">
       <bcf:key>maxcitenames</bcf:key>
@@ -104,7 +104,7 @@
     </bcf:option>
     <bcf:option type="singlevalued">
       <bcf:key>maxsortnames</bcf:key>
-      <bcf:value>99</bcf:value>
+      <bcf:value>3</bcf:value>
     </bcf:option>
     <bcf:option type="singlevalued">
       <bcf:key>maxitems</bcf:key>
@@ -172,7 +172,7 @@
     </bcf:option>
     <bcf:option type="singlevalued">
       <bcf:key>sortingtemplatename</bcf:key>
-      <bcf:value>ynt</bcf:value>
+      <bcf:value>nyt</bcf:value>
     </bcf:option>
     <bcf:option type="singlevalued">
       <bcf:key>sortsets</bcf:key>
@@ -331,7 +331,7 @@
     </bcf:option>
     <bcf:option type="singlevalued">
       <bcf:key>maxbibnames</bcf:key>
-      <bcf:value>99</bcf:value>
+      <bcf:value>3</bcf:value>
     </bcf:option>
     <bcf:option type="singlevalued">
       <bcf:key>maxcitenames</bcf:key>
@@ -339,7 +339,7 @@
     </bcf:option>
     <bcf:option type="singlevalued">
       <bcf:key>maxsortnames</bcf:key>
-      <bcf:value>99</bcf:value>
+      <bcf:value>3</bcf:value>
     </bcf:option>
     <bcf:option type="singlevalued">
       <bcf:key>maxitems</bcf:key>
@@ -2374,58 +2374,57 @@
     <bcf:datasource type="file" datatype="bibtex" glob="false">references.bib</bcf:datasource>
   </bcf:bibdata>
   <bcf:section number="0">
-    <bcf:citekey order="1" intorder="1">siegel2023</bcf:citekey>
-    <bcf:citekey order="2" intorder="1">siegel2023</bcf:citekey>
-    <bcf:citekey order="3" intorder="1">siegel2023</bcf:citekey>
-    <bcf:citekey order="4" intorder="1">malik2025</bcf:citekey>
-    <bcf:citekey order="5" intorder="1">schneider2020</bcf:citekey>
-    <bcf:citekey order="6" intorder="1">hu2020</bcf:citekey>
-    <bcf:citekey order="7" intorder="1">jimenez2020</bcf:citekey>
-    <bcf:citekey order="8" intorder="1">sun2021</bcf:citekey>
-    <bcf:citekey order="9" intorder="1">rotow2023</bcf:citekey>
-    <bcf:citekey order="10" intorder="1">jimenez2020</bcf:citekey>
-    <bcf:citekey order="10" intorder="2">jiang2021</bcf:citekey>
-    <bcf:citekey order="11" intorder="1">walters2020</bcf:citekey>
-    <bcf:citekey order="12" intorder="1">siegel2023</bcf:citekey>
-    <bcf:citekey order="13" intorder="1">siegel2023</bcf:citekey>
-    <bcf:citekey order="14" intorder="1">rotow2023</bcf:citekey>
-    <bcf:citekey order="15" intorder="1">leonetti2019</bcf:citekey>
-    <bcf:citekey order="16" intorder="1">leonetti2019</bcf:citekey>
-    <bcf:citekey order="17" intorder="1">rotow2023</bcf:citekey>
-    <bcf:citekey order="17" intorder="2">malik2025</bcf:citekey>
-    <bcf:citekey order="18" intorder="1">mendez2019</bcf:citekey>
-    <bcf:citekey order="19" intorder="1">wu2018</bcf:citekey>
-    <bcf:citekey order="20" intorder="1">rogers2010</bcf:citekey>
-    <bcf:citekey order="21" intorder="1">jiang2021</bcf:citekey>
-    <bcf:citekey order="22" intorder="1">jiang2021</bcf:citekey>
-    <bcf:citekey order="23" intorder="1">gilmer2017</bcf:citekey>
-    <bcf:citekey order="24" intorder="1">kipf2017</bcf:citekey>
-    <bcf:citekey order="25" intorder="1">velickovic2018</bcf:citekey>
-    <bcf:citekey order="26" intorder="1">jiang2021</bcf:citekey>
-    <bcf:citekey order="27" intorder="1">hu2020</bcf:citekey>
-    <bcf:citekey order="28" intorder="1">malik2025</bcf:citekey>
-    <bcf:citekey order="29" intorder="1">jiang2021</bcf:citekey>
-    <bcf:citekey order="30" intorder="1">jimenez2020</bcf:citekey>
-    <bcf:citekey order="31" intorder="1">ying2019</bcf:citekey>
-    <bcf:citekey order="32" intorder="1">lundberg2017</bcf:citekey>
-    <bcf:citekey order="33" intorder="1">jimenez2020</bcf:citekey>
-    <bcf:citekey order="34" intorder="1">walters2020</bcf:citekey>
-    <bcf:citekey order="34" intorder="2">sun2021</bcf:citekey>
-    <bcf:citekey order="35" intorder="1">tropsha2020</bcf:citekey>
-    <bcf:citekey order="36" intorder="1">stokes2020</bcf:citekey>
-    <bcf:citekey order="37" intorder="1">malik2025</bcf:citekey>
-    <bcf:citekey order="38" intorder="1">jimenez2020</bcf:citekey>
-    <bcf:citekey order="38" intorder="2">ying2019</bcf:citekey>
-    <bcf:citekey order="39" intorder="1">malik2025</bcf:citekey>
-    <bcf:citekey order="40" intorder="1">jiang2021</bcf:citekey>
-    <bcf:citekey order="41" intorder="1">kipf2017</bcf:citekey>
-    <bcf:citekey order="42" intorder="1">velickovic2018</bcf:citekey>
-    <bcf:citekey order="43" intorder="1">ying2019</bcf:citekey>
-    <bcf:citekey order="44" intorder="1">lundberg2017</bcf:citekey>
-    <bcf:citekey order="45" intorder="1">tropsha2020</bcf:citekey>
+    <bcf:citekey order="1" intorder="1">Siegeletal2023</bcf:citekey>
+    <bcf:citekey order="2" intorder="1">Siegeletal2023</bcf:citekey>
+    <bcf:citekey order="2" intorder="2">RotowJanne2023</bcf:citekey>
+    <bcf:citekey order="3" intorder="1">RotowJanne2023</bcf:citekey>
+    <bcf:citekey order="4" intorder="1">Siegeletal2023</bcf:citekey>
+    <bcf:citekey order="5" intorder="1">Passaroetal2021</bcf:citekey>
+    <bcf:citekey order="6" intorder="1">RotowJanne2023</bcf:citekey>
+    <bcf:citekey order="7" intorder="1">Passaroetal2021</bcf:citekey>
+    <bcf:citekey order="8" intorder="1">Passaroetal2021</bcf:citekey>
+    <bcf:citekey order="8" intorder="2">RotowJanne2023</bcf:citekey>
+    <bcf:citekey order="9" intorder="1">RotowJanne2023</bcf:citekey>
+    <bcf:citekey order="9" intorder="2">Maliketal2025</bcf:citekey>
+    <bcf:citekey order="10" intorder="1">Limetal2024</bcf:citekey>
+    <bcf:citekey order="11" intorder="1">Zdraziletal2024</bcf:citekey>
+    <bcf:citekey order="12" intorder="1">Zdraziletal2024</bcf:citekey>
+    <bcf:citekey order="13" intorder="1">Huangetal2021</bcf:citekey>
+    <bcf:citekey order="14" intorder="1">Huangetal2021</bcf:citekey>
+    <bcf:citekey order="14" intorder="2">Maliketal2025</bcf:citekey>
+    <bcf:citekey order="15" intorder="1">Dengetal2022</bcf:citekey>
+    <bcf:citekey order="16" intorder="1">Jiangetal2021</bcf:citekey>
+    <bcf:citekey order="17" intorder="1">Jiangetal2021</bcf:citekey>
+    <bcf:citekey order="17" intorder="2">Dengetal2022</bcf:citekey>
+    <bcf:citekey order="18" intorder="1">Gilmeretal2017</bcf:citekey>
+    <bcf:citekey order="19" intorder="1">Gilmeretal2017</bcf:citekey>
+    <bcf:citekey order="20" intorder="1">Zhangetal2021</bcf:citekey>
+    <bcf:citekey order="21" intorder="1">Xiongetal2020</bcf:citekey>
+    <bcf:citekey order="21" intorder="2">Jiangetal2021</bcf:citekey>
+    <bcf:citekey order="22" intorder="1">Huetal2020</bcf:citekey>
+    <bcf:citekey order="23" intorder="1">Atzetal2021</bcf:citekey>
+    <bcf:citekey order="24" intorder="1">Maliketal2025</bcf:citekey>
+    <bcf:citekey order="25" intorder="1">Maliketal2025</bcf:citekey>
+    <bcf:citekey order="25" intorder="2">Jiangetal2021</bcf:citekey>
+    <bcf:citekey order="26" intorder="1">Jiangetal2021</bcf:citekey>
+    <bcf:citekey order="27" intorder="1">Luoetal2022</bcf:citekey>
+    <bcf:citekey order="28" intorder="1">Yingetal2019</bcf:citekey>
+    <bcf:citekey order="29" intorder="1">Yingetal2019</bcf:citekey>
+    <bcf:citekey order="29" intorder="2">Luoetal2022</bcf:citekey>
+    <bcf:citekey order="30" intorder="1">Wangetal2023</bcf:citekey>
+    <bcf:citekey order="30" intorder="2">Sunetal2021</bcf:citekey>
+    <bcf:citekey order="31" intorder="1">Wangetal2023</bcf:citekey>
+    <bcf:citekey order="31" intorder="2">Tropshaetal2020</bcf:citekey>
+    <bcf:citekey order="32" intorder="1">Stokesetal2020</bcf:citekey>
+    <bcf:citekey order="33" intorder="1">Stokesetal2020</bcf:citekey>
+    <bcf:citekey order="33" intorder="2">Maliketal2025</bcf:citekey>
+    <bcf:citekey order="34" intorder="1">Maliketal2025</bcf:citekey>
+    <bcf:citekey order="34" intorder="2">Jiangetal2021</bcf:citekey>
+    <bcf:citekey order="34" intorder="3">Luoetal2022</bcf:citekey>
+    <bcf:citekey order="35" intorder="1" nocite="1">*</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
-  <bcf:sortingtemplate name="ynt">
+  <bcf:sortingtemplate name="nyt">
     <bcf:sort order="1">
       <bcf:sortitem order="1">presort</bcf:sortitem>
     </bcf:sort>
@@ -2433,11 +2432,6 @@
       <bcf:sortitem order="1">sortkey</bcf:sortitem>
     </bcf:sort>
     <bcf:sort order="3">
-      <bcf:sortitem order="1">sortyear</bcf:sortitem>
-      <bcf:sortitem order="2">year</bcf:sortitem>
-      <bcf:sortitem literal="1" order="3">9999</bcf:sortitem>
-    </bcf:sort>
-    <bcf:sort order="4">
       <bcf:sortitem order="1">sortname</bcf:sortitem>
       <bcf:sortitem order="2">author</bcf:sortitem>
       <bcf:sortitem order="3">editor</bcf:sortitem>
@@ -2445,16 +2439,24 @@
       <bcf:sortitem order="5">sorttitle</bcf:sortitem>
       <bcf:sortitem order="6">title</bcf:sortitem>
     </bcf:sort>
+    <bcf:sort order="4">
+      <bcf:sortitem order="1">sortyear</bcf:sortitem>
+      <bcf:sortitem order="2">year</bcf:sortitem>
+    </bcf:sort>
     <bcf:sort order="5">
       <bcf:sortitem order="1">sorttitle</bcf:sortitem>
       <bcf:sortitem order="2">title</bcf:sortitem>
     </bcf:sort>
+    <bcf:sort order="6">
+      <bcf:sortitem order="1">volume</bcf:sortitem>
+      <bcf:sortitem literal="1" order="2">0</bcf:sortitem>
+    </bcf:sort>
   </bcf:sortingtemplate>
   <!-- DATALISTS -->
   <bcf:datalist section="0"
-                name="ynt/global//global/global/global"
+                name="nyt/global//global/global/global"
                 type="entry"
-                sortingtemplatename="ynt"
+                sortingtemplatename="nyt"
                 sortingnamekeytemplatename="global"
                 labelprefix=""
                 uniquenametemplatename="global"

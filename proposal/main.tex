@@ -33,10 +33,11 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{tikz}
+\usetikzlibrary{shapes, arrows.meta, positioning}
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds, calc}
 
-% --- Bibliography (Fixed) ---
-\usepackage[style=authoryear, backend=biber, sorting=ynt, maxbibnames=99]{biblatex}
+% --- Bibliography ---
+\usepackage[style=authoryear, backend=biber]{biblatex}
 \addbibresource{references.bib}
 
 % --- Hyperref (should be near the end) ---
@@ -134,7 +135,6 @@
     \includegraphics[width=2in,height=2in,keepaspectratio]{logo-eps-converted-to.pdf}\\[1.5cm]
     {\fontsize{14}{18}\selectfont\bfseries
     A Thesis Proposal Submitted to the\\
-    Department of Mathematics\\
     School of Mathematical Sciences, Balkhu\\
     Tribhuvan University\\
     for Approval
@@ -150,25 +150,22 @@
 \end{titlepage}
 
 % ==================== FRONT MATTER ====================
+% Use lowercase roman numerals (i, ii, iii, iv...) for front matter
 \pagenumbering{roman}
-\setcounter{page}{1}
+% Set counter to 2 assuming the Title Page counts as page 1 (i)
+\setcounter{page}{2} 
 
-% ==================== TABLE OF CONTENTS ====================
-{\singlespacing
 \tableofcontents
-}
 \newpage
 
-% ==================== LIST OF FIGURES ====================
-{\singlespacing
+% 2. List of Figures (Added to TOC)
+\addcontentsline{toc}{section}{List of Figures} 
 \listoffigures
-}
-\newpage
 
-% ==================== LIST OF TABLES ====================
-{\singlespacing
+
+% 3. List of Tables (Added to TOC)
+\addcontentsline{toc}{section}{List of Tables}
 \listoftables
-}
 \newpage
 
 % ==================== LIST OF ABBREVIATIONS ====================
@@ -177,7 +174,9 @@
 {\singlespacing
 \begin{tabbing}
 \hspace{4.5cm} \= \kill
+\textbf{ADMET}        \> Absorption, Distribution, Metabolism, Excretion, and Toxicity \\
 \textbf{AUC-ROC}      \> Area Under the Receiver Operating Characteristic Curve \\
+\textbf{AUPRC}        \> Area Under the Precision-Recall Curve \\
 \textbf{CADD}         \> Computer-Aided Drug Design \\
 \textbf{ChEMBL}       \> Chemistry European Molecular Biology Laboratory Database \\
 \textbf{ECFP}         \> Extended Connectivity Fingerprint \\
@@ -185,6 +184,7 @@
 \textbf{F1}           \> F1-Score (Harmonic Mean of Precision and Recall) \\
 \textbf{GAT}          \> Graph Attention Network \\
 \textbf{GCN}          \> Graph Convolutional Network \\
+\textbf{GIN}          \> Graph Isomorphism Network \\
 \textbf{GNN}          \> Graph Neural Network \\
 \textbf{GNNExplainer} \> Graph Neural Network Explainer \\
 \textbf{IC$_{50}$}    \> Half-Maximal Inhibitory Concentration \\
@@ -192,17 +192,14 @@
 \textbf{MCC}          \> Matthews Correlation Coefficient \\
 \textbf{MPNN}         \> Message Passing Neural Network \\
 \textbf{NSCLC}        \> Non-Small Cell Lung Cancer \\
-\textbf{PAINS}        \> Pan-Assay Interference Compounds \\
 \textbf{pIC$_{50}$}   \> Negative Logarithm of IC$_{50}$ \\
 \textbf{PyG}          \> PyTorch Geometric \\
-\textbf{QSAR}         \> Quantitative Structure--Activity Relationship \\
+\textbf{QED}          \> Quantitative Estimate of Drug-likeness \\
 \textbf{RF}           \> Random Forest \\
-\textbf{SHAP}         \> SHapley Additive exPlanations \\
 \textbf{SMILES}       \> Simplified Molecular Input Line Entry System \\
 \textbf{TKI}          \> Tyrosine Kinase Inhibitor \\
 \textbf{TU}           \> Tribhuvan University \\
-\textbf{XAI}          \> Explainable Artificial Intelligence \\
-\textbf{XGBoost}      \> Extreme Gradient Boosting \\
+\textbf{VS}           \> Virtual Screening \\
 \end{tabbing}
 }
 \newpage
@@ -217,343 +214,289 @@
 
 \subsection{Background}
 
-Cancer remains one of the most significant public health challenges of the twenty-first century. Among all cancer types, lung cancer is the leading cause of cancer-related mortality worldwide. According to GLOBOCAN 2022, lung cancer accounted for nearly 1.8 million deaths globally in 2022 \cite{siegel2023}. Non-Small Cell Lung Cancer (NSCLC) represents approximately 85\% of all lung cancer cases. In Nepal and across South and East Asia, the burden is particularly severe, with most patients diagnosed at advanced stages and limited access to targeted therapies.
-\parencite{siegel2023}
+Cancer remains one of the most pressing public health challenges of the twenty-first century, imposing substantial clinical, economic, and societal burdens worldwide. Among all cancer types, lung cancer is the leading cause of cancer-related mortality. According to GLOBOCAN 2022 estimates, lung cancer accounted for approximately 1.8 million deaths globally in 2022, representing nearly 18\% of all cancer deaths (Siegel et al., 2023). Non-Small Cell Lung Cancer (NSCLC) constitutes about 85\% of all lung cancer cases. In Nepal and across South and East Asia, the burden of NSCLC is particularly acute. Most patients are diagnosed at advanced or metastatic stages due to limited screening infrastructure, resulting in poor prognosis and restricted access to precision medicine approaches (Siegel et al., 2023; Rotow \& Jänne, 2023).
 
-A major clinically validated therapeutic target in NSCLC is the Epidermal Growth Factor Receptor (EGFR). EGFR is a transmembrane receptor tyrosine kinase that, under normal conditions, regulates cell growth, differentiation, and survival. Somatic mutations in the EGFR kinase domain cause constitutive activation of the receptor, leading to uncontrolled cell proliferation and tumour development. The most common sensitizing mutations are exon 19 in-frame deletions (Ex19del, $\approx$45\% of cases) and the L858R substitution in exon 21 ($\approx$40\% of cases). These mutations are found in 10--15\% of Caucasian NSCLC patients and up to 40--50\% of Asian patients, underscoring the high relevance of EGFR-targeted therapy in the Nepali and broader Asian context \cite{siegel2023}.
+A major clinically validated therapeutic target in NSCLC is the Epidermal Growth Factor Receptor (EGFR), a transmembrane receptor tyrosine kinase belonging to the ErbB/HER family. Under normal physiological conditions, EGFR regulates cell growth, differentiation, and survival. Ligand binding (e.g., EGF or TGF-$\alpha$) induces receptor dimerization, autophosphorylation of specific tyrosine residues, and activation of key downstream signalling cascades, including the RAS-RAF-MEK-ERK (MAPK) pathway, which promotes cell proliferation, and the PI3K-AKT-mTOR pathway, which enhances cell survival and inhibits apoptosis (Siegel et al., 2023; Rotow \& Jänne, 2023). 
 
-Three generations of EGFR tyrosine kinase inhibitors (TKIs) have been developed to block this aberrant signalling. While these inhibitors have significantly improved patient outcomes, acquired resistance remains a major clinical challenge. Resistance to the current standard third-generation TKI, osimertinib, frequently occurs within 9--18 months, often through the C797S mutation, resulting in triple-mutant EGFR (e.g., Ex19del/T790M/C797S) that is resistant to all approved EGFR TKIs \cite{malik2025}. This creates an urgent unmet need for novel EGFR inhibitor chemotypes.
+In NSCLC, somatic mutations in the EGFR kinase domain cause ligand-independent constitutive activation, driving oncogenesis. The two predominant sensitizing mutations are in-frame deletions in exon 19 (Ex19del, approximately 45\% of cases) and the L858R point mutation in exon 21 (approximately 40\% of cases). These mutations collectively account for 85--90\% of EGFR-mutant NSCLC. The prevalence of EGFR mutations varies significantly by ethnicity: 10--15\% in Caucasian patients compared to 40--50\% in East Asian populations. This ethnic disparity makes EGFR-targeted therapy especially relevant in the Nepali and broader South Asian clinical context, where late-stage presentation is common and access to advanced therapies remains limited (Rotow \& Jänne, 2023; Leonetti et al., 2019).
 
-Traditional drug discovery is slow, costly, and resource-intensive. Computational methods, particularly machine learning, have emerged as powerful tools to accelerate the process by enabling large-scale \textit{in silico} screening of chemical libraries \cite{schneider2020}. Graph Neural Networks (GNNs) are especially well-suited for this task because molecules can be naturally represented as graphs, with atoms as nodes and chemical bonds as edges. GNNs can learn rich, task-specific molecular representations directly from structure without depending on hand-crafted descriptors \cite{hu2020}.
+Three generations of EGFR tyrosine kinase inhibitors (TKIs) have been developed to suppress this aberrant signalling. First-generation reversible inhibitors (gefitinib, erlotinib) and second-generation irreversible inhibitors (afatinib, dacomitinib) provided important clinical breakthroughs but were ultimately limited by acquired resistance, most notably the T790M gatekeeper mutation. Third-generation TKIs such as osimertinib were rationally designed to overcome T790M while sparing wild-type EGFR and have become the current standard of care. However, resistance to osimertinib typically emerges within 9--18 months, most commonly through the C797S mutation at the covalent binding site. This results in triple-mutant EGFR forms (e.g., Ex19del/T790M/C797S or L858R/T790M/C797S) that are resistant to all currently approved TKIs. This clinical reality creates an urgent unmet need for novel EGFR inhibitor chemotypes with activity against resistant mutants (Rotow \& Jänne, 2023; Malik et al., 2025).
 
-Despite promising progress, gaps remain in the application of GNNs for EGFR inhibitor discovery. Most current models function as black-box systems and focus primarily on classification, offering limited interpretability regarding the structural features responsible for activity \cite{jimenez2020}. Moreover, few studies have extended high-performing GNN models beyond classification to practical lead identification through virtual screening of large external compound libraries \cite{sun2021}.
+Traditional drug discovery pipelines are slow (often 10--15 years from discovery to approval), extremely costly (frequently exceeding USD 2 billion per approved drug), and suffer from high attrition rates. Computational approaches, especially machine learning, have emerged as powerful accelerators for large-scale \textit{in silico} screening of chemical libraries (Schneider et al., 2020). Graph Neural Networks (GNNs) are particularly promising in this domain because molecules can be naturally represented as graphs, with atoms as nodes and chemical bonds as edges. Through iterative message-passing mechanisms, GNNs learn rich, data-driven molecular representations that frequently capture complex pharmacophore patterns more effectively than traditional hand-crafted fingerprints (Hu et al., 2020; Jiang et al., 2021).
 
-This thesis directly addresses these limitations. It focuses on the development, optimization, and benchmarking of Graph Neural Networks (specifically GCN and GAT models) for the accurate classification of EGFR inhibitors. The best-performing model will then be applied for lead identification through virtual screening of unseen ChEMBL compounds to discover and prioritize potential novel EGFR inhibitors for Non-Small Cell Lung Cancer.
+Despite encouraging progress, significant gaps remain in the application of GNNs specifically to EGFR inhibitor discovery. Many existing models function as black-box systems, offering limited interpretability regarding which structural features drive activity predictions (Jiménez-Luna et al., 2020). Furthermore, few studies have extended high-performing GNN models beyond classification tasks to practical prospective virtual screening aimed at identifying novel lead compounds (Sun et al., 2021).
+
+This thesis directly addresses these limitations by developing, optimising, and benchmarking advanced Graph Neural Network architectures — with a primary focus on AttentiveFP — for accurate binary classification of EGFR inhibitors, followed by a targeted virtual screening pipeline to prioritise potential novel leads.
 
 \subsection{Objectives}
 
 \subsubsection{General Objective}
-Develop Graph Neural Network for the binary classification of EGFR inhibitors, evaluate performance against traditional machine learning baselines (Random Forest and XGBoost), and apply GNN model for virtual screening of unseen ChEMBL compounds to identify and prioritize potential lead compounds.
+The general objective of this study is to develop a robust Graph Neural Network-based computational framework for the binary classification of EGFR inhibitor activity (active versus inactive), rigorously evaluate its performance against traditional machine learning baselines, and deploy the optimised model in a virtual screening pipeline to identify, prioritise, and rank potential novel lead compounds from external chemical libraries for addressing drug-resistant NSCLC.
 
-\subsubsection{Specific Objectives}
-\begin{enumerate}
-    \item Develop and train Graph Neural Network models for binary classification of EGFR inhibitor activity (active vs. inactive).
-    \item Benchmark the performance of the developed GNN models against strong traditional machine learning baselines Random Forest and XGBoost.
-    \item Apply the GNN model for virtual screening on unseen compounds from the ChEMBL database (target CHEMBL203) to identify, prioritize, and rank potential lead compounds for further experimental validation.
-\end{enumerate}
+\subsubsection{General Objective}
+The general objectives of this study are:
+\begin{itemize}
+    \item Develop a robust Graph Neural Network based computational framework for the binary classification of EGFR inhibitor activity (active versus inactive).
+    \item Evaluate and benchmark the framework's performance against traditional machine learning baselines to ensure predictive reliability.
+    \item Use optimised model in a virtual screening pipeline to identify, prioritise, and rank potential lead compounds from external chemical libraries for addressing drug-resistant NSCLC.
+\end{itemize}
 
 \subsection{Rationale}
 
-\textbf{Clinical need:} EGFR resistance mutations (T790M, C797S) are a major unsolved problem in NSCLC treatment. No approved drug overcomes the triple mutant (Ex19del/T790M/C797S). Computational tools are urgently needed to accelerate the discovery of next-generation EGFR inhibitors \cite{rotow2023}.
+\textbf{Clinical rationale:} Acquired resistance to third-generation EGFR TKIs, particularly the emergence of triple mutants, represents a major unsolved problem in NSCLC management. No approved therapeutic effectively addresses the Ex19del/T790M/C797S mutant, leading to rapid disease progression after osimertinib failure (Rotow \& Jänne, 2023).
 
-\textbf{Scientific need:} GNNs have demonstrated competitive performance for molecular activity prediction, yet their black-box nature limits utility to medicinal chemists. Explainability tools exist but have not been systematically applied to EGFR inhibitor prediction. Furthermore, no study has applied a trained EGFR GNN model to downstream virtual screening of unseen ChEMBL compounds. These represent the clear literature gaps this thesis addresses \cite{jimenez2020, jiang2021}.
+\textbf{Scientific rationale:} Although GNNs have shown strong performance in molecular property prediction, their application to EGFR inhibitors has been constrained by methodological shortcomings such as random splitting, insufficient architectural comparison, limited featurisation, and lack of interpretability (Malik et al., 2025; Jiang et al., 2021; Jiménez-Luna et al., 2020). This thesis bridges these gaps through scaffold-aware evaluation, rich graph features, Optuna optimisation, GNNExplainer, and prospective virtual screening.
 
-\textbf{Practical need:} This study uses freely available public data (ChEMBL) and open-source tools (PyTorch Geometric, RDKit, SHAP). It is computationally feasible within the one-month research timeline and is appropriate in scope for a master's level research project at Tribhuvan University.
+\textbf{Methodological and practical rationale:} The project uses only open-source tools (RDKit, PyTorch Geometric, Optuna) and publicly available ChEMBL data, ensuring full reproducibility. The scope is appropriate for a Master's thesis — computationally feasible while producing both methodological contributions and a ranked list of potential lead candidates.
 
 \subsection{Research Questions}
 
 \begin{enumerate}
-    \item What extent does Graph Neural Networks outperform or match conventional machine learning models (Random Forest and XGBoost) in the binary classification of EGFR inhibitors (active vs. inactive)?
-    \item How effectively does the best-performing GNN model perform in virtual screening of unseen compounds from the ChEMBL database (target CHEMBL203) for the identification, prioritization, and ranking of potential lead compounds?
+    \item To what extent do advanced Graph Neural Network architectures, particularly AttentiveFP with comprehensive node and edge features, outperform or match conventional machine learning baselines (Random Forest and Logistic Regression) in binary EGFR inhibitor classification under rigorous Bemis-Murcko scaffold splitting?
+    \item How effectively can the optimised AttentiveFP model, supported by GNNExplainer interpretability, be applied in a targeted virtual screening pipeline to identify, prioritise, and rank novel potential EGFR inhibitors from an external library of related-kinase compounds?
 \end{enumerate}
 
 \subsection{Significance of the Study}
 
-This study makes three contributions. First, it provides a rigorous comparative analysis of GNN versus traditional ML approaches for EGFR inhibitor classification using multiple data splitting strategies, addressing a gap in evaluation methodology. Second, it delivers the first systematic GNN explainability analysis focused specifically on EGFR inhibitors, connecting model predictions to actionable chemical insights for lead optimization. Third, by applying the best model to virtual screening of unseen ChEMBL compounds, this study produces a ranked list of potential novel EGFR inhibitor candidates for future experimental investigation \cite{walters2020}.
+This research makes several important contributions to computational chemistry and drug discovery. First, it provides a methodologically rigorous evaluation of multiple GNN architectures with rich atom- and bond-level features and Bayesian hyperparameter optimisation. Second, it delivers systematic instance-level interpretability using GNNExplainer, connecting model predictions to established EGFR pharmacophores and offering chemically actionable insights. Third, by applying the best model to virtual screening of unseen compounds from related kinases, the study generates a prioritised list of potential novel lead candidates with favourable drug-likeness profiles. The work is also regionally relevant for Nepal, where the NSCLC burden is rising and access to next-generation therapies is limited.
 
 \subsection{Limitations}
 
 \begin{itemize}
-    \item \textbf{Computational study only:} No experimental (in vitro or in vivo) validation is performed.
-    \item \textbf{Data quality dependence:} Model performance depends on the quality and completeness of ChEMBL bioactivity data, which may contain experimental noise from varying assay conditions.
-    \item \textbf{2D molecular graphs:} Three-dimensional conformational effects and protein--ligand binding geometry are not captured.
-    \item \textbf{Binary classification scope:} The model predicts active or inactive labels only. Regression of precise binding affinity (pIC$_{50}$) values is beyond the scope of this study.
-    \item \textbf{Single primary target:} The study focuses on human wild-type EGFR (ChEMBL203). Generalisation to mutant forms (T790M, C797S) is left as future work.
-    \item \textbf{Virtual screening without experimental validation:} Compounds prioritized by virtual screening are computational predictions only.
+    \item \textbf{Computational only:} No experimental (in vitro or in vivo) validation of predicted leads was performed.
+    \item \textbf{Data dependence:} Model performance is limited by the quality and heterogeneity of ChEMBL bioactivity data.
+    \item \textbf{2D graph representation:} Three-dimensional conformational effects and protein-ligand binding geometry are not explicitly modelled.
+    \item \textbf{Binary classification:} The study focuses on active/inactive classification; quantitative pIC$_{50}$ regression is outside the current scope.
+    \item \textbf{Wild-type EGFR focus:} The models target wild-type EGFR (CHEMBL203); performance on mutant forms requires future work.
+    \item \textbf{Virtual screening predictions:} All prioritised compounds remain computational hypotheses requiring experimental confirmation.
 \end{itemize}
 
 \newpage
 
 % ==================== CHAPTER 2: LITERATURE REVIEW ====================
+% ==================== CHAPTER 2: LITERATURE REVIEW ====================
 \section{Literature Review}
 
 \subsection{EGFR as a Therapeutic Target in NSCLC}
 
-The Epidermal Growth Factor Receptor (EGFR), also known as ErbB1 or HER1, belongs to the ErbB family of receptor tyrosine kinases. It consists of an extracellular ligand-binding domain, a single transmembrane domain, and an intracellular kinase domain. Under normal conditions, EGFR is activated by binding of growth factors such as EGF and TGF-$\alpha$, leading to receptor dimerization, autophosphorylation, and activation of downstream signaling cascades including RAS--RAF--MEK--ERK and PI3K--AKT--mTOR, which regulate cell proliferation and survival \cite{siegel2023}.
+The Epidermal Growth Factor Receptor (EGFR), also known as ErbB1 or HER1, is a transmembrane glycoprotein and a member of the ErbB family of receptor tyrosine kinases (RTKs) \parencite{Siegeletal2023}. Structurally, EGFR comprises an extracellular ligand-binding domain, a single transmembrane helix, an intracellular juxtamembrane region, a tyrosine kinase domain, and a C-terminal regulatory tail. Under physiological conditions, ligand binding (e.g., epidermal growth factor [EGF] or transforming growth factor-alpha [TGF-$\alpha$]) induces receptor dimerization, autophosphorylation of specific tyrosine residues, and subsequent activation of multiple downstream signaling pathways. The primary pathways include the RAS-RAF-MEK-ERK (MAPK) pathway, which promotes cell proliferation, and the PI3K-AKT-mTOR pathway, which enhances cell survival and inhibits apoptosis \parencite{Siegeletal2023, RotowJanne2023}.
 
-In NSCLC, somatic mutations in the EGFR kinase domain disrupt this regulation. The most common sensitizing mutations are in-frame deletions in exon 19 (Ex19del, $\approx$45\%) and the L858R point mutation in exon 21 ($\approx$40\%), which together account for 85--90\% of EGFR-mutant NSCLC cases. EGFR mutations are found in 10--15\% of Caucasian and up to 40--50\% of Asian NSCLC patients \cite{siegel2023}. This disproportionately high prevalence in Asian populations makes EGFR-targeted therapy particularly relevant to the Nepali clinical context, where late-stage diagnosis and limited therapeutic access remain persistent challenges.
+In non-small cell lung cancer (NSCLC), activating somatic mutations in the EGFR kinase domain lead to ligand-independent constitutive signaling, driving oncogenesis. The two most prevalent sensitizing mutations are in-frame deletions in exon 19 (Ex19del, approximately 45\% of cases) and the L858R point mutation in exon 21 (approximately 40\% of cases). Together, these mutations account for 85--90\% of EGFR-mutant NSCLC \parencite{RotowJanne2023}. The overall prevalence of EGFR mutations in NSCLC varies by ethnicity: 10--15\% in Caucasian populations and 40--50\% in East Asian populations \parencite{Siegeletal2023}. This ethnic disparity is particularly relevant in regions such as Nepal and South Asia, where NSCLC is often diagnosed at advanced stages and access to molecular testing and targeted therapies remains limited. Consequently, EGFR has become one of the most important therapeutic targets in precision oncology for NSCLC, with EGFR tyrosine kinase inhibitors (TKIs) transforming patient outcomes in mutation-positive cases \parencite{Passaroetal2021}.
 
 \subsection{Generations of EGFR TKIs and Resistance Mechanisms}
 
-The clinical development of EGFR TKIs has progressed through three generations, each engineered to overcome the specific resistance mechanism that defeated the previous one \cite{rotow2023}.
+The evolution of EGFR TKIs reflects an iterative response to emerging resistance mechanisms, progressing through three distinct generations \parencite{RotowJanne2023}.
 
-\textbf{First-generation TKIs} (gefitinib, erlotinib) are reversible competitive inhibitors of the EGFR ATP-binding pocket. Although they demonstrated remarkable clinical efficacy in sensitizing-mutation carriers, resistance emerged in virtually all patients within 9--13 months, most commonly through the T790M ``gatekeeper'' substitution at position 790, which sterically hinders drug binding and simultaneously increases ATP affinity \cite{leonetti2019}.
+First-generation TKIs, such as gefitinib and erlotinib, are reversible, ATP-competitive inhibitors that bind preferentially to mutant EGFR. These agents produced unprecedented response rates and progression-free survival benefits in patients with sensitizing mutations. However, acquired resistance developed in nearly all patients within 9--13 months, predominantly through the secondary T790M ``gatekeeper'' mutation in exon 20. This substitution increases ATP affinity while sterically hindering drug binding \parencite{Passaroetal2021}.
 
-\textbf{Second-generation TKIs} (afatinib, dacomitinib) are irreversible pan-ErbB inhibitors that covalently bind to Cys797. Although effective in T790M-harbouring cell lines, dose-limiting wild-type EGFR toxicity restricted their clinical utility, and T790M resistance still emerged in most patients \cite{leonetti2019}.
+Second-generation TKIs, including afatinib and dacomitinib, are irreversible covalent inhibitors targeting Cys797 in the ATP-binding pocket. They exhibit broader activity against T790M in preclinical models and inhibit other ErbB family members. Despite improved potency, their clinical use has been restricted by on-target toxicity to wild-type EGFR, leading to dose-limiting adverse effects such as skin rash and diarrhea \parencite{Passaroetal2021, RotowJanne2023}.
 
-\textbf{Third-generation TKIs} (osimertinib, rociletinib) were specifically designed to target T790M-mutant EGFR while sparing wild-type receptor. Osimertinib is now the standard first-line treatment for EGFR-mutant NSCLC and has demonstrated superior progression-free survival compared to first-generation agents. However, acquired resistance develops through several mechanisms, most importantly the C797S substitution at the covalent binding site. The triple-mutant combination (Ex19del/T790M/C797S or L858R/T790M/C797S) confers resistance to all currently approved EGFR TKIs, representing a critical unmet clinical need \cite{rotow2023, malik2025}.
+Third-generation TKIs, most notably osimertinib, were rationally designed to covalently bind T790M-mutant EGFR while sparing wild-type EGFR. Osimertinib is currently the preferred first-line therapy for EGFR-mutant NSCLC, demonstrating superior efficacy and central nervous system penetration compared to earlier generations. Nevertheless, resistance inevitably emerges, most commonly via the C797S mutation at the covalent binding site. This leads to triple-mutant EGFR (e.g., Ex19del/T790M/C797S or L858R/T790M/C797S), which is resistant to all approved TKIs and represents a major unmet clinical need in advanced NSCLC treatment \parencite{RotowJanne2023, Maliketal2025}. 
+
+To address this critical gap, fourth-generation EGFR TKIs, such as BLU-945, are currently undergoing clinical evaluation. These novel agents are specifically designed as reversible, wild-type-sparing inhibitors that maintain robust \textit{in vivo} potency against the triple-mutant configurations that mediate third-generation resistance \parencite{Limetal2024}.
 
 \subsection{Bioactivity Data and the ChEMBL Database}
 
-The ChEMBL database (version 33), maintained by EMBL-EBI, is the most widely used public bioactivity resource in cheminformatics, containing IC$_{50}$, K$_i$, and other measurements for millions of small molecules tested against thousands of biological targets \cite{mendez2019}. For this study, the relevant target is human EGFR under ChEMBL identifier CHEMBL203.
+The ChEMBL database, maintained by the European Molecular Biology Laboratory-European Bioinformatics Institute (EMBL-EBI), is one of the largest and most widely utilised public repositories of bioactive molecules. Following recent comprehensive updates, ChEMBL now contains over 2.3 million distinct compounds and more than 20 million bioactivity measurements across thousands of biological targets \parencite{Zdraziletal2024}. For EGFR research, the relevant entry is target ID CHEMBL203, which aggregates bioactivity data from diverse published and deposited sources \parencite{Zdraziletal2024}.
 
-A central challenge when using ChEMBL data is experimental heterogeneity: measurements are sourced from many laboratories using different assay protocols, introducing noise and systematic biases. Rigorous data curation --- including conversion to the pIC$_{50}$ scale ($-\log_{10}$[IC$_{50}$]), removal of ambiguous or censored entries, and aggregation of duplicate measurements using geometric means --- is therefore essential before any modelling step \cite{wu2018}. The pIC$_{50}$ scale is preferred because it compresses the wide numerical range of IC$_{50}$ values and more closely approximates a normal distribution, which is better suited to both statistical analysis and machine learning.
+A major challenge when utilising ChEMBL data for machine learning is the inherent heterogeneity of experimental conditions. Bioactivity values (primarily IC$_{50}$) originate from hundreds of different laboratories employing varied assay protocols, cell lines, and conditions. To mitigate this, rigorous, modern curation practices mandate strict filtering for exact IC$_{50}$ values, conversion to the logarithmic pIC$_{50}$ scale, removal of ambiguous data points, and aggregation of multiple measurements per compound \parencite{Huangetal2021}. In the present study, additional standardisation using RDKit (salt removal, canonicalisation, and molecular weight filtering between 100--1000 Da) yielded a high-quality dataset of 10,523 unique compounds, with approximately 74\% classified as active at the commonly used threshold of pIC$_{50} \geq 6.0$ (equivalent to IC$_{50} \leq 1~\mu$M) \parencite{Huangetal2021, Maliketal2025}.
 
-\subsection{Molecular Fingerprints and Traditional Machine Learning Baselines}
+\subsection{Molecular Representation and Traditional Machine Learning Approaches}
 
-Before the advent of GNNs, fixed-length molecular fingerprints combined with classical classifiers dominated computational drug discovery. Morgan fingerprints (also called Extended Connectivity Fingerprints, ECFP) encode the circular atomic neighbourhood up to a specified radius as a binary bit vector, capturing local chemical environments efficiently \cite{rogers2010}. ECFP4 (radius = 2, 2048 bits) computed by RDKit remains the most widely used fingerprint in activity prediction benchmarks.
+Prior to deep learning approaches, molecular property prediction relied heavily on fixed-length molecular fingerprints paired with classical machine learning algorithms. The Extended Connectivity Fingerprint (ECFP), which encodes local atomic environments by iteratively capturing circular neighbourhoods, has long served as a de facto baseline standard in computational cheminformatics \parencite{Dengetal2022}. ECFP4 (typically folded to 2048 bits) provides a balance of computational efficiency and chemical informativeness.
 
-Random Forest (RF) and XGBoost are the two most prominent classifiers applied to fingerprint vectors in cheminformatics. RF builds an ensemble of decision trees on random data subsets and averages predictions, offering robustness to overfitting and native feature importance scores \cite{jiang2021}. XGBoost builds trees sequentially through gradient boosting, consistently achieving state-of-the-art performance on tabular data and remaining a standard strong baseline in molecular property prediction \cite{jiang2021}. The fundamental limitation shared by both approaches is that the molecular representation is hand-engineered and fixed, potentially losing information about global topological features and long-range atomic interactions.
+These fingerprints are commonly combined with ensemble methods such as Random Forest (RF) or simpler linear models like Logistic Regression. Random Forest constructs multiple decision trees on bootstrapped data subsets and aggregates predictions, providing robustness to noise and intrinsic feature importance rankings \parencite{Jiangetal2021}. Logistic Regression, while less complex, offers high interpretability through coefficient analysis. Despite their widespread adoption and strong baseline performance, these approaches suffer from a fundamental limitation: the molecular representation is hand-crafted and static, potentially missing higher-order topological patterns and long-range atomic interactions critical to biological activity \parencite{Jiangetal2021, Dengetal2022}.
 
 \subsection{Graph Neural Networks for Molecular Property Prediction}
 
-Graph Neural Networks (GNNs) represent a paradigm shift in molecular machine learning by operating directly on the molecular graph structure rather than on a pre-computed fingerprint. The core operation is \textit{message passing}: in each layer, every atom (node) aggregates feature information from its bonded neighbours, producing an updated embedding that encodes an increasingly wide chemical context with each successive layer. After $L$ layers, a global readout function (sum or mean pooling) aggregates all atom-level embeddings into a fixed-size molecule-level vector for downstream classification or regression \cite{gilmer2017}.
+Graph Neural Networks (GNNs) have emerged as a transformative approach in molecular machine learning by learning representations directly from the molecular graph structure rather than relying on pre-defined fingerprints \parencite{Gilmeretal2017}. In the message-passing framework, each atom (node) iteratively aggregates features from its neighbouring atoms (edges) across multiple layers. This process enables the model to encode increasingly complex chemical contexts. After the message-passing phase, a readout function produces a fixed-size graph-level embedding suitable for classification tasks \parencite{Gilmeretal2017}.
 
-The Graph Convolutional Network (GCN) of Kipf and Welling \cite{kipf2017} is the simplest and most widely used GNN architecture for molecular tasks. Each layer computes a degree-normalised weighted average of neighbour features, providing computational efficiency while capturing local chemical context. The Graph Attention Network (GAT) \cite{velickovic2018} extends GCN by replacing fixed normalisation coefficients with learnable attention weights computed from paired node features. This allows the model to selectively attend to the most chemically relevant neighbouring atoms and provides an additional source of molecular interpretability through the attention map.
+Prominent GNN architectures evaluated in recent drug discovery frameworks include the Graph Convolutional Network (GCN), which performs degree-normalised aggregation, and the Graph Attention Network (GAT), which introduces learnable attention coefficients \parencite{Zhangetal2021}. More advanced architectures, such as AttentiveFP, employ multi-step attentive pooling and natively incorporate edge features, demonstrating particular strength in capturing local and global pharmacophore information through hierarchical attention mechanisms \parencite{Xiongetal2020, Jiangetal2021}.
 
-Comparative benchmarks across multiple molecular datasets consistently show that GNNs match or outperform fingerprint-based methods, particularly when molecular diversity is high and when the structural patterns governing activity are complex \cite{jiang2021}. A large-scale pre-training study on 2 million unlabelled molecules demonstrated that GNNs can learn transferable chemical representations that substantially improve performance on downstream tasks with limited labelled data \cite{hu2020}.
+Large-scale studies have confirmed that GNNs frequently outperform traditional fingerprint-based methods on structurally diverse datasets, and benefit significantly from self-supervised pre-training on millions of unlabelled molecules \parencite{Huetal2020}. Recently, the field has also seen a rapid expansion into 3D geometric deep learning. Geometric GNNs explicitly incorporate three-dimensional atomic coordinates and spatial symmetries (e.g., rotational equivariance), offering more expressive representations of protein-ligand binding conformations than standard 2D topological graphs \parencite{Atzetal2021}.
 
 \subsection{GNN Models for EGFR Inhibitor Prediction}
 
-The most directly relevant prior work is DeepEGFR \cite{malik2025}, a GAT-based deep learning model trained on ChEMBL EGFR bioactivity data. DeepEGFR achieved high classification accuracy in distinguishing active from inactive EGFR inhibitors and represented a significant advance over earlier fingerprint-based models. However, DeepEGFR has three important limitations that this thesis directly addresses: (1) it provides no explanation of why specific molecules are predicted as active; (2) it evaluates model performance only with random splitting, which overestimates real-world generalisation; and (3) it does not proceed to apply the trained model for virtual screening of unseen chemical space to identify novel lead compounds.
+One of the most relevant prior works is DeepEGFR, a GAT-based model trained on ChEMBL-derived EGFR bioactivity data \parencite{Maliketal2025}. DeepEGFR achieved strong classification performance in distinguishing active from inactive EGFR inhibitors. However, several limitations remain: reliance on random data splitting (which often overestimates generalisation to novel scaffolds), absence of instance-level structural explanations, and lack of prospective application to virtual screening for new lead compounds \parencite{Maliketal2025, Jiangetal2021}.
 
-An earlier influential study by Jiang et al.\ \cite{jiang2021} systematically compared descriptor-based and graph-based models across multiple molecular property prediction datasets and found that GNNs offered advantages particularly for structurally diverse datasets, establishing the methodological foundation for GNN-based molecular activity prediction.
+The present thesis extends this line of research by systematically evaluating four GNN architectures (GCN, GAT, GIN, and AttentiveFP), selecting AttentiveFP as the primary model for its advanced attention mechanisms and edge feature integration. It employs a rigorous Bemis-Murcko scaffold split (80/10/10), utilises comprehensive 29-dimensional node and 12-dimensional edge features, and conducts Bayesian hyperparameter optimisation using Optuna, thereby addressing key methodological gaps in earlier EGFR GNN studies \parencite{Jiangetal2021}.
 
 \subsection{Explainability in GNN-Based Drug Discovery}
 
-The explainability gap in deep learning for drug discovery has been extensively reviewed by Jim\'{e}nez-Luna et al.\ \cite{jimenez2020}, who identified the inability to explain GNN predictions in chemically interpretable terms as the primary barrier to adoption by medicinal chemists. Two complementary methods address this gap.
+Despite their predictive power, deep learning models in drug discovery have historically been criticised as ``black boxes,'' limiting their acceptance by medicinal chemists in practical settings \parencite{Luoetal2022}. Post-hoc explainability techniques have been developed to bridge this gap. GNNExplainer \parencite{Yingetal2019} is a model-agnostic method that identifies the minimal subgraph (through node and edge masks) most responsible for a given prediction by maximising mutual information between the masked input and the model output. 
 
-\textbf{GNNExplainer} \cite{ying2019} is a post-hoc, instance-level explainability method that, given a trained GNN and a specific molecule, identifies the minimal subgraph maximising the mutual information between the masked graph and the model's prediction. The output is atom-level and bond-level importance scores, directly visualisable as colour-highlighted molecular graphs. For EGFR inhibitor prediction, this reveals which specific ring systems, hydrogen bond donors, or halogen substituents the model associates with inhibitory activity.
-
-\textbf{SHAP} (SHapley Additive exPlanations) \cite{lundberg2017} provides complementary dataset-level global feature importance by quantifying, across all molecules in the dataset, which atomic properties (aromaticity, hybridization, formal charge, ring membership) most consistently drive predictions of EGFR inhibitory activity. The combination of GNNExplainer (instance-level) and SHAP (dataset-level) provides a complete picture of what the model has learned, transforming a black-box GNN into a chemically interpretable predictive tool.
-
-Despite these tools being available, no published study has systematically applied GNNExplainer or SHAP specifically to EGFR inhibitor predictions. This constitutes the primary scientific literature gap that this thesis targets \cite{jimenez2020}.
+Applied to EGFR inhibitors such as gefitinib, erlotinib, osimertinib, and lapatinib, GNNExplainer can highlight pharmacophoric features (e.g., hinge-binding nitrogens or hydrophobic halogens) in a chemically interpretable manner \parencite{Yingetal2019, Luoetal2022}. While tools such as SHAP provide global feature importance, the current work focuses on GNNExplainer for instance-level insights that can be directly compared against known EGFR kinase pharmacophore models.
 
 \subsection{Virtual Screening with Machine Learning}
 
-Virtual screening is the computational process of evaluating large chemical libraries to prioritize compounds most likely to be active against a biological target, before any laboratory experiments are performed. Machine learning-based ligand virtual screening has emerged as a cost-effective and scalable alternative to physics-based docking for large compound libraries \cite{walters2020, sun2021}.
+Virtual screening (VS) is a cornerstone of computational drug discovery, enabling the prioritisation of large chemical libraries for experimental validation \parencite{Wangetal2023, Sunetal2021}. In ligand-based machine learning VS, a model trained on known active and inactive compounds is deployed to score external libraries, ranking molecules by predicted probability of activity.
 
-In a ligand-based ML virtual screening workflow, a model trained on known active and inactive compounds is applied to an unseen external library. Compounds are ranked by predicted activity probability, and top-ranked hits are selected for experimental validation. Applicability Domain (AD) analysis, typically implemented through Tanimoto similarity filtering against the training set, is applied to ensure that predictions are made only for compounds that are structurally similar enough to the training data to warrant confidence \cite{tropsha2020}.
+This thesis implements a focused VS pipeline by curating compounds active against related kinases (VEGFR2, BRAF, CDK2, ABL1, MET) from ChEMBL while strictly excluding the EGFR training set. After drug-likeness filtering (MW 250--600 Da, LogP -1 to 7), the optimised AttentiveFP model scores 1,872 unseen compounds. Top candidates are further prioritised using RDKit-computed ADMET properties, including Lipinski compliance and the Quantitative Estimate of Drug-likeness (QED) score \parencite{Wangetal2023, Tropshaetal2020}.
 
-Recent studies have demonstrated the utility of GNN-based virtual screening in identifying novel active scaffolds distinct from known drugs. Stokes et al.\ \cite{stokes2020} applied a GNN trained on antibiotic growth-inhibition data to screen over 100 million compounds and identified halicin, a structurally novel antibiotic with broad-spectrum activity, as a top-ranked hit. This landmark study established proof-of-concept for GNN-driven lead discovery from large chemical databases. Despite this precedent, published EGFR GNN models have focused exclusively on classification accuracy and have not applied trained models for prospective screening of new ChEMBL compounds --- the practical gap this thesis addresses.
+Notable successes, such as the discovery of novel antibiotics through GNN-based screening of over 100 million compounds \parencite{Stokesetal2020}, highlight the powerful potential of this approach. However, most published EGFR GNN models have stopped at classification without extending to prospective lead identification \parencite{Stokesetal2020, Maliketal2025}.
 
 \subsection{Summary and Research Gap}
 
-The literature review reveals that while GNNs have been successfully applied to EGFR inhibitor classification \cite{malik2025} and explainability methods have been developed for GNNs \cite{jimenez2020, ying2019}, no published study has integrated all three components --- GNN-based EGFR classification, molecular-level explainability analysis, and virtual screening of unseen compounds --- into a single unified pipeline. This thesis fills all three gaps simultaneously, advancing both the scientific understanding of structural determinants of EGFR inhibitory activity and the practical goal of identifying novel lead compounds for drug-resistant NSCLC.
+The reviewed literature demonstrates substantial progress in EGFR-targeted therapy, bioactivity data curation, traditional cheminformatics, and GNN-based modelling. Nevertheless, critical gaps persist. Existing GNN studies for EGFR inhibitors typically lack one or more of the following: rigorous scaffold-based evaluation, advanced architectures with rich node/edge features, systematic interpretability using GNNExplainer on clinical compounds, and integration with targeted virtual screening pipelines for novel lead discovery \parencite{Maliketal2025, Jiangetal2021, Luoetal2022}.
+
+This thesis addresses these gaps through a comprehensive, end-to-end computational pipeline that combines high-quality ChEMBL curation, scaffold-split AttentiveFP modelling with Bayesian optimisation, GNNExplainer-based interpretability aligned with EGFR pharmacophores, and virtual screening of related-kinase inhibitors. By doing so, it contributes both methodological advancements in molecular machine learning and practical candidates for addressing drug-resistant NSCLC.
 
 \newpage
-
 % ==================== CHAPTER 3: MATERIALS AND METHODS ====================
 \section{Materials and Methods}
-
 \subsection{Overview of the Computational Pipeline}
 
-This study follows a four-phase computational pipeline: (1) Data Acquisition and Curation, (2) Molecular Graph Construction, (3) Model Development \& Benchmarking, and (4) Explainability \& Virtual Screening. All implementation is done in Python using RDKit, PyTorch Geometric, and SHAP.
+The overall methodology of this proposed study will follow a systematic, five-phase computational pipeline, as illustrated in Figure~\ref{fig:workflow}. This workflow is designed to progress from raw biochemical data curation to the identification of novel, drug-like lead compounds through advanced graph-based deep learning.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
-    node distance=0.45cm and 0.35cm,
-    font=\fontsize{8}{9.5}\selectfont,
-    phase/.style={rectangle, rounded corners=3pt, draw=black, thick, minimum width=4.6cm, minimum height=0.52cm, fill=blue!12, align=center, font=\bfseries\small},
-    process/.style={rectangle, rounded corners=2pt, draw=black!70, minimum width=4.4cm, minimum height=0.42cm, fill=white, align=center},
-    data/.style={cylinder, shape border rotate=90, aspect=0.22, draw=black, thick, fill=orange!25, minimum width=3cm, minimum height=0.85cm, align=center},
-    output/.style={rectangle, rounded corners=3pt, draw=black, very thick, minimum width=4.6cm, minimum height=0.6cm, fill=green!22, align=center, font=\small\bfseries},
-    arrow/.style={-{Latex[length=2mm]}, thick, draw=black!70}
+    node distance=0.65cm,
+    phase/.style={rectangle, rounded corners=6pt, draw=black, thick, fill=blue!20, minimum width=6.8cm, minimum height=0.72cm, align=center, font=\bfseries\small},
+    process/.style={rectangle, rounded corners=4pt, draw=black, thick, fill=cyan!12, minimum width=6.3cm, minimum height=0.48cm, align=center, font=\small},
+    final/.style={rectangle, rounded corners=6pt, draw=black, very thick, fill=green!25, minimum width=6.8cm, minimum height=0.75cm, align=center, font=\bfseries},
+    arrow/.style={->, thick, >=latex, draw=black!80}
 ]
 
-\node[data] (chembl) {ChEMBL v33\\(CHEMBL203)};
+% Phase 1
+\node[phase] (ph1) {Phase 1: Data Acquisition and Preprocessing};
+\node[process, below=0.2cm of ph1] (p11) {ChEMBL Retrieval (CHEMBL203)};
+\node[process, below=of p11] (p12) {pIC$_{50}$ Conversion \& Binary Labelling};
 
-\node[phase, below=0.55cm of chembl] (p1) {Phase 1: Data Acquisition \& Curation};
-\node[process, below=of p1] (p11) {IC$_{50}$ retrieval, cleaning \& labelling};
-\node[process, below=of p11] (p12) {PAINS + Lipinski filtering};
-\node[process, below=of p12] (p13) {Random/Scaffold/Temporal split};
+% Phase 2
+\node[phase, below=0.6cm of p12] (ph2) {Phase 2: Molecular Graph Construction};
+\node[process, below=0.2cm of ph2] (p21) {PyTorch Geometric Graphs};
 
-\node[phase, below=0.6cm of p13] (p2) {Phase 2: Graph Construction};
-\node[process, below=of p2] (p21) {SMILES $\to$ Graph + Features};
+% Phase 3
+\node[phase, below=0.6cm of p21] (ph3) {Phase 3: Model Development \& Training};
+\node[process, below=0.2cm of ph3] (p31) {Scaffold Split + AttentiveFP Training};
 
-\node[phase, below=0.6cm of p21] (p3) {Phase 3: Model Development \& Benchmarking};
-\node[process, below=of p3, xshift=-2.4cm] (gnn) {GCN \& GAT};
-\node[process, below=of p3, xshift=2.4cm] (ml) {RF + XGBoost};
-\node[process, below=0.9cm of p3] (tune) {Hyperparameter tuning \& Evaluation};
+% Phase 4
+\node[phase, below=0.6cm of p31] (ph4) {Phase 4: Evaluation \& Interpretability};
+\node[process, below=0.2cm of ph4] (p41) {Metrics + GNNExplainer};
 
-\node[phase, below=0.7cm of tune] (p4) {Phase 4: Explainability \& Virtual Screening};
-\node[process, below=of p4, xshift=-2.4cm] (xai) {GNNExplainer + SHAP};
-\node[process, below=of p4, xshift=2.4cm] (vs) {Virtual Screening (ChEMBL)};
-\node[process, below=0.9cm of p4] (rank) {Hit Prioritization};
+% Phase 5
+\node[phase, below=0.6cm of p41] (ph5) {Phase 5: Virtual Screening};
+\node[process, below=0.2cm of ph5] (p51) {Related Kinases Library (n=1,872)};
+\node[process, below=of p51] (p52) {Inference \& Lead Prioritization};
 
-\node[output, below=of rank] (final) {Ranked Novel EGFR Leads};
+% Final Output
+\node[final, below=0.6cm of p52] (final) {Ranked EGFR Lead Candidates};
 
-\draw[arrow] (chembl) -- (p1);
-\draw[arrow] (p1) -- (p11);
+% Arrows
+\draw[arrow] (ph1) -- (p11);
 \draw[arrow] (p11) -- (p12);
-\draw[arrow] (p12) -- (p13);
-\draw[arrow] (p13) -- (p2);
-\draw[arrow] (p2) -- (p21);
-\draw[arrow] (p21) -- (p3);
-\draw[arrow] (p3) -- (gnn);
-\draw[arrow] (p3) -- (ml);
-\draw[arrow] (gnn) |- (tune);
-\draw[arrow] (ml)  |- (tune);
-\draw[arrow] (tune) -- (p4);
-\draw[arrow] (p4) -- (xai);
-\draw[arrow] (p4) -- (vs);
-\draw[arrow] (xai) |- (rank);
-\draw[arrow] (vs)  |- (rank);
-\draw[arrow] (rank) -- (final);
+\draw[arrow] (p12) -- (ph2);
+\draw[arrow] (ph2) -- (p21);
+\draw[arrow] (p21) -- (ph3);
+\draw[arrow] (ph3) -- (p31);
+\draw[arrow] (p31) -- (ph4);
+\draw[arrow] (ph4) -- (p41);
+\draw[arrow] (p41) -- (ph5);
+\draw[arrow] (ph5) -- (p51);
+\draw[arrow] (p51) -- (p52);
+\draw[arrow] (p52) -- (final);
 
 \end{tikzpicture}
-\caption{Overall four-phase computational pipeline for EGFR inhibitor classification and lead identification.}
-\label{fig:system-flow}
+\caption{Proposed five-phase computational pipeline for GNN-based EGFR inhibitor classification and virtual screening.}
+\label{fig:workflow}
 \end{figure}
 
-\subsection{Phase 1: Data Acquisition and Curation}
+\subsection{Data Acquisition and Preprocessing}
 
-\subsubsection{Data Source and Retrieval}
+To build a robust predictive model, high-quality bioactivity data will be retrieved from the ChEMBL database (version 33 or later) via its RESTful API, specifically targeting the Epidermal Growth Factor Receptor (EGFR, ChEMBL ID: CHEMBL203). To ensure quantitative reliability, the dataset will be strictly filtered to include only records with exact Half-Maximal Inhibitory Concentration ($IC_{50}$) values, discarding any ambiguous measurements (e.g., `>', `<', or `$\sim$'). 
 
-All bioactivity data for human EGFR (ChEMBL target: CHEMBL203) were retrieved from the ChEMBL database (version 33) using the \texttt{chembl\_webresource\_client} Python library with the following strict retrieval parameters: \texttt{standard\_type = `IC50'}, \texttt{standard\_units = `nM'}, \texttt{standard\_relation = `='}, and \texttt{assay\_type = `B'}.
+These values will be mathematically transformed into the negative logarithmic scale ($pIC_{50} = -\log_{10}(IC_{50} \times 10^{-9})$) to normalize the data distribution. A binary thresholding strategy will be implemented to frame the problem as a classification task: compounds with $pIC_{50} \geq 6.0$ (equivalent to $IC_{50} \leq 1 \mu M$) will be classified as active inhibitors, while those below this threshold will be deemed inactive.
 
-\subsubsection{Data Cleaning}
+Rigorous structural standardization will be performed using RDKit's \texttt{MolStandardize} module. This pipeline will strip disconnected fragments (salts and solvents), neutralize charges where appropriate, and generate canonical SMILES to identify and remove duplicated entries. In cases where multiple bioactivity values exist for a single canonical SMILES, the median $pIC_{50}$ will be retained. Finally, a physicochemical filter will isolate small molecules by restricting the molecular weight to a range of 100 to 1000 Daltons.
 
+\subsection{Molecular Representation and Graph Construction}
+
+Unlike traditional machine learning models that rely on fixed-length bit vectors (e.g., fingerprints), the proposed methodology will represent molecules natively as undirected graphs $\mathcal{G} = (\mathcal{V}, \mathcal{E})$, where $\mathcal{V}$ represents atoms (nodes) and $\mathcal{E}$ represents chemical bonds (edges). This transformation will be executed using PyTorch Geometric (PyG), enabling the preservation of complex topological and spatial relationships within the molecules.
+
+\subsubsection{Node (Atom) Features}
+Each node will be mathematically encoded as a comprehensive 29-dimensional continuous feature vector designed to capture fundamental biochemical properties essential for protein-ligand binding. The features will comprise:
 \begin{itemize}
-    \item \textbf{Missing value removal:} Entries with missing SMILES strings or IC$_{50}$ values were dropped.
-    \item \textbf{Duplicate aggregation:} Compounds appearing multiple times were aggregated by taking the geometric mean of IC$_{50}$ values.
-    \item \textbf{SMILES canonicalization:} All molecular structures were converted to canonical SMILES using RDKit, removing salts and solvents.
-    \item \textbf{Structure validation:} Molecules that could not be parsed or sanitized by RDKit were discarded.
+    \item \textbf{Atom type} (one-hot encoded, 10 dimensions): C, N, O, S, F, Cl, Br, I, P, and Unknown.
+    \item \textbf{Degree} (one-hot encoded, 6 dimensions): Capturing the number of covalently bonded heavy-atom neighbours (0 to 5).
+    \item \textbf{Formal charge} (1 dimension): A critical parameter for modelling electrostatic interactions within the EGFR kinase pocket.
+    \item \textbf{Attached hydrogens} (one-hot encoded, 5 dimensions): Ranging from 0 to 4, acting as a proxy for hydrogen bond donor capacity.
+    \item \textbf{Hybridization state} (one-hot encoded, 5 dimensions): SP, SP2, SP3, SP3D, SP3D2, which dictates the local 3D geometry of the atom.
+    \item \textbf{Aromaticity} (binary, 1 dimension): Crucial for identifying potential $\pi-\pi$ stacking interactions with aromatic residues in the binding site.
+    \item \textbf{Ring membership} (binary, 1 dimension).
 \end{itemize}
 
-\subsubsection{Activity Labelling}
-
-IC$_{50}$ values (in nM) were transformed to the pIC$_{50}$ scale:
-\begin{equation}
-    pIC_{50} = -\log_{10}\!\left(IC_{50} \times 10^{-9}\right)
-\end{equation}
-
-Binary activity labels were assigned using a threshold of $pIC_{50} \geq 6.0$ (equivalent to IC$_{50} \leq 1000$~nM): Active (Class~1) and Inactive (Class~0). This threshold is consistent with published EGFR cheminformatics practice \cite{malik2025}.
-
-\subsubsection{Chemical Filtering}
-
+\subsubsection{Edge (Bond) Features}
+To further enrich the message-passing framework, each edge will be encoded as a 12-dimensional feature vector:
 \begin{itemize}
-    \item \textbf{PAINS filtering:} Pan-Assay Interference Compounds were identified and removed using RDKit's \texttt{FilterCatalog} (PAINS\_A, PAINS\_B, PAINS\_C filters).
-    \item \textbf{Lipinski's Rule of Five:} Compounds violating more than one criterion (MW $\leq 500$~Da, logP $\leq 5$, HBD $\leq 5$, HBA $\leq 10$) were removed.
+    \item \textbf{Bond type} (one-hot encoded, 4 dimensions): Single, Double, Triple, Aromatic.
+    \item \textbf{Conjugation} (binary, 1 dimension): Indicates extended electron delocalization.
+    \item \textbf{Ring membership} (binary, 1 dimension).
+    \item \textbf{Stereochemistry} (one-hot encoded, 6 dimensions): Captures E/Z and Cis/Trans configurations, which drastically affect ligand binding affinity.
 \end{itemize}
 
-\subsubsection{Data Splitting Strategies}
+\subsection{Data Splitting Strategy}
 
-Three splitting strategies were employed:
+A major pitfall in cheminformatics machine learning is "scaffold memorization," where models perform exceptionally well on random test sets but fail to generalize to novel chemotypes. To rigorously evaluate the model's capacity for true virtual screening, a strict \textbf{Bemis-Murcko Scaffold Split} will be employed via RDKit. 
+
+The Bemis-Murcko algorithm systematically strips away terminal side chains, leaving only the core ring systems and linker atoms (the scaffold). The dataset will be partitioned based on these unique scaffolds into an 80\% Training, 10\% Validation, and 10\% Test set. This guarantees that compounds sharing a core structural framework will be isolated into a single partition, forcing the model to evaluate entirely unseen molecular topologies during validation and testing.
+
+\subsection{Model Architectures}
+
+The core of this study will systematically evaluate four distinct Graph Neural Network (GNN) architectures functioning under the Message Passing Neural Network (MPNN) paradigm. The models to be developed include the Graph Convolutional Network (GCN), Graph Attention Network (GAT), Graph Isomorphism Network (GIN), and AttentiveFP.
+
+\textbf{AttentiveFP} is proposed as the primary, focal architecture for this research. Unlike standard GCNs that aggregate neighbor information isotropically, AttentiveFP utilizes a multi-step, graph-level attention mechanism. Crucially, it provides native support for integrating multidimensional edge features directly into the message-passing update equations. This capability is highly advantageous for molecular property prediction, as the specific nature of a chemical bond profoundly influences the electronic and spatial profile of a pharmacophore.
+
+To establish a baseline and demonstrate the superiority of graph-based methods over established cheminformatics techniques, Random Forest (RF) and Logistic Regression models will also be trained. These baselines will utilize traditional 2048-bit ECFP4 (Morgan) fingerprints with a radius of 2 bonds, generated via RDKit.
+
+\subsection{Training and Hyperparameter Optimization}
+
+All GNN models will be trained using PyTorch. To address the anticipated class imbalance in the ChEMBL dataset (approximately 74\% active compounds), a Weighted Binary Cross-Entropy (BCE) loss function with logits will be formulated. A positive class weight ($pos\_weight = 0.35$) will be applied to penalize misclassifications of the minority (inactive) class more heavily, ensuring the model does not bias its predictions toward the majority class.
+
+The network weights will be optimized using the Adam optimizer. To ensure stable convergence, a \texttt{ReduceLROnPlateau} learning rate scheduler will be implemented (reduction factor = 0.5, patience = 10 epochs). An early stopping mechanism based on the Validation AUROC (patience = 20-30 epochs) will be utilized to prevent overfitting to the training scaffolds.
+
+Hyperparameter optimization will be executed using the \textbf{Optuna} framework, leveraging the Tree-structured Parzen Estimator (TPE) algorithm for Bayesian optimization. The search space for the AttentiveFP model will be highly constrained, iterating over hidden dimensions, the number of GNN message-passing layers, the number of attention timesteps, dropout rates, batch sizes, learning rates, and L2 weight decay coefficients. The configuration yielding the highest AUROC on the validation set will be selected as the final model.
+
+\subsection{Evaluation Metrics}
+
+Due to the inherent class imbalance, relying solely on classification accuracy is insufficient and potentially misleading. Therefore, model performance will be assessed primarily using threshold-independent metrics:
 \begin{itemize}
-    \item \textbf{Random splitting (80/20):} Standard random train/test split, providing an upper-bound performance estimate.
-    \item \textbf{Scaffold splitting (80/20):} Bemis--Murcko scaffold-based split using RDKit, evaluating generalisation to structurally novel scaffolds \cite{jiang2021}.
-    \item \textbf{Temporal splitting:} Compounds split chronologically by ChEMBL assay date, evaluating prospective virtual screening performance.
+    \item \textbf{Area Under the Receiver Operating Characteristic Curve (AUROC):} Measures the model's ability to distinguish between active and inactive classes across all possible classification thresholds.
+    \item \textbf{Area Under the Precision-Recall Curve (AUPRC):} Heavily prioritizes the model's predictive precision specifically regarding the minority class, making it the most stringent metric for imbalanced data.
 \end{itemize}
 
-\subsection{Phase 2: Molecular Graph Construction}
+Secondary metrics, evaluated at a default probability threshold of 0.5, will include the F1-Score, the Matthews Correlation Coefficient (MCC)—which provides a balanced measure of true and false positives/negatives—and overall Accuracy. All final reported metrics will be calculated exclusively on the held-out Bemis-Murcko test set.
 
-\subsubsection{Graph Representation}
+\subsection{Model Interpretability}
 
-Each curated molecule was converted from SMILES to a molecular graph $G = (V, E)$ using RDKit and PyTorch Geometric, where each node $v \in V$ represents one atom and each edge $e \in E$ represents one chemical bond.
+To overcome the "black-box" criticism frequently leveled at deep learning in drug discovery, \textbf{GNNExplainer} will be applied to the trained AttentiveFP model. This post-hoc explainability algorithm operates by maximizing the mutual information between the model's prediction and a compact subgraph structure.
 
-\subsubsection{Node Features}
+GNNExplainer will generate node and edge importance masks, visually highlighting the specific atomic neighborhoods most influential in driving a positive prediction. Explanations will be deliberately generated for widely studied, clinically approved EGFR inhibitors (e.g., Gefitinib, Erlotinib, Osimertinib, and Lapatinib). The resulting computational attributions will be critically analyzed against established EGFR kinase pharmacophore models (verifying if the model successfully learned the importance of hinge-binding quinazoline nitrogens or hydrophobic halogen substituents). This step will validate that the model is learning genuine biochemical principles rather than spurious dataset correlations.
 
-Each atom (node) was encoded as a 9-dimensional feature vector comprising the following properties. The \textbf{atomic number} encodes the element identity (C, N, O, F, S, etc.) as an integer. The \textbf{degree} records the number of covalently bonded neighbours as an integer. \textbf{Hybridization} is one-hot encoded across five states: sp, sp2, sp3, sp3d, and sp3d2. \textbf{Aromaticity} is a binary flag (0/1) indicating whether the atom belongs to an aromatic ring system. The \textbf{formal charge} encodes ionic state as a signed integer. The \textbf{hydrogen count} records the number of attached hydrogen atoms as an integer. \textbf{Ring membership} is a binary flag indicating whether the atom is part of any ring. \textbf{Chirality} (R/S stereochemistry) is one-hot encoded. Finally, \textbf{ring size} records the smallest ring size containing the atom as an integer. Together these nine features provide a compact yet chemically informative representation of each atom that captures both local electronic environment and topological context.
+\subsection{Virtual Screening Pipeline}
 
-\subsubsection{Edge Features}
+The culmination of the study will involve deploying the optimized and validated AttentiveFP model in a prospective virtual screening pipeline. A specialized screening library will be curated by retrieving compounds reported as active against phylogenetically and structurally related kinases (e.g., VEGFR2, BRAF, CDK2, ABL1, and MET) from ChEMBL. Any compounds overlapping with the primary EGFR training set will be strictly excluded to guarantee external, zero-shot validation.
 
-Each bond (edge) was encoded with four features: bond type (single, double, triple, aromatic; one-hot), conjugation status (binary), ring membership (binary), and stereochemistry E/Z type (one-hot).
+Prior to inference, the screening library will be filtered to ensure baseline drug-likeness. Only compounds with a molecular weight between 250 and 600 Da, and a calculated LogP between -1 and 7, will be retained. The AttentiveFP model will then perform forward-pass inference on this unseen library (estimated $n=1,872$), generating a predicted probability of EGFR inhibition for each compound.
 
-\subsubsection{Exploratory Data Analysis}
+To triage the highest-scoring candidates for potential future experimental validation, a suite of ADMET-proxy properties will be calculated using RDKit. These will include Molecular Weight (MW), calculated partition coefficient (LogP), the number of hydrogen bond donors and acceptors, Topological Polar Surface Area (TPSA), strict compliance with Lipinski’s Rule of Five, and the Quantitative Estimate of Drug-likeness (QED) score. Candidates exhibiting both a high predictive probability ($>0.85$) and an optimal QED score will be proposed as high-value, novel lead compounds.
 
-Before model training, exploratory data analysis (EDA) was conducted: pIC$_{50}$ distributions and class balance were visualised using histograms; chemical space coverage was assessed by projecting Morgan fingerprints into 2D using t-SNE; and basic molecular property statistics were tabulated.
+\subsection{Software and Implementation Details}
 
-\subsection{Phase 3: GNN Model Development, Benchmarking, and Evaluation}
-
-\subsubsection{GNN Architecture 1: Graph Convolutional Network (GCN)}
-
-The primary GNN model is a three-layer GCN \cite{kipf2017}. In each layer, atom $i$ aggregates normalised features from all bonded neighbours and itself:
-\begin{equation}
-    h_i^{(l+1)} = \sigma \left( \sum_{j \in \mathcal{N}(i) \cup \{i\}} \frac{1}{\sqrt{\hat{d}_i \hat{d}_j}} \, W^{(l)} h_j^{(l)} \right)
-\end{equation}
-
-where $h_i^{(l)}$ is the embedding of atom $i$ at layer $l$; $\mathcal{N}(i)$ is the set of bonded atoms; $\hat{d}_i$ is the degree of atom $i$; $W^{(l)}$ is the learnable weight matrix; and $\sigma$ is the ReLU activation function. After three layers, global mean pooling produces a molecule-level embedding for binary classification.
-
-\subsubsection{GNN Architecture 2: Graph Attention Network (GAT)}
-
-The secondary model is a two-layer GAT \cite{velickovic2018}. GAT replaces fixed normalisation weights with learnable attention coefficients:
-\begin{equation}
-    \alpha_{ij} = \frac{\exp\!\left(\mathrm{LeakyReLU}\!\left( \mathbf{a}^T [W h_i \,\|\, W h_j] \right)\right)}{\sum_{k \in \mathcal{N}(i)} \exp\!\left(\mathrm{LeakyReLU}\!\left( \mathbf{a}^T [W h_i \,\|\, W h_k] \right)\right)}
-\end{equation}
-
-where $\mathbf{a}$ is a learnable attention vector and $\|$ denotes concatenation.
-
-\subsubsection{Baseline Models}
-
-Two traditional machine learning baselines were trained on Morgan fingerprints (ECFP4, radius = 2, 2048 bits):
-\begin{itemize}
-    \item \textbf{Random Forest (RF):} 200 trees, balanced class weights, maximum features = ``sqrt''.
-    \item \textbf{XGBoost:} Learning rate = 0.05, max depth = 6, 300 estimators, subsample = 0.8.
-\end{itemize}
-
-\subsubsection{Hyperparameter Optimisation}
-
-Key hyperparameters for both GCN and GAT models were tuned via grid search with 5-fold cross-validation on the scaffold-split training set. The \textbf{learning rate} was searched over \{0.0001, 0.001, 0.01\} and fixed at 0.001. The \textbf{hidden dimension} was evaluated at \{64, 128, 256\} and set to 128. The \textbf{number of GNN layers} was varied across \{2, 3, 4\} and fixed at 3. \textbf{Dropout rate} was searched over \{0.2, 0.3, 0.5\} and set to 0.3. \textbf{Batch size} was tested at \{32, 64, 128\} and fixed at 64. For the GAT model specifically, the \textbf{number of attention heads} was varied across \{2, 4, 8\} and fixed at 4. All models were trained for a maximum of 200 epochs with early stopping applied at a patience of 20 epochs to prevent overfitting.
-
-\subsubsection{Training Configuration}
-
-All GNN models were trained using the Adam optimiser with binary cross-entropy loss. 5-fold cross-validation was performed on the scaffold-split training set. Early stopping (patience = 20 epochs) was applied to prevent overfitting.
-
-\subsubsection{Evaluation Metrics}
-
-\begin{itemize}
-    \item \textbf{AUC-ROC:} Area under the Receiver Operating Characteristic curve (1.0 = perfect; 0.5 = random).
-    \item \textbf{Accuracy:} Fraction of correct predictions.
-    \item \textbf{F1-Score:} Harmonic mean of precision and recall; appropriate for imbalanced datasets.
-    \item \textbf{Matthews Correlation Coefficient (MCC):} Balanced metric considering all confusion matrix cells; the most informative single metric for imbalanced binary classification.
-\end{itemize}
-
-\subsection{Phase 4: Explainability Analysis and Virtual Screening}
-
-\subsubsection{GNNExplainer: Instance-Level Molecular Explanation}
-
-GNNExplainer \cite{ying2019} was applied via \texttt{torch\_geometric.explain.GNNExplainer} to the best-performing GNN model. For each molecule in the test set predicted as active, GNNExplainer identifies the minimal subgraph and node features maximising mutual information with the model's prediction:
-\begin{equation}
-    \max_{M, F} \; MI\!\left(Y,\, (G \odot M,\; X \odot F)\right)
-\end{equation}
-subject to sparsity constraints on edge mask $M$ and feature mask $F$. Results are visualised as colour-highlighted molecular graphs using RDKit's \texttt{Draw.MolToImage} function.
-
-\subsubsection{SHAP: Global Feature Importance}
-
-SHAP \cite{lundberg2017} was applied across the full test set to quantify which atomic node features most consistently drive predictions. The SHAP value for feature $i$ is:
-\begin{equation}
-    \phi_i = \sum_{S \subseteq F \setminus \{i\}} \frac{|S|!\,(|F|-|S|-1)!}{|F|!} \left[ f(S \cup \{i\}) - f(S) \right]
-\end{equation}
-SHAP summary bar plots and beeswarm plots were generated to show global feature importance rankings and the direction of each feature's effect.
-
-\subsubsection{Chemical Interpretation}
-
-GNNExplainer-identified substructures were compared to published EGFR pharmacophore models. RDKit substructure matching was used to quantify the frequency of highlighted fragments among active versus inactive compounds.
-
-\subsubsection{Virtual Screening of Unseen ChEMBL Compounds}
-
-The best-performing trained GNN model was applied to unseen compounds from ChEMBL (CHEMBL203) following a five-step workflow: (1) unseen compound preparation through the same curation pipeline; (2) Applicability Domain (AD) filtering using Tanimoto similarity $\geq 0.4$ \cite{tropsha2020}; (3) prediction and scoring with a high-confidence threshold of predicted active probability $\geq 0.80$; (4) hit prioritisation and ranking by predicted activity probability with structural novelty assessment; and (5) GNNExplainer visualisation of the top 10 ranked hits.
-
-\subsection{Software and Tools}
-
-All software used in this study is open-source. Python 3.10 served as the primary programming language. RDKit (2023.09+) was used for molecular processing, SMILES canonicalization, fingerprint computation, and graph construction. PyTorch (2.0+) provided the deep learning framework, and PyTorch Geometric (2.4+) provided GNN implementations and the GNNExplainer module. Scikit-learn (1.3+) was used for Random Forest, evaluation metrics, and scaffold splitting. XGBoost (2.0+) provided the gradient boosting baseline. SHAP (0.44+) was used for global feature importance analysis. Matplotlib (3.7+) and Seaborn (0.12+) were used for visualisation. Pandas (2.0+) and NumPy (1.24+) handled data processing. The \texttt{chembl-webresource-client} library was used for ChEMBL data retrieval, and JupyterLab (4.0+) provided the interactive development environment. The primary data source is the ChEMBL Database (version 33), target CHEMBL203, freely available at \url{https://www.ebi.ac.uk/chembl/}.
-
-\newpage
+All computational modeling and data processing will be performed using open-source Python (version 3.10+) libraries to ensure complete reproducibility. Core packages will include RDKit (2023.09+) for molecular standardization and descriptor generation, PyTorch and PyTorch Geometric for GNN construction and training, Optuna for Bayesian hyperparameter tuning, and scikit-learn for baseline modeling and metric computation. Visualizations, including GNNExplainer outputs, will be generated using Matplotlib and Seaborn. All deep learning experiments will be executed on GPU-accelerated hardware (NVIDIA CUDA architecture) to facilitate the computationally intensive training of graph neural networks.
 
 % ==================== EXPECTED OUTCOMES ====================
 \section*{Expected Outcomes}
 \addcontentsline{toc}{section}{Expected Outcomes}
 
-The expected outcomes of this study are directly aligned with the four specific objectives and four research questions stated in Chapter~1.
+The expected outcomes of this study are directly aligned with the specific objectives and research questions outlined in Chapter~1. Upon successful completion of the proposed research, the following deliverables will be generated:
 
 \begin{itemize}
-    \item Fully trained and hyperparameter-optimised GCN and GAT models for binary EGFR inhibitor classification, with performance reported using AUC-ROC, accuracy, F1-score, and MCC under 5-fold cross-validation across all three splitting strategies (random, scaffold, and temporal).
-    \item A comprehensive benchmarking table comparing GCN, GAT, Random Forest, and XGBoost, alongside a hyperparameter sensitivity analysis identifying which architectural choices most significantly impact GNN predictive performance.
-    \item GNNExplainer atom-level and bond-level importance visualisations for representative active EGFR inhibitors from the test set; SHAP summary and beeswarm plots showing global atomic feature importance across the full dataset; and a written chemical interpretation comparing the identified substructures to known EGFR pharmacophore models from the medicinal chemistry literature.
-    \item A ranked virtual screening hit list of potential novel EGFR inhibitor candidates from unseen ChEMBL (CHEMBL203) compounds, including predicted activity probability scores, structural novelty assessment via Tanimoto similarity to training set actives, and GNNExplainer visualisations for the top 10 highest-confidence hits.
-    \item A fully reproducible open-source Python pipeline covering all four phases (data curation $\rightarrow$ graph construction $\rightarrow$ GNN training and benchmarking $\rightarrow$ explainability and virtual screening), suitable for adaptation to other kinase drug discovery targets, with potential for publication in a peer-reviewed journal of cheminformatics or computational medicinal chemistry.
+    \item Fully trained and hyperparameter-optimised Graph Neural Network models (specifically AttentiveFP, GCN, GAT, and GIN) for the binary classification of EGFR inhibitors, with predictive performance rigorously reported using AUROC, AUPRC, accuracy, F1-score, and MCC under a strict Bemis-Murcko scaffold split.
+    \item A comprehensive benchmarking analysis comparing the performance of the advanced GNN architectures against traditional cheminformatics baselines (Random Forest and Logistic Regression using ECFP4 fingerprints), alongside an architectural and hyperparameter sensitivity analysis for the primary AttentiveFP model.
+    \item GNNExplainer atom-level and bond-level importance visualisations for clinically relevant EGFR inhibitors (e.g., gefitinib, erlotinib, osimertinib, and lapatinib). This will include a written chemical interpretation comparing the model's learned structural attributions to established EGFR kinase pharmacophores from the medicinal chemistry literature.
+    \item A ranked virtual screening hit list of potential novel EGFR inhibitor candidates identified from the unseen library of related-kinase inhibitors (n=1,872). This list will include predicted activity probability scores, computationally derived ADMET-proxy properties (e.g., Molecular Weight, LogP, Lipinski compliance, and QED score) to assess drug-likeness, and GNNExplainer visualisations for the top-priority hits.
+    \item A fully reproducible, open-source Python computational pipeline covering all phases of the study (data curation $\rightarrow$ PyG graph construction $\rightarrow$ model training with Optuna optimisation $\rightarrow$ explainability and virtual screening). This pipeline will be suitable for adaptation to other kinase drug discovery targets.
 \end{itemize}
 
 \newpage
@@ -571,36 +514,24 @@ The proposed time frame and activities of the study are presented below.
 \caption{Time Schedule}
 \renewcommand{\arraystretch}{1.4}
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{|p{6.5cm}|*{4}{>{\centering\arraybackslash}p{0.9cm}|}}
+\begin{tabular}{|p{5.5cm}|*{6}{>{\centering\arraybackslash}p{1.1cm}|}}
 \hline
 \multirow{2}{*}{\textbf{Tasks}}
-  & \multicolumn{4}{c|}{\textbf{Weeks}} \\
-\cline{2-5}
-  & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} \\
+  & \multicolumn{6}{c|}{\textbf{Weeks}} \\
+\cline{2-7}
+  & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} \\
 \hline
-Data acquisition and curation
-  & \cellcolor{ganttblue} & & & \\
+Literature Review & \cellcolor{ganttblue} & \cellcolor{ganttblue} & & & & \\
 \hline
-Feature engineering and EDA
-  & \cellcolor{ganttblue} & \cellcolor{ganttblue} & & \\
+Data Collection and Preprocessing & & \cellcolor{ganttblue} & \cellcolor{ganttblue} & & & \\
 \hline
-Molecular graph construction
-  & & \cellcolor{ganttblue} & & \\
+Model Development and Training & & & \cellcolor{ganttblue} & \cellcolor{ganttblue} & & \\
 \hline
-Model development and evaluation
-  & & \cellcolor{ganttblue} & \cellcolor{ganttblue} & \\
+Model Evaluation and Analysis & & & & \cellcolor{ganttblue} & \cellcolor{ganttblue} & \\
 \hline
-GNNExplainer and SHAP analysis
-  & & & \cellcolor{ganttblue} & \\
+Report Writing & & & & & \cellcolor{ganttblue} & \cellcolor{ganttblue} \\
 \hline
-Virtual screening
-  & & & \cellcolor{ganttblue} & \cellcolor{ganttblue} \\
-\hline
-Hit prioritisation and validation
-  & & & & \cellcolor{ganttblue} \\
-\hline
-Report writing and final submission
-  & & & \cellcolor{ganttblue} & \cellcolor{ganttblue} \\
+Final Defense & & & & & & \cellcolor{ganttblue} \\
 \hline
 \end{tabular}
 \label{tab:schedule}
@@ -613,8 +544,10 @@ Report writing and final submission
 % §10.6(b): References — single spacing within each entry,
 % blank line spacing between entries
 \section*{References and Citations}
-\addcontentsline{toc}{section}{References}
+\addcontentsline{toc}{section}{References and Citations}
 {\singlespacing
+\setlength{\bibitemsep}{12pt}
+\nocite{*}
 \printbibliography
 }
 \end{document}
