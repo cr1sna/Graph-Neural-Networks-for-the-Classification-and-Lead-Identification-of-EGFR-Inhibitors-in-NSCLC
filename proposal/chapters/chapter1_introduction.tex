@@ -1,0 +1,64 @@
+% ==================== CHAPTER 1 ====================
+\section{Introduction}
+
+\subsection{Background}
+
+Cancer remains one of the most pressing public health challenges of the twenty-first century, imposing substantial clinical, economic, and societal burdens worldwide. Among all cancer types, lung cancer is the leading cause of cancer-related mortality. According to GLOBOCAN 2022 estimates, lung cancer accounted for approximately 1.8 million deaths globally in 2022, representing nearly 18\% of all cancer deaths (Siegel et al., 2023). Non-Small Cell Lung Cancer (NSCLC) constitutes about 85\% of all lung cancer cases. In Nepal and across South and East Asia, the burden of NSCLC is particularly acute. Most patients are diagnosed at advanced or metastatic stages due to limited screening infrastructure, resulting in poor prognosis and restricted access to precision medicine approaches (Siegel et al., 2023; Rotow \& Jänne, 2023).
+
+A major clinically validated therapeutic target in NSCLC is the Epidermal Growth Factor Receptor (EGFR), a transmembrane receptor tyrosine kinase belonging to the ErbB/HER family. Under normal physiological conditions, EGFR regulates cell growth, differentiation, and survival. Ligand binding (e.g., EGF or TGF-$\alpha$) induces receptor dimerization, autophosphorylation of specific tyrosine residues, and activation of key downstream signalling cascades, including the RAS-RAF-MEK-ERK (MAPK) pathway, which promotes cell proliferation, and the PI3K-AKT-mTOR pathway, which enhances cell survival and inhibits apoptosis (Siegel et al., 2023; Rotow \& Jänne, 2023). 
+
+In NSCLC, somatic mutations in the EGFR kinase domain cause ligand-independent constitutive activation, driving oncogenesis. The two predominant sensitizing mutations are in-frame deletions in exon 19 (Ex19del, approximately 45\% of cases) and the L858R point mutation in exon 21 (approximately 40\% of cases). These mutations collectively account for 85--90\% of EGFR-mutant NSCLC. The prevalence of EGFR mutations varies significantly by ethnicity: 10--15\% in Caucasian patients compared to 40--50\% in East Asian populations. This ethnic disparity makes EGFR-targeted therapy especially relevant in the Nepali and broader South Asian clinical context, where late-stage presentation is common and access to advanced therapies remains limited (Rotow \& Jänne, 2023; Leonetti et al., 2019).
+
+Three generations of EGFR tyrosine kinase inhibitors (TKIs) have been developed to suppress this aberrant signalling. First-generation reversible inhibitors (gefitinib, erlotinib) and second-generation irreversible inhibitors (afatinib, dacomitinib) provided important clinical breakthroughs but were ultimately limited by acquired resistance, most notably the T790M gatekeeper mutation. Third-generation TKIs such as osimertinib were rationally designed to overcome T790M while sparing wild-type EGFR and have become the current standard of care. However, resistance to osimertinib typically emerges within 9--18 months, most commonly through the C797S mutation at the covalent binding site. This results in triple-mutant EGFR forms (e.g., Ex19del/T790M/C797S or L858R/T790M/C797S) that are resistant to all currently approved TKIs. This clinical reality creates an urgent unmet need for novel EGFR inhibitor chemotypes with activity against resistant mutants (Rotow \& Jänne, 2023; Malik et al., 2025).
+
+Traditional drug discovery pipelines are slow (often 10--15 years from discovery to approval), extremely costly (frequently exceeding USD 2 billion per approved drug), and suffer from high attrition rates. Computational approaches, especially machine learning, have emerged as powerful accelerators for large-scale \textit{in silico} screening of chemical libraries (Schneider et al., 2020). Graph Neural Networks (GNNs) are particularly promising in this domain because molecules can be naturally represented as graphs, with atoms as nodes and chemical bonds as edges. Through iterative message-passing mechanisms, GNNs learn rich, data-driven molecular representations that frequently capture complex pharmacophore patterns more effectively than traditional hand-crafted fingerprints (Hu et al., 2020; Jiang et al., 2021).
+
+Despite encouraging progress, significant gaps remain in the application of GNNs specifically to EGFR inhibitor discovery. Many existing models function as black-box systems, offering limited interpretability regarding which structural features drive activity predictions (Jiménez-Luna et al., 2020). Furthermore, few studies have extended high-performing GNN models beyond classification tasks to practical prospective virtual screening aimed at identifying novel lead compounds (Sun et al., 2021).
+
+This thesis directly addresses these limitations by developing, optimising, and benchmarking advanced Graph Neural Network architectures — with a primary focus on AttentiveFP — for accurate binary classification of EGFR inhibitors, followed by a targeted virtual screening pipeline to prioritise potential novel leads.
+
+\subsection{Objectives}
+
+\subsubsection{General Objective}
+Graph Neural Networks for the Classification and Lead Identification of EGFR Inhibitors in Non-Small Cell Lung Cancer
+
+\subsubsection{Specific Objective}
+The general objectives of this study are:
+\begin{itemize}
+    \item Develop a robust Graph Neural Network based computational framework for the binary classification of EGFR inhibitor activity (active versus inactive).
+    \item Evaluate and benchmark the framework's performance against traditional machine learning baselines to ensure predictive reliability.
+    \item Use optimised model in a virtual screening pipeline to identify, prioritise, and rank potential lead compounds from external chemical libraries for addressing drug-resistant NSCLC.
+\end{itemize}
+
+\subsection{Rationale}
+
+\textbf{Clinical rationale:} Acquired resistance to third-generation EGFR TKIs, particularly the emergence of triple mutants, represents a major unsolved problem in NSCLC management. No approved therapeutic effectively addresses the Ex19del/T790M/C797S mutant, leading to rapid disease progression after osimertinib failure (Rotow \& Jänne, 2023).
+
+\textbf{Scientific rationale:} Although GNNs have shown strong performance in molecular property prediction, their application to EGFR inhibitors has been constrained by methodological shortcomings such as random splitting, insufficient architectural comparison, limited featurisation, and lack of interpretability (Malik et al., 2025; Jiang et al., 2021; Jiménez-Luna et al., 2020). This thesis bridges these gaps through scaffold-aware evaluation, rich graph features, Optuna optimisation, GNNExplainer, and prospective virtual screening.
+
+\textbf{Methodological and practical rationale:} The project uses only open-source tools (RDKit, PyTorch Geometric, Optuna) and publicly available ChEMBL data, ensuring full reproducibility. The scope is appropriate for a Master's thesis — computationally feasible while producing both methodological contributions and a ranked list of potential lead candidates.
+
+\subsection{Research Questions}
+
+\begin{enumerate}
+    \item To what extent do advanced Graph Neural Network architectures, particularly AttentiveFP with comprehensive node and edge features, outperform or match conventional machine learning baselines (Random Forest and Logistic Regression) in binary EGFR inhibitor classification under rigorous Bemis-Murcko scaffold splitting?
+    \item How effectively can the optimised AttentiveFP model, supported by GNNExplainer interpretability, be applied in a targeted virtual screening pipeline to identify, prioritise, and rank novel potential EGFR inhibitors from an external library of related-kinase compounds?
+\end{enumerate}
+
+\subsection{Significance of the Study}
+
+This research makes several important contributions to computational chemistry and drug discovery. First, it provides a methodologically rigorous evaluation of multiple GNN architectures with rich atom- and bond-level features and Bayesian hyperparameter optimisation. Second, it delivers systematic instance-level interpretability using GNNExplainer, connecting model predictions to established EGFR pharmacophores and offering chemically actionable insights. Third, by applying the best model to virtual screening of unseen compounds from related kinases, the study generates a prioritised list of potential novel lead candidates with favourable drug-likeness profiles. The work is also regionally relevant for Nepal, where the NSCLC burden is rising and access to next-generation therapies is limited.
+
+\subsection{Limitations}
+
+\begin{itemize}
+    \item \textbf{Computational only:} No experimental (in vitro or in vivo) validation of predicted leads was performed.
+    \item \textbf{Data dependence:} Model performance is limited by the quality and heterogeneity of ChEMBL bioactivity data.
+    \item \textbf{2D graph representation:} Three-dimensional conformational effects and protein-ligand binding geometry are not explicitly modelled.
+    \item \textbf{Binary classification:} The study focuses on active/inactive classification; quantitative pIC$_{50}$ regression is outside the current scope.
+    \item \textbf{Wild-type EGFR focus:} The models target wild-type EGFR (CHEMBL203); performance on mutant forms requires future work.
+    \item \textbf{Virtual screening predictions:} All prioritised compounds remain computational hypotheses requiring experimental confirmation.
+\end{itemize}
+
+\newpage
+
