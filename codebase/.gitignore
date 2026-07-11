@@ -1,0 +1,33 @@
+# Virtual environment
+venv/
+.venv/
+
+# Data (large / regenerable)
+/data/
+*.pt
+*.zip
+
+# Model checkpoints
+checkpoints/
+
+# Pipeline outputs (regenerable by running the pipeline)
+results/
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+
+# Build / misc artifacts
+*.log
+*.bbl
+*.blg
+*.aux
+texput.log
+google.html
+.DS_Store
+
+# TensorBoard / experiment logs
+experiments/
+*.tfevents.*
+events.out.*
