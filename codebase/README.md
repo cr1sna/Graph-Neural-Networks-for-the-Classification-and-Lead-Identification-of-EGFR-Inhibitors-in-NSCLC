@@ -124,36 +124,35 @@ pip install -r requirements.txt
 
 ## 🚀 Quick Start
 
-### Step 1 — Data Acquisition & Preprocessing
+### Full pipeline (recommended)
 ```bash
-# Fetch EGFR bioactivity data from ChEMBL and preprocess
-python -m src.data.fetch_chembl
-python -m src.data.preprocess
+# Runs everything end-to-end: ChEMBL fetch → preprocess → EDA → graph build →
+# Bemis-Murcko scaffold split → train 7 models (5 GNNs + RF + MLP) → Optuna
+# tuning (AttentiveFP) → Nepali medicinal-plant virtual screening.
+# Writes results/: benchmark_results.csv, nepali_leads_rf.csv,
+# nepali_leads_gcn.csv, optuna_verify.json, eda_summary.json.
+python main.py
 ```
 
-### Step 2 — Train All Models & Generate Comparison Table
+### Individual stages
 ```bash
-python run_pipeline.py --models GCN,GAT,GIN,ATTENTIVEFP --run_baselines --epochs 30
+python -m src.data.fetch_chembl        # 1. fetch EGFR bioactivity from ChEMBL
+python -m src.data.preprocess          # 2. curate, pIC50, binary labels
+python run_pipeline.py --run_baselines --epochs 200   # 3. train + benchmark 7 models
+python run_tuning.py --model ATTENTIVEFP --n_trials 20 # 4. Optuna tuning (AttentiveFP)
+python -m src.screening.screen_multimodel             # 5. GCN + Random Forest Nepali screen
 ```
 
-### Step 3 — Hyperparameter Tuning (AttentiveFP)
+### Reproduce figures & verify against the thesis
 ```bash
-python run_tuning.py --model ATTENTIVEFP --n_trials 20
-```
+# Regenerate all thesis figures from the outputs
+python -m src.utils.make_thesis_figures
 
-### Step 4 — Interpretability Analysis (GNNExplainer)
-```bash
-# Trains the tuned model and explains Gefitinib, Erlotinib, Osimertinib, Lapatinib
-python run_interpretability.py
-```
-
-### Step 5 — Virtual Screening
-```bash
-# Fetch ~1,900 unseen kinase inhibitors from ChEMBL and rank by P(EGFR active)
-python run_virtual_screening.py --threshold 0.5 --top_n 20
-
-# Reuse cached library (skip API fetch)
-python run_virtual_screening.py --skip_fetch --threshold 0.8 --top_n 50
+# Consistency guard: checks the thesis .tex values against the code outputs.
+# NOTE: results/ is not committed (regenerable), so run `python main.py` FIRST
+# to generate the CSV/JSON outputs the guard reads — otherwise it will error
+# on missing files.
+python verify_report.py
 ```
 
 ---
