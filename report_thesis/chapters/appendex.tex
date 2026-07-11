@@ -1,0 +1,381 @@
+%═══════════════════════════════════════════════════════
+%  APPENDICES
+%═══════════════════════════════════════════════════════
+
+%───────────────────────────────────────────────────────
+%  APPENDIX A — Dataset Information
+%───────────────────────────────────────────────────────
+\clearpage
+\section*{Appendix A: Dataset Information}
+\addcontentsline{toc}{section}{Appendix A: Dataset Information}
+\label{app:dataset}
+
+\subsection*{A.1 ChEMBL Query Parameters}
+
+The EGFR bioactivity dataset was retrieved from ChEMBL
+\parencite{mendez2019chembl} via the REST API in May 2026 using the parameters
+listed in Table~\ref{tab:app_chembl_query}. Only binding assay
+records with high confidence scores were retained.
+
+\begin{table}[H]
+\caption{ChEMBL query parameters used to retrieve EGFR
+         bioactivity data.}
+\label{tab:app_chembl_query}
+\centering
+\begin{tabular}{@{}p{5cm}p{8cm}@{}}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+Database           & ChEMBL (May 2026 release) \\
+Target name        & Epidermal Growth Factor Receptor (EGFR) \\
+ChEMBL target ID   & CHEMBL203 \\
+Activity type      & IC\textsubscript{50} \\
+Units              & nM (nanomolar) \\
+Assay type         & B (binding assay) \\
+Confidence score   & $\geq 9$ (direct single protein target) \\
+Organism           & \textit{Homo sapiens} \\
+Activity threshold & pIC\textsubscript{50} $\geq 6.0$
+                     $\rightarrow$ Active
+                     (IC\textsubscript{50} $\leq 1\,\mu$M);\\
+                   & pIC\textsubscript{50} $< 6.0$
+                     $\rightarrow$ Inactive \\
+Data split method  & Bemis-Murcko scaffold split \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{A.2 Dataset Curation Statistics}
+
+Table~\ref{tab:app_curation} shows the number of compounds
+retained at each stage of the curation pipeline.
+
+\begin{table}[H]
+\caption{Step-by-step dataset curation statistics for the
+         EGFR bioactivity dataset.}
+\label{tab:app_curation}
+\centering
+\begin{tabular}{@{}clc@{}}
+\toprule
+\textbf{Step} & \textbf{Filter Applied}
+              & \textbf{Compounds Remaining} \\
+\midrule
+0 & Raw ChEMBL records retrieved           & $\sim$15{,}000--20{,}000 \\
+1 & Remove missing or invalid SMILES       & --- \\
+2 & Salt stripping and canonicalisation    & --- \\
+3 & Molecular weight filter (100--1000 Da) & --- \\
+4 & Remove duplicate molecules             & --- \\
+\midrule
+  & \textbf{Final curated dataset}         & \textbf{10{,}523} \\
+\midrule
+  & Active (pIC\textsubscript{50}
+    $\geq 6.0$)                            & 7{,}792 (74.0\%) \\
+  & Inactive (pIC\textsubscript{50}
+    $< 6.0$)                              & 2{,}731 (26.0\%) \\
+  & Active:Inactive ratio                 & 2.85:1 \\
+\midrule
+  & Training set (80\%, scaffold)         & 8{,}418 \\
+  & Validation set (10\%, scaffold)       & 1{,}052 \\
+  & Test set (10\%, scaffold)             & 1{,}053 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+The Bemis-Murcko scaffold split ensures that all molecules
+sharing the same core framework are assigned to the same
+partition, preventing optimistic bias from scaffold
+memorisation and providing a more realistic estimate of
+generalisation to novel chemical matter.
+
+
+%───────────────────────────────────────────────────────
+%  APPENDIX B — Screening Library and Results
+%───────────────────────────────────────────────────────
+\clearpage
+\section*{Appendix B: Screening Library and Virtual
+          Screening Results}
+\addcontentsline{toc}{section}{Appendix B: Screening
+  Library and Virtual Screening Results}
+\label{app:library}
+
+\subsection*{B.1 Screening Library Source}
+
+The virtual screening library comprises 535 natural product
+compounds curated from seven traditional Nepali medicinal
+plant species---\textit{Swertia chirayita}, \textit{Rhododendron
+arboreum}, \textit{Nardostachys jatamansi}, \textit{Terminalia
+chebula}, \textit{Berberis aristata}, \textit{Ocimum sanctum},
+and \textit{Tinospora cordifolia}---retrieved from the
+COCONUT~2.0 natural product database \parencite{sorokina2021coconut}
+and standardised with the same RDKit pipeline as the training data.
+These ethnomedicinal species are traditionally used for inflammatory
+and proliferative conditions, enriching the library for bioactive
+chemical space relative to random chemical libraries. The composition
+of the library by species is given in Table~\ref{tab:app_nepali_lib}.
+
+\begin{table}[H]
+\caption{Composition of the Nepali medicinal plant screening
+         library retrieved from COCONUT 2.0, by species.}
+\label{tab:app_nepali_lib}
+\centering
+\begin{tabular}{@{}llc@{}}
+\toprule
+\textbf{Plant Species} & \textbf{Major Compound Class}
+                       & \textbf{Compounds} \\
+\midrule
+\textit{Nardostachys jatamansi} & Sesquiterpenes, coumarins    & 203 \\
+\textit{Terminalia chebula}     & Hydrolysable tannins         & 195 \\
+\textit{Tinospora cordifolia}   & Diterpenes, alkaloids        & 71  \\
+\textit{Swertia chirayita}      & Xanthones, secoiridoids      & 23  \\
+\textit{Berberis aristata}      & Isoquinoline alkaloids       & 19  \\
+\textit{Rhododendron arboreum}  & Triterpenoids, flavonoids    & 15  \\
+\textit{Ocimum sanctum}         & Phenylpropanoids, terpenoids & 9   \\
+\midrule
+\textbf{Total} & --- & \textbf{535} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All 535 compounds were scored by the study's two best-performing models---the best
+graph network (GCN) and the best overall classifier (Random Forest). The best
+classifier predicted \textbf{181 compounds} active at $\hat{p} \geq 0.50$ and a
+single compound (\textbf{apigenin}) above $\hat{p} \geq 0.90$; the best graph network
+was far more conservative (24 actives, none above $\hat{p} \geq 0.90$). Only
+\textbf{luteolin} was predicted active ($\hat{p} \geq 0.50$) by both models.
+
+\subsection*{B.2 Top Lipinski-Compliant Lead}
+
+\begin{table}[H]
+\caption{Canonical SMILES and physicochemical properties of the highest-confidence
+         Lipinski-compliant lead (Random Forest).}
+\label{tab:app_smiles}
+\centering
+\small
+\begin{tabular}{@{}p{3.5cm}p{9.8cm}@{}}
+\toprule
+\textbf{Property} & \textbf{Value} \\
+\midrule
+Compound
+  & Apigenin \\
+Source species
+  & \textit{Ocimum sanctum} \\
+Predicted probability ($\hat{p}$, Random Forest)
+  & 0.9127 \\
+Predicted probability ($\hat{p}$, GCN)
+  & 0.4100 \\
+Canonical SMILES
+  & \texttt{O=c1cc(-c2ccc(O)cc2)oc2cc(O)cc(O)c12} \\
+Molecular Weight (Da)
+  & 270.2 \\
+LogP
+  & 2.58 \\
+QED
+  & 0.632 \\
+TPSA (\AA$^2$)
+  & 90.9 \\
+Lipinski Ro5 violations
+  & 0 \\
+Compound class
+  & Flavone (polyphenolic) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{B.3 Virtual Screening Summary Statistics}
+
+\begin{table}[H]
+\caption{Summary of virtual screening results from the two best models applied to the
+         535-compound Nepali medicinal plant library (COCONUT 2.0).}
+\label{tab:app_vs_summary}
+\centering
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Metric} & \textbf{Random Forest} & \textbf{GCN} \\
+\midrule
+Total compounds screened          & 535 & 535 \\
+Predicted active ($\hat{p} \geq 0.50$) & 181 (33.8\%) & 24 (4.5\%) \\
+Predicted active ($\hat{p} \geq 0.75$) & 34 (6.4\%)   &  2 (0.4\%) \\
+Predicted active ($\hat{p} \geq 0.90$) &  1 (0.2\%)   &  0 (0.0\%) \\
+Highest-confidence compliant lead & Apigenin & Rulepidadiene~A \\
+Top consensus lead (both models)  & \multicolumn{2}{c}{Luteolin} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+%───────────────────────────────────────────────────────
+%  APPENDIX C — GNN Architecture and Hyperparameters
+%───────────────────────────────────────────────────────
+\clearpage
+\section*{Appendix C: GNN Architecture and
+          Hyperparameter Optimisation}
+\addcontentsline{toc}{section}{Appendix C: GNN Architecture
+  and Hyperparameter Optimisation}
+\label{app:hyperparams}
+
+\subsection*{C.1 AttentiveFP Final Hyperparameters}
+
+Table~\ref{tab:app_hyperparams} lists the final
+hyperparameters of the tuned AttentiveFP model selected
+by Bayesian optimisation using Optuna over 20 trials,
+with validation AUROC as the objective.
+
+\begin{table}[H]
+\caption{Final hyperparameters of the tuned AttentiveFP
+         model selected by Optuna Bayesian optimisation.}
+\label{tab:app_hyperparams}
+\centering
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Hyperparameter} & \textbf{Search Range}
+                        & \textbf{Optimal Value} \\
+\midrule
+Hidden dimension        & \{64, 128, 256\} & 128 \\
+Message passing layers  & 2--4      & 3 \\
+Attention timesteps ($T$) & 2--4   & 2 \\
+Dropout rate            & 0.1--0.5  & 0.129 \\
+Learning rate           & $10^{-4}$--$10^{-2}$ & $2.61\times10^{-3}$ \\
+Batch size              & \{32, 64, 128\} & 64 \\
+L2 weight decay         & $10^{-5}$--$10^{-3}$ & $1.10\times10^{-5}$ \\
+Optimiser               & ---       & Adam \\
+Loss function           & ---       & Binary cross-entropy \\
+Training epochs         & ---       & $\leq$80 (early stopping) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{C.2 Model Performance Comparison}
+
+Table~\ref{tab:app_model_compare} compares all five GNN
+architectures and two traditional machine learning
+baselines evaluated under the Bemis-Murcko scaffold split.
+
+\begin{table}[H]
+\caption{Performance comparison of GNN architectures and
+         traditional ML baselines on the EGFR scaffold test set
+         (Bemis-Murcko split).}
+\label{tab:app_model_compare}
+\centering
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Model} & \textbf{AUROC} & \textbf{AUPRC}
+               & \textbf{F1} & \textbf{MCC} \\
+\midrule
+\textbf{Random Forest (ECFP4)} & \textbf{0.8827} & \textbf{0.9496} & \textbf{0.8762} & 0.5072 \\
+MLP (ECFP4)                & 0.8547 & 0.9354 & 0.8629 & \textbf{0.5281} \\
+GCN                        & 0.8454 & 0.9332 & 0.7877 & 0.4707 \\
+GraphSAGE                  & 0.8229 & 0.9179 & 0.8070 & 0.4706 \\
+GIN                        & 0.8217 & 0.9163 & 0.8487 & 0.4865 \\
+GAT                        & 0.8162 & 0.9176 & 0.7689 & 0.4473 \\
+AttentiveFP                & 0.8087 & 0.9108 & 0.8254 & 0.3989 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{C.3 Molecular Graph Feature Vectors}
+
+\begin{table}[H]
+\caption{Node (atom) and edge (bond) feature vectors
+         used as input to all GNN architectures.}
+\label{tab:app_features}
+\centering
+\begin{tabular}{@{}p{3cm}p{2cm}p{8cm}@{}}
+\toprule
+\textbf{Feature} & \textbf{Dim.} & \textbf{Description} \\
+\midrule
+\multicolumn{3}{l}{\textit{Node features ($d_n = 29$)}} \\
+Atom type       & 10 & One-hot: C, N, O, S, F, Cl, Br, I, P, other \\
+Degree          & 6  & One-hot: 0--5 bonds \\
+Formal charge   & 1  & Integer scalar \\
+Hydrogen count  & 5  & One-hot: 0--4 H atoms \\
+Hybridisation   & 5  & One-hot: sp, sp2, sp3, sp3d, sp3d2 \\
+Aromaticity     & 1  & Binary flag \\
+Ring membership & 1  & Binary flag \\
+\midrule
+\multicolumn{3}{l}{\textit{Edge features ($d_e = 12$)}} \\
+Bond type       & 4  & One-hot: single, double, triple, aromatic \\
+Conjugation     & 1  & Binary flag \\
+Ring membership & 1  & Binary flag \\
+Stereo          & 6  & One-hot: none, any, E, Z, cis, trans \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+%───────────────────────────────────────────────────────
+%  APPENDIX D — Software and Computational Environment
+%───────────────────────────────────────────────────────
+\clearpage
+\section*{Appendix D: Software and Computational
+          Environment}
+\addcontentsline{toc}{section}{Appendix D: Software and
+  Computational Environment}
+\label{app:software}
+
+\subsection*{D.1 Software List}
+
+\begin{table}[H]
+\caption{Software packages, libraries, and databases
+         used in this study.}
+\label{tab:app_software}
+\centering
+\small
+\begin{tabular}{@{}p{3.8cm}p{2.2cm}p{7.2cm}@{}}
+\toprule
+\textbf{Software / Tool} & \textbf{Version}
+                         & \textbf{Role} \\
+\midrule
+Python          & 3.14      & Pipeline scripting \\
+PyTorch         & 2.12.0    & Deep learning framework \\
+PyTorch Geometric & 2.7.0   & GNN implementation \\
+RDKit           & 2026.3.2  & Cheminformatics, molecular graphs \\
+Optuna          & 4.8.0     & Bayesian hyperparameter optimisation \\
+scikit-learn    & 1.8.0     & Baseline ML, metrics \\
+pandas          & 3.0.3     & Data handling \\
+numpy           & 2.4.6     & Numerical computation \\
+matplotlib      & 3.10.9    & Visualisation \\
+seaborn         & 0.13.2    & Statistical visualisation \\
+\midrule
+\textit{Databases} & & \\
+ChEMBL          & May 2026  & EGFR bioactivity training data \\
+COCONUT         & 2.0       & Nepali medicinal plant
+                              screening library \\
+PubChem         & ---       & Compound verification \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{D.2 Hardware Environment}
+
+\begin{table}[H]
+\caption{Computational hardware and software environment
+         used for all experiments.}
+\label{tab:app_hardware}
+\centering
+\begin{tabular}{@{}p{5cm}p{8cm}@{}}
+\toprule
+\textbf{Component} & \textbf{Specification} \\
+\midrule
+Processor
+  & Apple Silicon (M-series) \\
+RAM
+  & 16~GB unified memory \\
+GPU
+  & Not used (CPU-only execution) \\
+Operating system
+  & macOS \\
+Python environment
+  & Python 3.14 virtual environment (venv) \\
+GNN training backend
+  & PyTorch (CPU) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+All GNN training and virtual screening inference were
+executed entirely on CPU, without requiring a GPU,
+demonstrating the accessibility of the pipeline on
+commodity academic hardware. The full training pipeline
+for AttentiveFP (20 Optuna trials + final training)
+completed within a practical timeframe on the CPU.

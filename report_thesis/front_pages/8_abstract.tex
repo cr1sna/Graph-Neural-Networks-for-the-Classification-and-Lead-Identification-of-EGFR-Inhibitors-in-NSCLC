@@ -1,0 +1,79 @@
+% ════════════════════════════════════════════════════════════════════
+%  front_pages/abstract.tex
+%  Abstract Page
+% ════════════════════════════════════════════════════════════════════
+
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+\thispagestyle{plain}
+\vspace{0.3cm}
+
+\begin{onehalfspace}
+\noindent
+Non-small cell lung cancer (NSCLC) accounts for approximately
+85\% of all lung cancer cases globally, with epidermal growth
+factor receptor (EGFR) mutations representing one of the most
+clinically significant oncogenic drivers. EGFR-targeted tyrosine
+kinase inhibitors have transformed the treatment landscape for
+EGFR-mutant NSCLC; however, acquired resistance and the high cost
+of therapy remain major clinical challenges, particularly in
+resource-limited South Asian settings. This study presents a graph
+neural network (GNN)-based computational framework for the
+classification of EGFR inhibitors and the prospective virtual
+screening of bioactive compounds from traditional Nepali medicinal
+plants.
+
+\vspace{0.3cm}
+\noindent
+A curated dataset of 10,523 unique compounds with experimentally
+validated EGFR bioactivity (74\% active) was assembled from ChEMBL,
+standardised with RDKit, and represented as molecular graphs using
+29-dimensional atom and 12-dimensional bond features. Seven
+classification models were benchmarked under a rigorous
+Bemis-Murcko scaffold split: five GNN architectures (GCN, GAT, GIN,
+AttentiveFP, and GraphSAGE) and two baselines (Random Forest and a
+multi-layer perceptron on 2048-bit ECFP4 fingerprints). The
+fingerprint baselines led on the scaffold test set (Random Forest
+AUROC 0.8827, MLP 0.8547), ahead of the graph neural networks
+(0.8087--0.8454, GCN strongest); Bayesian hyperparameter
+optimisation with Optuna raised AttentiveFP's validation AUROC to
+0.8632 but it did not surpass the baselines, indicating that
+well-tuned fingerprint models remain highly competitive on a
+scaffold-split dataset of this size.
+
+\vspace{0.3cm}
+\noindent
+The two best-performing models---the best graph network (GCN) and
+the best overall classifier (Random Forest)---were then applied to a
+virtual screening library of 535 natural product compounds curated
+from seven traditional Nepali medicinal plant species
+(\textit{Swertia chirayita}, \textit{Rhododendron arboreum},
+\textit{Nardostachys jatamansi}, \textit{Terminalia chebula},
+\textit{Berberis aristata}, \textit{Ocimum sanctum}, and
+\textit{Tinospora cordifolia}) via the COCONUT~2.0 database.
+Compounds were ranked by predicted activity and assessed for
+drug-likeness using Lipinski's Rule of Five and ADMET-proxy
+descriptors (QED, TPSA). The screening hit list proved strongly
+model-dependent---the Random Forest predicted 181 actives and the
+GCN only 24---exposing the earlier tuned-AttentiveFP screen as
+over-confident. Despite this, both best models converged on the same
+drug-like chemotype, the flavones: \textbf{apigenin}
+(\textit{Ocimum sanctum}) was the single highest-confidence
+Lipinski-compliant lead (Random Forest predicted probability 0.913,
+QED 0.632), while \textbf{luteolin}, predicted active by both models,
+was the top cross-model consensus candidate.
+
+\vspace{0.3cm}
+\noindent
+This work shows that model-consensus virtual screening can identify
+actionable, drug-like flavonoid lead candidates from Nepali
+ethnomedicinal compound libraries using an entirely open-source,
+CPU-only pipeline, while underscoring that natural-product screening
+predictions are strongly model-dependent and require cross-model
+consensus and experimental validation.
+\end{onehalfspace}
+
+\vspace{0.5cm}
+\noindent{\fontsize{10}{12}\selectfont\textit{\textbf{Keywords:}
+EGFR inhibitors, graph neural networks, virtual screening,
+Nepali medicinal plants, drug discovery.}}

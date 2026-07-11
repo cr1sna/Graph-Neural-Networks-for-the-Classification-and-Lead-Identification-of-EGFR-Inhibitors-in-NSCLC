@@ -1,0 +1,747 @@
+% ================================================================
+%  CHAPTER 4: RESULTS AND DISCUSSION
+% ================================================================
+\chapter{Results and Discussion}
+
+This chapter presents the complete experimental results of the five-phase
+computational pipeline. Section~\ref{sec:data_dist} characterises the curated
+EGFR bioactivity dataset. Section~\ref{sec:ml_perf} evaluates and compares all
+seven classification models. Section~\ref{sec:vs_results} reports Nepali
+medicinal plant virtual screening outcomes and lead prioritisation.
+Section~\ref{sec:disc} provides an integrated discussion of all findings.
+
+% ----------------------------------------------------------------
+\section{Data Distribution Analysis}
+\label{sec:data_dist}
+% ----------------------------------------------------------------
+
+\subsection{Dataset Composition and Class Balance}
+
+The curated dataset comprised \textbf{10,523 unique EGFR-bioactive compounds}
+retrieved from ChEMBL (CHEMBL203) following strict quality filtering. The binary
+label distribution exhibited a moderate class imbalance: \textbf{7,792 active
+compounds} (74.0\%, \texorpdfstring{pIC$_{50}$}{pIC50} $\geq 6.0$) and
+\textbf{2,731 inactive compounds} (26.0\%,
+\texorpdfstring{pIC$_{50}$}{pIC50} $< 6.0$). This imbalance is inherent to
+bioactivity databases and reflects the practical reality that published compounds
+are disproportionately those that demonstrated measurable activity in assay
+screening campaigns.
+
+Table~\ref{tab:dataset_overview} summarises the dataset composition across the
+three scaffold-split partitions.
+
+\begin{table}[H]
+\centering
+\caption{Dataset composition and class distribution across scaffold-split partitions.}
+\label{tab:dataset_overview}
+{\singlespacing
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Partition} & \textbf{Total} & \textbf{Active} & \textbf{Inactive}
+                   & \textbf{Active (\%)} \\
+\midrule
+Training   & 8{,}418 & 6{,}292 & 2{,}126 & 74.7 \\
+Validation & 1{,}052 &     743 &     309 & 70.6 \\
+Test       & 1{,}053 &     757 &     296 & 71.9 \\
+\midrule
+\textbf{Total} & \textbf{10{,}523} & \textbf{7{,}792} & \textbf{2{,}731}
+               & \textbf{74.0} \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+The class balance remained broadly consistent across all three partitions
+(74.7\% / 70.6\% / 71.9\%), with the held-out validation and test partitions being
+marginally less active-enriched. This is expected under a strict Bemis-Murcko
+scaffold split, in which the large shared scaffold families are concentrated in the
+training set and the held-out partitions are dominated by novel singleton scaffolds.
+The overall class balance is shown in Figure~\ref{fig:class_balance}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.5\textwidth]{eda_class_balance.pdf}
+\caption{Class balance of the curated EGFR dataset: 74.0\% active and 26.0\%
+         inactive compounds across 10,523 unique molecules.}
+\label{fig:class_balance}
+\end{figure}
+
+\subsection{\texorpdfstring{pIC$_{50}$}{pIC50} Distribution}
+
+The pIC$_{50}$ distribution across the full dataset exhibited a bimodal profile.
+The active subpopulation was centred around $\text{pIC}_{50} \approx 7.5$--8.0
+(corresponding to IC$_{50}$ values of 10--32 nM), reflecting the high-potency
+compounds typically selected for further optimisation in medicinal chemistry
+campaigns. The inactive subpopulation showed a peak near $\text{pIC}_{50} \approx
+5.2$--5.5, representing weak binders at the micro-molar level. The binary threshold
+at pIC$_{50} = 6.0$ (IC$_{50} = 1~\mu$M) was placed in a relatively low-density
+valley between these two modes, providing a chemically meaningful separation rather
+than an arbitrary cut-point. This is consistent with the standard medicinal chemistry
+convention that defines a ``hit'' as a compound with measurable activity at or
+below 1 $\mu$M. The bimodal structure and the placement of the decision threshold
+are shown in Figure~\ref{fig:pic50}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.82\textwidth]{eda_pic50_distribution.pdf}
+\caption{Distribution of EGFR bioactivity (pIC$_{50}$) for the curated dataset,
+         coloured by activity label. The active and inactive subpopulations form
+         two modes separated by the pIC$_{50} = 6.0$ decision threshold (dashed
+         line, IC$_{50} = 1~\mu$M).}
+\label{fig:pic50}
+\end{figure}
+
+\subsection{Physicochemical Property Analysis}
+
+Analysis of the RDKit-computed physicochemical properties of the curated dataset
+revealed that the majority of compounds occupied drug-like chemical space. Key
+observations are summarised in Table~\ref{tab:physchem}.
+
+\begin{table}[H]
+\centering
+\caption{Summary statistics of physicochemical properties of the curated dataset.}
+\label{tab:physchem}
+{\singlespacing
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Property} & \textbf{Min} & \textbf{Median} & \textbf{Mean} & \textbf{Max} \\
+\midrule
+Molecular Weight (Da) & 65.4  & 478.0  & 475.0  & 991.7 \\
+LogP                  & $-$2.0 & 4.5   & 4.5    & 13.1  \\
+H-Bond Donors         & 0      & 2      & 2.2    & 10    \\
+H-Bond Acceptors      & 0      & 7      & 6.6    & 17    \\
+TPSA (\AA$^{2}$)      & 0.0    & 96.3   & 95.2   & 273.0 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+The median molecular weight of 478 Da and median LogP of 4.5 sit close to the upper
+limits of Lipinski's Rule of Five (Ro5), consistent with the physicochemical
+characteristics of ATP-competitive kinase inhibitors, which frequently occupy the
+upper boundary of drug-like chemical space. Approximately \textbf{47\%} of the
+compounds were fully Lipinski-compliant (MW $\leq$ 500 Da, LogP $\leq$ 5,
+HBD $\leq$ 5, HBA $\leq$ 10); the remainder most often exceed the LogP or molecular
+weight thresholds, reflecting the lipophilic, higher-mass character typical of this
+inhibitor class. The molecular weight and lipophilicity distributions are shown in
+Figure~\ref{fig:properties}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{eda_property_distributions.pdf}
+\caption{Distributions of molecular weight (left) and calculated LogP (right) for a
+         random sample of the curated dataset. Dashed lines mark the Lipinski
+         thresholds (MW = 500 Da, LogP = 5); most compounds cluster near these
+         thresholds, characteristic of kinase inhibitors.}
+\label{fig:properties}
+\end{figure}
+
+\subsection{Scaffold Diversity Analysis}
+
+The Bemis-Murcko scaffold analysis identified \textbf{3,693 unique scaffolds}
+across the full dataset. Of these, 2,418 (65.5\%) were singletons, comprising
+only a single compound. The most frequently occurring scaffold, observed in
+572 compounds, corresponds to the 4-anilinoquinazoline core, which is the
+defining pharmacophore of first- and second-generation EGFR TKIs including
+gefitinib, erlotinib, and lapatinib. Several further scaffolds each comprising
+over one hundred compounds include the pyrrolopyrimidine core characteristic of
+certain second-generation and third-generation inhibitors. This scaffold-level analysis
+confirms that the dataset represents a structurally diverse yet pharmacophore-focused
+chemical space. Figure~\ref{fig:scaffold} shows the most frequent scaffolds and the
+overall split between singleton and multi-compound scaffolds, which motivates the
+use of scaffold-based data splitting.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{eda_scaffold_diversity.pdf}
+\caption{Bemis-Murcko scaffold diversity of the curated dataset. Left: number of
+         compounds sharing each of the most frequent scaffolds. Right: the split
+         between singleton scaffolds (a single compound) and multi-compound
+         scaffolds, illustrating the long-tailed scaffold distribution that
+         necessitates scaffold-based splitting.}
+\label{fig:scaffold}
+\end{figure}
+
+% ----------------------------------------------------------------
+\section{Machine Learning Model Performance}
+\label{sec:ml_perf}
+% ----------------------------------------------------------------
+
+\subsection{Individual Model Performance on the Scaffold Test Set}
+
+All seven models were trained under identical scaffold split conditions and evaluated
+on the held-out scaffold test set of 1,053 compounds. Results are presented in
+Table~\ref{tab:results}. The classification threshold was set at $\hat{p} = 0.5$
+for all threshold-dependent metrics (F1-Score, MCC, Accuracy).
+
+\begin{table}[H]
+\centering
+\caption{Performance comparison of all models on the scaffold-held-out test set
+         (threshold = 0.50 for F1, MCC, Accuracy).}
+\label{tab:results}
+{\singlespacing
+\begin{tabular}{llccccc}
+\toprule
+\textbf{Model} & \textbf{Type} & \textbf{AUROC} & \textbf{AUPRC}
+               & \textbf{F1} & \textbf{MCC} & \textbf{Accuracy} \\
+\midrule
+\rowcolor{tableblue}
+Random Forest       & ML + ECFP4 & 0.8827 & 0.9496 & 0.8762 & 0.5072 & 0.8129 \\
+MLP                 & ML + ECFP4 & 0.8547 & 0.9354 & 0.8629 & 0.5281 & 0.8053 \\
+GCN                 & GNN        & 0.8454 & 0.9332 & 0.7877 & 0.4707 & 0.7312 \\
+GraphSAGE           & GNN        & 0.8229 & 0.9179 & 0.8070 & 0.4706 & 0.7474 \\
+GIN                 & GNN        & 0.8217 & 0.9163 & 0.8487 & 0.4865 & 0.7863 \\
+GAT                 & GNN        & 0.8162 & 0.9176 & 0.7689 & 0.4473 & 0.7123 \\
+AttentiveFP         & GNN        & 0.8087 & 0.9108 & 0.8254 & 0.3989 & 0.7521 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+Figure~\ref{fig:model_comparison} visualises these results across the four headline
+metrics, making the relative ordering of the seven models directly comparable.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.98\textwidth]{results_model_comparison.pdf}
+\caption{Performance of all seven models on the scaffold-held-out test set across
+         AUROC, AUPRC, F1-score, and MCC. The Random Forest and MLP fingerprint
+         baselines lead on AUROC, while the graph neural networks form a competitive
+         cluster led by GCN.}
+\label{fig:model_comparison}
+\end{figure}
+
+\subsubsection{Random Forest Performance}
+
+Random Forest achieved the highest test-set AUROC (0.8827) and AUPRC (0.9496)
+among all models, together with the strongest F1-Score (0.8762); the MLP baseline
+attained the highest MCC (0.5281), narrowly ahead of Random Forest (0.5072). The
+strong performance of the two fingerprint-based baselines is consistent with
+established observations in cheminformatics benchmarks: ensemble and shallow
+neural methods built on ECFP4 fingerprints are highly competitive on bioactivity
+datasets of this scale ($\sim$10,000 compounds), particularly when the training
+and test chemical spaces share fingerprint-level structural similarity. The high
+AUPRC value (0.9496) is especially significant given the 74:26 class imbalance,
+indicating that Random Forest maintains high precision at high recall thresholds.
+
+\subsubsection{Graph Neural Network Performance}
+
+Among the five GNN architectures at default settings, \textbf{GCN achieved the
+highest AUROC (0.8454)}, followed by GraphSAGE (0.8229), GIN (0.8217), GAT
+(0.8162), and AttentiveFP (0.8087). Notably, the simpler convolution- and
+sampling-based architectures outperformed the more elaborate attention-based
+models on this metric---a common observation, since high-capacity,
+molecule-specific architectures such as AttentiveFP are highly sensitive to
+hyperparameter choices and tend to underperform simpler models until properly
+tuned (Section~\ref{sec:hp_tuning}). The per-architecture characteristics are:
+\begin{itemize}
+    \item \textbf{GCN} provided the strongest and most stable default GNN, its
+          degree-normalised convolution generalising well to novel scaffolds without
+          extensive tuning.
+    \item \textbf{GraphSAGE} performed comparably (AUROC 0.8229), with its
+          concatenated self-and-neighbour update giving robust inductive
+          generalisation on molecular graphs of this scale.
+    \item \textbf{GIN} achieved the strongest F1-Score (0.8487) and MCC (0.4865)
+          among the GNNs; its sum aggregation preserves neighbourhood multiset
+          information that benefits threshold-dependent classification.
+    \item \textbf{GAT} did not translate its learned attention weights into a higher
+          AUROC than GCN at default settings, indicating that the additional
+          parameters require tuning to pay off.
+    \item \textbf{AttentiveFP}, despite its sophisticated two-level attention and
+          native 12-dimensional edge-feature integration, recorded the lowest
+          default AUROC (0.8087) and MCC (0.3989). This points to substantial
+          untapped capacity that motivates the dedicated hyperparameter optimisation
+          reported in Section~\ref{sec:hp_tuning}.
+\end{itemize}
+
+\subsubsection{GNN vs.\ Traditional ML Baselines}
+
+The performance gap between the fingerprint baselines and all default GNN models
+(AUROC difference: 0.037--0.074 relative to Random Forest) reflects a well-documented
+phenomenon in molecular machine learning: GNNs require larger training datasets and
+careful tuning to overcome the strong inductive bias provided by ECFP4 fingerprints.
+Notably, the MLP baseline (AUROC 0.8547), which applies deep learning to the same
+ECFP4 fingerprints, outperformed all five default GNN models, confirming that the
+fixed fingerprint representation—rather than deep learning capacity alone—drives the
+advantage of the baselines. The ECFP4 representation was refined through decades of
+cheminformatics research specifically for molecular activity prediction, while GNN
+architectures must learn to identify relevant substructures from first principles.
+This gap is not closed by hyperparameter optimisation: tuning AttentiveFP
+(Section~\ref{sec:hp_tuning}) improved its validation AUROC but left its test AUROC
+essentially unchanged, so on the strict scaffold test set the fingerprint baselines
+remained ahead of every graph neural network.
+
+\subsection{Hyperparameter Tuning Results}
+\label{sec:hp_tuning}
+
+Bayesian hyperparameter optimisation was performed over 20 Optuna trials using the
+Tree-structured Parzen Estimator sampler, with the objective of maximising
+validation AUROC. The optimal hyperparameter configuration identified for
+AttentiveFP is presented in Table~\ref{tab:optuna}.
+
+\begin{table}[H]
+\centering
+\caption{Optimal AttentiveFP hyperparameters identified by Optuna Bayesian
+         optimisation over 20 trials, with the resulting performance.}
+\label{tab:optuna}
+{\singlespacing
+\begin{tabular}{lcc}
+\toprule
+\textbf{Hyperparameter} & \textbf{Default Value} & \textbf{Optimal Value} \\
+\midrule
+\texttt{hidden\_channels}  & 128   & 128                         \\
+\texttt{num\_layers}       & 2     & 3                           \\
+\texttt{num\_timesteps}    & 2     & 2                           \\
+\texttt{dropout}           & 0.30  & 0.129                       \\
+\texttt{batch\_size}       & 64    & 64                          \\
+\texttt{learning\_rate}    & 0.001 & $2.61 \times 10^{-3}$       \\
+\texttt{weight\_decay}     & 0.0   & $1.10 \times 10^{-5}$       \\
+\midrule
+\textbf{Best validation AUROC (20 trials)} & \multicolumn{2}{c}{\textbf{0.8632}} \\
+\textbf{Tuned test AUROC} (cf.\ default 0.8087) & \multicolumn{2}{c}{0.7970} \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+The optimisation raised the best \emph{validation} AUROC to \textbf{0.8632}, a
+modest improvement that lifts AttentiveFP into the middle of the field on the
+validation metric. On the held-out scaffold \emph{test} set, however, the tuned model
+achieved an AUROC of only \textbf{0.7970}---essentially unchanged from the untuned
+model (0.8087), still the lowest of the GNNs, and well below the Random Forest
+(0.8827) and MLP (0.8547) fingerprint baselines. In other words, hyperparameter
+tuning improves the validation-set fit but does not translate into better test-set
+generalisation, and the gap to the fingerprint-based baselines is not closed on this
+strict scaffold-split task---a realistic outcome consistent with the well-documented
+difficulty of out-performing tuned fingerprint models on medium-sized bioactivity
+datasets.
+
+The selected hyperparameters are nonetheless informative:
+
+\begin{itemize}
+    \item \textbf{num\_layers = 3}: A third message-passing layer enables atoms to
+          exchange information across up to three bonds, covering the spatial extent
+          of most pharmacophoric motifs (the default used only two).
+    \item \textbf{dropout = 0.129}: A lower dropout than the default (0.30) was
+          preferred, indicating that the model benefits from retaining more of its
+          representational capacity on this dataset.
+    \item \textbf{learning\_rate = $2.61 \times 10^{-3}$}: A higher learning rate
+          than the default ($10^{-3}$) accelerated convergence within the per-trial
+          epoch budget.
+    \item \textbf{weight\_decay = $1.10 \times 10^{-5}$}: A small non-zero L2 penalty
+          (absent by default) provided mild regularisation against scaffold-specific
+          overfitting.
+    \item \textbf{hidden\_channels, num\_timesteps, and batch\_size} were retained at
+          their default values (128, 2, and 64), indicating these were already
+          near-optimal for the task.
+\end{itemize}
+
+% ----------------------------------------------------------------
+\section{Nepali Medicinal Plant Virtual Screening Results}
+\label{sec:vs_results}
+% ----------------------------------------------------------------
+
+\subsection{Screening Library Composition}
+
+The Nepali medicinal plant screening library was assembled from the COCONUT 2.0
+database by filtering for compounds annotated to seven traditional Nepali plant
+species, then applying the same RDKit standardisation pipeline as the ChEMBL training
+data. After salt removal, canonicalisation, the molecular-weight filter, and
+deduplication by canonical SMILES, the final library comprised \textbf{535 unique
+natural product compounds} distributed across the seven species as summarised in
+Table~\ref{tab:library_comp}.
+
+\begin{table}[H]
+\centering
+\caption{Composition of the Nepali medicinal plant screening library from COCONUT 2.0.}
+\label{tab:library_comp}
+{\singlespacing
+\begin{tabular}{lcc}
+\toprule
+\textbf{Plant Species} & \textbf{Compound Class} & \textbf{Compounds} \\
+\midrule
+\textit{Nardostachys jatamansi} & Sesquiterpenes, coumarins    & 203 \\
+\textit{Terminalia chebula}     & Hydrolysable tannins         & 195 \\
+\textit{Tinospora cordifolia}   & Diterpenes, alkaloids        & 71 \\
+\textit{Swertia chirayita}      & Xanthones, secoiridoids      & 23 \\
+\textit{Berberis aristata}      & Isoquinoline alkaloids       & 19 \\
+\textit{Rhododendron arboreum}  & Triterpenoids, flavonoids    & 15 \\
+\textit{Ocimum sanctum}         & Phenylpropanoids, terpenoids & 9  \\
+\midrule
+\textbf{Total} & --- & \textbf{535} \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+The library is dominated by \textit{Nardostachys jatamansi} (203 compounds) and
+\textit{Terminalia chebula} (195), reflecting their extensive phytochemical
+characterisation in COCONUT, whereas \textit{Ocimum sanctum} (9) and
+\textit{Rhododendron arboreum} (15) are comparatively under-represented---an
+illustration of the uneven database coverage of Nepali medicinal flora. The
+distribution across the seven species is shown in Figure~\ref{fig:library_comp}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{screening_library_composition.pdf}
+\caption{Composition of the Nepali medicinal plant screening library by species,
+         totalling 535 unique natural product compounds retrieved from COCONUT 2.0.}
+\label{fig:library_comp}
+\end{figure}
+
+\subsection{Multi-Model Screening Funnel and Hit Identification}
+
+A preliminary screen scored the library with the tuned AttentiveFP model. However,
+AttentiveFP was in fact the \emph{weakest} classifier on the scaffold test set
+(Section~\ref{sec:ml_perf}). To avoid basing lead selection on the weakest model,
+the prospective screen was re-run and deployed with the study's two
+\emph{best-performing} models---the strongest graph neural network (GCN, test AUROC
+0.8454) and the strongest overall classifier (Random Forest, test AUROC 0.8827)---applied
+to the identical 535-compound library. Table~\ref{tab:vs_summary} compares the
+progressive screening funnel obtained under all three models.
+
+\begin{table}[H]
+\centering
+\caption{Nepali plant virtual screening funnel under the three models, showing the
+         number of compounds retained at each activity and drug-likeness stage. The
+         three models disagree sharply, revealing the model-sensitivity of the screen.}
+\label{tab:vs_summary}
+{\singlespacing
+\begin{tabular}{lccc}
+\toprule
+\textbf{Filter Stage} & \textbf{AttentiveFP} & \textbf{GCN} & \textbf{Random Forest} \\
+                      & \textbf{(0.81)}      & \textbf{(0.85)} & \textbf{(0.88)} \\
+\midrule
+Full plant compound library                     & 535 & 535 & 535 \\
+Predicted active ($\hat{p} \geq 0.50$)          & 144 &  24 & 181 \\
+Predicted active ($\hat{p} \geq 0.80$)          &  83 &   1 &   6 \\
+Predicted active ($\hat{p} \geq 0.90$)          &  71 &   0 &   1 \\
+Drug-like leads ($\hat{p} \geq 0.90$, Ro5, QED $\geq 0.40$) & 11 & 0 & 1 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+The three funnels differ dramatically, and this divergence is itself a central
+result. The tuned AttentiveFP predicts 144 actives at $\hat{p} \geq 0.50$ and an
+implausible 71 compounds at $\hat{p} \geq 0.90$; the best graph network (GCN)
+predicts only 24 actives and \emph{not a single} compound at $\hat{p} \geq 0.90$;
+and the best overall classifier (Random Forest) predicts 181 actives but only one
+compound at $\hat{p} \geq 0.90$. The abundance of apparently high-confidence hits in
+the AttentiveFP screen is therefore an artefact of poor probability calibration on
+out-of-distribution natural products by the weakest model, and is \emph{not}
+reproduced by either best-calibrated model. This model-sensitivity is the principal
+caution of the screening campaign: virtual-screening hit lists on natural-product
+chemical space depend strongly on the choice of classifier, and the most trustworthy
+leads are those nominated by the strongest models---ideally by more than one. A
+second, related artefact---over-confidence on large, non-drug-like natural
+products---is also model-dependent in its severity: the weakest model (AttentiveFP)
+scored large hydrolysable \textit{Terminalia chebula} tannins (e.g.,
+pentagalloylglucose, MW $\approx 941$~Da) at $\hat{p} \approx 1.0$, and the best GNN
+(GCN) assigned its highest scores to large \textit{Swertia} and \textit{Tinospora}
+triterpenoids, all of which violate the Rule of Five. Only the best classifier
+(Random Forest) placed drug-like compounds---the flavones apigenin and kaempferol---at
+the very top of its ranking, relegating the tannins below them ($\hat{p} \approx
+0.82$). In every case, non-drug-like large compounds still appear among the high
+scorers, reinforcing the need to couple activity prediction with drug-likeness
+filtering. The three funnels are compared in Figure~\ref{fig:funnel}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{screening_funnel.pdf}
+\caption{Virtual screening funnel for the Nepali medicinal plant library under the
+         three models (tuned AttentiveFP, best GNN = GCN, best classifier = Random
+         Forest), showing the number of compounds retained at each prioritisation
+         stage. The sharp disagreement between models---AttentiveFP retaining 71
+         compounds at $\hat{p} \geq 0.90$ versus 0 for GCN and 1 for Random
+         Forest---illustrates the model-sensitivity of the screen.}
+\label{fig:funnel}
+\end{figure}
+
+\subsection{Consensus Leads from the Best-Performing Models}
+
+Because no single classifier is authoritative, lead prioritisation is based on the
+two best-performing models rather than the weak AttentiveFP screen. The top drug-like
+(Lipinski-compliant) leads nominated by the Random Forest are listed in
+Table~\ref{tab:leads_rf}, and those nominated by the GCN in Table~\ref{tab:leads_gcn}.
+
+\begin{table}[H]
+\small
+\centering
+\caption{Top drug-like (Lipinski-compliant) Nepali plant leads nominated by the
+         best overall classifier (Random Forest), ranked by predicted activity.
+         Listed compounds are those bearing common (trivial) names.}
+\label{tab:leads_rf}
+{\singlespacing
+\begin{tabular}{clcccccc}
+\toprule
+\textbf{Rank} & \textbf{Compound} & \textbf{$\hat{p}$}
+              & \textbf{MW (Da)} & \textbf{LogP} & \textbf{QED}
+              & \textbf{Ro5} & \textbf{Plant} \\
+\midrule
+1 & Apigenin       & 0.9127 & 270.2 & 2.58 & 0.632 & $\checkmark$ & \textit{O.~sanctum}    \\
+2 & Kaempferol     & 0.8340 & 286.2 & 2.28 & 0.546 & $\checkmark$ & \textit{N.~jatamansi}  \\
+3 & Isogentisin    & 0.7282 & 258.2 & 2.37 & 0.655 & $\checkmark$ & \textit{S.~chirayita}  \\
+4 & Luteolin       & 0.6789 & 286.2 & 2.28 & 0.511 & $\checkmark$ & \textit{T.~chebula}    \\
+5 & Tinosporaside  & 0.6607 & 492.5 & 0.63 & 0.440 & $\checkmark$ & \textit{T.~cordifolia} \\
+6 & Columbin       & 0.6180 & 358.4 & 2.53 & 0.613 & $\checkmark$ & \textit{T.~cordifolia} \\
+7 & Palmarin       & 0.6042 & 374.4 & 1.74 & 0.591 & $\checkmark$ & \textit{T.~cordifolia} \\
+8 & Nardostachysin & 0.5836 & 430.5 & 2.95 & 0.526 & $\checkmark$ & \textit{N.~jatamansi}  \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\begin{table}[H]
+\small
+\centering
+\caption{Top drug-like (Lipinski-compliant) Nepali plant leads nominated by the best
+         graph neural network (GCN), ranked by predicted activity. The GCN is
+         markedly more conservative: no compliant compound exceeds $\hat{p} = 0.66$,
+         and none reaches the $\hat{p} \geq 0.80$ threshold.}
+\label{tab:leads_gcn}
+{\singlespacing
+\begin{tabular}{clcccccc}
+\toprule
+\textbf{Rank} & \textbf{Compound} & \textbf{$\hat{p}$}
+              & \textbf{MW (Da)} & \textbf{LogP} & \textbf{QED}
+              & \textbf{Ro5} & \textbf{Plant} \\
+\midrule
+1 & Rulepidadiene~A   & 0.6531 & 202.3 & 4.19 & 0.552 & $\checkmark$ & \textit{N.~jatamansi}  \\
+2 & Nardostachysin    & 0.5915 & 430.5 & 2.95 & 0.526 & $\checkmark$ & \textit{N.~jatamansi}  \\
+3 & Palmarin          & 0.5532 & 374.4 & 1.74 & 0.591 & $\checkmark$ & \textit{T.~cordifolia} \\
+4 & Luteolin          & 0.5138 & 286.2 & 2.28 & 0.511 & $\checkmark$ & \textit{T.~chebula}    \\
+5 & Jatamanvaltrate~H & 0.4995 & 442.5 & 1.70 & 0.405 & $\checkmark$ & \textit{N.~jatamansi}  \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+Two observations stand out. First, the best models converge on \emph{flavones}---%
+apigenin, luteolin and kaempferol---as the most drug-like predicted-active scaffolds
+(Table~\ref{tab:flavones}). Flavones are a chemically coherent and literature-supported
+class of natural ATP-competitive kinase binders, lending biological plausibility that
+the AttentiveFP depside/coumarin hits lacked. Second, although the best classifier
+(Random Forest) is comparatively well calibrated---its two highest-scoring compounds
+are the drug-like flavones apigenin and kaempferol---the best GNN (GCN) still assigns
+its highest raw probabilities to large, non-drug-like \textit{Swertia} and
+\textit{Tinospora} triterpenoids, so drug-likeness filtering remains essential.
+
+\begin{table}[H]
+\centering
+\caption{Predicted activity of the flavone scaffolds under the two best models. Only
+         luteolin is predicted active ($\hat{p} \geq 0.50$) by \emph{both} models.}
+\label{tab:flavones}
+{\singlespacing
+\begin{tabular}{lcccccl}
+\toprule
+\textbf{Flavone} & \textbf{RF $\hat{p}$} & \textbf{GCN $\hat{p}$}
+                 & \textbf{MW (Da)} & \textbf{QED} & \textbf{Ro5} & \textbf{Plant} \\
+\midrule
+Apigenin   & 0.913 & 0.410 & 270.2 & 0.632 & $\checkmark$ & \textit{O.~sanctum}   \\
+Luteolin   & 0.679 & 0.514 & 286.2 & 0.511 & $\checkmark$ & \textit{T.~chebula}   \\
+Kaempferol & 0.834 & 0.320 & 286.2 & 0.546 & $\checkmark$ & \textit{N.~jatamansi} \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+Figure~\ref{fig:leads_scatter} positions the Random Forest drug-like leads in the
+predicted-activity versus drug-likeness plane.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{screening_leads_scatter.pdf}
+\caption{Random Forest drug-like Nepali plant lead candidates in the
+         predicted-activity versus drug-likeness (QED) plane. All shown candidates are
+         Lipinski-compliant and marker size is proportional to molecular weight.
+         Dashed lines mark the $H_2$ thresholds ($\hat{p}$~$\geq$~0.80,
+         QED~$\geq$~0.40); apigenin and kaempferol clear both.}
+\label{fig:leads_scatter}
+\end{figure}
+
+\subsubsection{Highest-Confidence Drug-Like Lead: Apigenin (\textit{Ocimum sanctum})}
+
+The single highest-confidence Lipinski-compliant lead is \textbf{apigenin} from
+\textit{Ocimum sanctum} (holy basil, Tulsi), scored by the best overall classifier
+(Random Forest) at $\hat{p} = 0.913$:
+\begin{itemize}
+    \item \textbf{Predicted activity}: $\hat{p} = 0.913$ (Random Forest; the single
+          library compound exceeding $\hat{p} \geq 0.90$)
+    \item \textbf{Molecular weight}: 270.2 Da (well within the Ro5 limit of 500 Da)
+    \item \textbf{LogP}: 2.58 (favourable lipophilicity)
+    \item \textbf{QED}: 0.632 (clearly drug-like)
+    \item \textbf{Lipinski Ro5}: Fully compliant --- no violations
+    \item \textbf{Source}: \textit{Ocimum sanctum} (Tulsi) --- a sacred and widely
+          used plant in Nepali and South Asian traditional medicine
+\end{itemize}
+Apigenin is a well-characterised dietary flavone with documented anti-proliferative
+and kinase-modulating activity, providing biological plausibility for further
+investigation. It is, however, a \emph{model-dependent} lead: the best graph network
+scores the same compound at only $\hat{p} = 0.410$, illustrating the model-sensitivity
+established above.
+
+\subsubsection{Top Consensus Lead: Luteolin}
+
+The most robust nomination is \textbf{luteolin}, the only small, drug-like flavone
+predicted active ($\hat{p} \geq 0.50$) by \emph{both} best models---Random Forest
+($\hat{p} = 0.679$) and GCN ($\hat{p} = 0.514$)---with MW $= 286.2$~Da and QED
+$= 0.511$. Because it is endorsed independently by the best fingerprint model and the
+best graph model, luteolin represents the highest-priority \emph{consensus} candidate
+for experimental EGFR inhibition assays, notwithstanding its sub-0.80 probabilities.
+
+\subsection{Structural Diversity of Plant-Derived Leads}
+
+Across the two best models the drug-like leads span several distinct chemotypes:
+flavones (apigenin, luteolin, kaempferol), xanthones (isogentisin), clerodane
+furanoditerpenoids (columbin, palmarin, tinosporaside), iridoid esters
+(jatamanvaltrate~H, nardostachysin), and sesquiterpenoids (rulepidadiene~A). This
+diversity suggests that several distinct binding modes to the EGFR ATP cleft may be
+accessible from Nepali plant compounds; the recurrence of the planar, hydroxylated
+flavone scaffold across the independent predictions of both best models is the
+strongest single structural signal, and a richer starting point than a structurally
+homogeneous synthetic inhibitor library.
+
+% ----------------------------------------------------------------
+\section{Discussion}
+\label{sec:disc}
+% ----------------------------------------------------------------
+
+\subsection{Evaluation of the Research Hypotheses}
+
+The two research hypotheses formulated in Chapter~1 are evaluated
+against the results reported above.
+
+\textbf{$H_1$ (Performance Hypothesis) --- not supported.} $H_1$ predicted that the
+graph neural networks, with rich atom and bond featurisation and Bayesian
+hyperparameter optimisation, would achieve superior AUROC to the Random Forest and
+MLP fingerprint baselines under the Bemis-Murcko scaffold split. The results do not
+support this hypothesis: the fingerprint baselines achieved the highest scaffold
+test-set AUROC (Random Forest 0.8827, MLP 0.8547), and no GNN matched them---GCN was
+the strongest GNN at 0.8454, and the tuned AttentiveFP reached a validation AUROC of
+only 0.8632 with a test AUROC of just 0.7970. $H_1$ is therefore
+\textbf{rejected} for this dataset: on a medium-sized, scaffold-split EGFR
+bioactivity set, well-tuned fingerprint models remained more accurate than the graph
+neural networks. This is itself an informative, honestly reported result, consistent
+with prior observations that ECFP4-based models are strong baselines on datasets of
+this scale.
+
+\textbf{$H_2$ (Virtual Screening Hypothesis) --- partially supported.} $H_2$ predicted
+that the screening pipeline would identify at least one fully Lipinski-compliant
+natural-product lead with predicted activity $\hat{p} \geq 0.80$ and QED $\geq 0.40$.
+The verdict is \emph{model-dependent}. The best overall classifier (Random Forest)
+identifies two such compounds---apigenin ($\hat{p} = 0.913$, QED $= 0.632$) and
+kaempferol ($\hat{p} = 0.834$, QED $= 0.546$)---so $H_2$ is \textbf{supported by the
+best classifier}. However, the best graph network (GCN) identifies \emph{no}
+Lipinski-compliant compound above $\hat{p} = 0.80$, so $H_2$ is \textbf{not supported
+by the best GNN} at that confidence. Only when the threshold is relaxed to
+$\hat{p} \geq 0.50$ do the two best models produce a consensus drug-like lead
+(luteolin). $H_2$ is therefore reported as \textbf{partially supported}: the pipeline
+does surface actionable, drug-like natural-product leads (flavones), but their
+predicted confidence and their identity depend strongly on the model, and the
+inflated confidence of the earlier AttentiveFP screen is not reproduced by the
+best-calibrated models.
+
+\subsection{Performance of Graph Neural Networks Relative to Baselines}
+
+The results demonstrate that the relationship between GNN and traditional ML
+performance is nuanced. Across both the default and tuned configurations, the
+fingerprint-based baselines outperformed all GNN models on the scaffold test set
+(Random Forest AUROC 0.8827 and MLP 0.8547, versus 0.8087--0.8454 for the GNNs).
+This finding is consistent with the molecular machine learning literature and
+reflects two factors: (i) ECFP4 fingerprints encode decades of human cheminformatics
+knowledge through their circular neighbourhood construction, providing a strong
+structural inductive bias; and (ii) medium-sized bioactivity datasets ($\sim$10,000
+compounds) often favour sample-efficient ensemble methods over parameter-intensive
+deep learning approaches.
+
+Bayesian hyperparameter optimisation raised AttentiveFP's validation AUROC to
+0.8632 (mid-field on the validation metric), but its tuned scaffold test AUROC
+(0.7970) remained the lowest of the GNNs and well below the fingerprint baselines. On this dataset, therefore, the GNNs offered no accuracy advantage: the
+Random Forest was the strongest classifier and, in the prospective screen, also the
+better-calibrated scoring model. The value of the graph approach here is not superior
+accuracy but a genuinely independent representation---operating directly on molecular
+graphs with the 29-dimensional atomic node features and 12-dimensional edge features
+that are invisible to ECFP4 fingerprints---which lets the best GNN (GCN) serve as a
+complementary second opinion to the Random Forest and thereby supports the cross-model
+consensus prioritisation used in the screen that follows.
+
+\subsection{Significance of Scaffold-Based Evaluation}
+
+A critical methodological contribution of this thesis is the strict application of
+Bemis-Murcko scaffold splitting. This approach fundamentally differs from random
+splitting, which can lead to optimistic performance estimates when structurally
+similar molecules appear in both training and test sets. Under scaffold splitting,
+the test set is composed entirely of compound-scaffold pairs whose core frameworks
+were never seen during training, providing a stringent evaluation of the model's
+ability to generalise to genuinely novel chemical matter.
+
+\subsection{Ethnopharmacological Rationale for Natural Product Screening}
+
+The hit rate observed in the Nepali plant screening was itself model-dependent,
+ranging from 4.5\% (GCN) through 33.8\% (Random Forest) at $\hat{p} \geq 0.50$. Even
+so, both best models enrich for the same drug-like chemotype---the \emph{flavones}
+apigenin, luteolin and kaempferol---which reflects the ethnopharmacological
+enrichment inherent in traditional medicinal plant selection: plants used for
+centuries in the treatment of inflammatory and proliferative conditions are
+biologically pre-filtered for bioactive chemical space. The prominence of the
+hydroxylated flavone scaffold among the top compliant hits is consistent with the
+established literature on plant-derived kinase modulators, as planar polyphenolic
+flavones are well documented ATP-competitive kinase binders that share structural
+features with the core pharmacophores of synthetic EGFR inhibitors
+\parencite{wu2018moleculenet}. At the same time, both the weakest model (AttentiveFP)
+and the best GNN (GCN) still rank large, non-drug-like polyphenols and triterpenoids
+among their highest-scoring compounds---a reminder that predictions on chemical space
+distant from the training distribution must be interpreted with caution and coupled
+with drug-likeness filtering.
+
+\subsection{Lead Compound Prioritisation Strategy}
+
+The prioritisation strategy applied three criteria---high predicted activity,
+Lipinski Rule of Five compliance, and consensus between the two best models---reflecting
+target engagement potential, oral bioavailability, and robustness to the
+model-sensitivity documented above. Under this strategy apigenin emerges as the
+highest-confidence single-model lead and luteolin as the top cross-model consensus
+lead. Critically, these compounds are derived from plants (\textit{Ocimum sanctum},
+\textit{Terminalia chebula}) that are inexpensive, culturally familiar, and locally
+accessible throughout Nepal, offering a potential pathway to affordable
+EGFR-targeted therapy candidates without the high synthesis costs of novel synthetic
+compounds.
+
+It is important to note that the prioritisation in this study represents an
+\textit{in silico} hypothesis, not experimental confirmation. The identified leads
+require: (i) \textit{in vitro} EGFR kinase inhibition assay; (ii) cellular
+antiproliferative testing in EGFR-mutant NSCLC cell lines (e.g., PC9, HCC827);
+and (iii) selectivity profiling against a kinase panel.
+
+\subsection{Limitations of the Current Results}
+
+Several limitations of the results presented in this chapter should be acknowledged:
+
+\begin{itemize}
+    \item \textbf{Model-sensitivity of the screen}: The single most important
+          limitation is that the virtual-screening hit list depends strongly on the
+          choice of classifier (144 predicted actives for AttentiveFP versus 24 for
+          GCN and 181 for Random Forest at $\hat{p} \geq 0.50$; 71 versus 0 versus 1
+          at $\hat{p} \geq 0.90$). No single model can be treated as authoritative,
+          and the predicted probabilities are not calibrated on out-of-distribution
+          natural products. Consensus across the best models mitigates but does not
+          eliminate this uncertainty; only experimental assay can resolve it.
+    \item \textbf{Validation AUROC vs.\ Test AUROC}: The tuned AttentiveFP's
+          validation AUROC (0.8632) exceeded its scaffold test AUROC ($\approx$0.80),
+          a gap that reflects optimisation against the validation partition. Future
+          work should employ a nested cross-validation scheme for unbiased test-set
+          estimation.
+    \item \textbf{Assay heterogeneity}: Training labels aggregate IC$_{50}$ values
+          from hundreds of laboratories with different protocols, imposing a label
+          noise ceiling on scaffold-split test-set performance.
+    \item \textbf{ADMET-proxy limitations}: The physicochemical properties used
+          do not capture metabolic stability, P-glycoprotein efflux, plasma protein
+          binding, or \textit{in vivo} pharmacokinetics.
+    \item \textbf{COCONUT 2.0 annotation completeness}: Organism taxonomy annotations
+          in COCONUT 2.0 may be incomplete for some Nepali plant species, potentially
+          missing additional bioactive compounds from these plants.
+    \item \textbf{No 3D structural validation}: The absence of molecular docking
+          against EGFR crystal structures means no binding pose or free energy
+          estimate is available to corroborate model predictions for the top leads.
+\end{itemize}

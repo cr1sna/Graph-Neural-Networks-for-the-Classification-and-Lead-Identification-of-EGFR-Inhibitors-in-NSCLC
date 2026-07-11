@@ -1,0 +1,327 @@
+% !TEX program = xelatex
+\documentclass[12pt, a4paper, oneside]{report}
+
+% ════════════════════════════════════════════════════════════════════
+%  PREAMBLE — GNN EGFR Inhibitor Discovery Thesis
+%  Department of Mathematics, IoST, Tribhuvan University
+%  APA 7th Edition | 1.5 line spacing | Times New Roman
+%
+%  ENGINE : XeLaTeX  (required for Nepali Unicode / Kalimati font)
+%  COMPILE: xelatex → biber → xelatex → xelatex
+%           OR:  latexmk -xelatex main.tex
+% ════════════════════════════════════════════════════════════════════
+
+
+% ── Page layout ──────────────────────────────────────────────────────
+% IoST margins: top/bottom/right = 1 in, left = 1.5 in (binding)
+\usepackage[top=1in, bottom=1in, right=1in, left=1.5in]{geometry}
+
+% ── Fonts (XeLaTeX) ──────────────────────────────────────────────────
+\usepackage{fontspec}
+
+% Main English font
+\setmainfont{Times New Roman}[
+  BoldFont       = Times New Roman Bold,
+  ItalicFont     = Times New Roman Italic,
+  BoldItalicFont = Times New Roman Bold Italic,
+]
+
+% Math font — now properly installed
+\usepackage{unicode-math}
+\setmathfont{latinmodern-math.otf}
+
+
+
+% Nepali font (Kalimati still missing)
+\newfontfamily\nepalifont{Kohinoor Devanagari}[Script=Devanagari]
+% Fallback if Noto is also missing:
+% \newfontfamily\nepalifont{FreeSerif}[Script=Devanagari]
+
+% Optional: If Latin Modern Math still complains, try this exact filename
+% \setmathfont{latinmodern-math.otf}
+
+
+% ── Line spacing ─────────────────────────────────────────────────────
+\usepackage{setspace}
+\onehalfspacing
+
+
+% ── Mathematics ──────────────────────────────────────────────────────
+\usepackage{amsmath}
+\usepackage{float}
+% NOTE: do NOT load amssymb or amsfonts — unicode-math already provides
+%       \mathbb, \mathcal, etc. and will conflict with them.
+
+
+% ── Tables ───────────────────────────────────────────────────────────
+\usepackage{booktabs}       % \toprule \midrule \bottomrule
+\usepackage{longtable}      % tables spanning multiple pages
+\usepackage{multirow}       % \multirow — merged row cells
+\usepackage{tabularx}       % auto-width X columns
+\usepackage{array}          % extended column types
+\usepackage{multicol}       % multi-column layout
+\usepackage{pifont}         % checkmark/cross symbols
+
+% ── Sequential Table/Figure numbering (IoST §10.7d) ──────────────────
+% Regulation requires Table 1, Table 2, … and Figure 1, Figure 2, …
+% numbered sequentially THROUGHOUT the thesis (not chapter-based 2.1).
+% \counterwithout is a LaTeX kernel command (since 2018); no package needed.
+\counterwithout{table}{chapter}
+\counterwithout{figure}{chapter}
+
+
+
+
+
+% ── TikZ (pipeline / architecture diagrams) ──────────────────────────
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning,
+                fit, backgrounds, calc}
+
+
+
+
+% ── Colors ───────────────────────────────────────────────────────────
+\usepackage[table, xcdraw]{xcolor}
+\definecolor{tableblue} {RGB}{210, 228, 255}
+\definecolor{headerblue}{RGB}{ 68, 114, 196}
+
+
+% ── Hyperlinks ───────────────────────────────────────────────────────
+% colorlinks=true with all colors black satisfies IoST print requirement
+% Load BEFORE cleveref
+\usepackage[colorlinks=true,
+            linkcolor=black,
+            citecolor=black,
+            urlcolor=black,
+            bookmarks=true]{hyperref}
+
+% PDF metadata — fill in before final submission
+\hypersetup{
+  pdftitle   = {Graph Neural Networks for the Classification and Lead
+                Identification of EGFR Inhibitors in Non-Small Cell
+                Lung Cancer},
+  pdfauthor  = {Krishna Gaire},
+  pdfsubject = {M.Sc.\ Data Science Thesis, Tribhuvan University},
+  pdfkeywords= {GNN, EGFR, NSCLC, AttentiveFP, Drug Discovery},
+}
+
+% ── Bibliography (APA 7th — IoST mandated) ───────────────────────────
+% Load AFTER hyperref
+\usepackage[backend=biber,
+            style=apa,
+            sorting=nyt,
+            maxcitenames=2,
+            uniquelist=false]{biblatex}
+\addbibresource{references.bib}
+
+
+% ── Typography ───────────────────────────────────────────────────────
+% Under XeLaTeX: protrusion only (no expansion), still reduces
+% overfull boxes at right margin.
+\usepackage{microtype}
+\setlength{\emergencystretch}{2em}   % last-resort overflow guard
+
+
+% ── List formatting ──────────────────────────────────────────────────
+\usepackage{enumitem}    % \begin{itemize}[noitemsep], etc.
+
+
+% ── Page rotation ────────────────────────────────────────────────────
+\usepackage{rotating}    % \begin{sidewaysfigure / sidewaystable}
+\usepackage{pdflscape}   % full landscape pages
+\usepackage{afterpage}   % \afterpage{\clearpage}
+
+
+
+
+% ── URL line-breaking ────────────────────────────────────────────────
+\usepackage{url}
+\def\UrlBreaks{\do\/\do-\do_\do.\do=}
+\usepackage{xurl}        % also allows breaks at more characters
+
+
+% ── csquotes (required by biblatex) ─────────────────────────────────
+\usepackage{csquotes}
+
+
+% ── TOC formatting ───────────────────────────────────────────────────
+\usepackage{tocloft}
+\renewcommand{\cftchapfont}     {\bfseries}
+\renewcommand{\cftchappagefont} {\bfseries}
+\setlength{\cftchapindent}     {0pt}
+\setlength{\cftbeforesecskip}  {4pt}
+\setlength{\cftsecindent}      {1.5em}
+\setlength{\cftsubsecindent}   {3.5em}
+\setlength{\cftsubsubsecindent}{5.5em}
+\setcounter{tocdepth}    {3}
+\setcounter{secnumdepth} {3}
+
+% List of Tables / Figures entries as "Table 1: caption" / "Figure 1: caption"
+% with the "Table N:" / "Figure N:" prefix in bold (IoST Appendix K/L sample).
+\renewcommand{\cfttabpresnum}{\bfseries Table\ }
+\renewcommand{\cfttabaftersnum}{\bfseries :\mdseries}
+\renewcommand{\cfttabnumwidth}{5.2em}
+\renewcommand{\cftfigpresnum}{\bfseries Figure\ }
+\renewcommand{\cftfigaftersnum}{\bfseries :\mdseries}
+\renewcommand{\cftfignumwidth}{5.6em}
+
+
+% ── Paragraph spacing ────────────────────────────────────────────────
+\setlength{\parindent}{0pt}
+\setlength{\parskip}  {6pt}
+\clubpenalty  = 10000
+\widowpenalty = 10000
+
+
+% ── Section heading format (IoST style) ──────────────────────────────
+\usepackage{titlesec}
+
+\titleformat{\chapter}[display]
+  {\normalfont\fontsize{14}{16}\bfseries\centering}
+  {\fontsize{14}{16}\selectfont Chapter~\thechapter}
+  {0pt}
+  {\fontsize{14}{16}\bfseries\centering}
+\titlespacing*{\chapter}{0pt}{20pt}{20pt}
+
+\titleformat{\section}
+  {\normalfont\fontsize{12}{15}\bfseries}{\thesection}{1em}{}
+\titlespacing*{\section}{0pt}{14pt}{8pt}
+
+\titleformat{\subsection}
+  {\normalfont\fontsize{12}{14}\bfseries}{\thesubsection}{1em}{}
+\titlespacing*{\subsection}{0pt}{12pt}{6pt}
+
+\titleformat{\subsubsection}
+  {\normalfont\fontsize{12}{14}\bfseries}{\thesubsubsection}{1em}{}
+\titlespacing*{\subsubsection}{0pt}{10pt}{4pt}
+
+
+% ── Page style ───────────────────────────────────────────────────────
+% IoST: page number centred at bottom; no running header
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\fontsize{10}{12}\selectfont\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \fancyfoot[C]{\fontsize{10}{12}\selectfont\thepage}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \renewcommand{\footrulewidth}{0pt}%
+}
+
+
+% ── Convenience symbols ──────────────────────────────────────────────
+\newcommand{\cmark}{\ding{51}}   % ✓  checkmark
+\newcommand{\xmark}{\ding{55}}   % ✗  cross
+
+
+% ── Figure search path ───────────────────────────────────────────────
+\graphicspath{{figures/}}
+
+
+% ════════════════════════════════════════════════════════════════════
+%  DOCUMENT
+% ════════════════════════════════════════════════════════════════════
+\begin{document}
+
+% ----------------------------------------------------------------
+%  Front matter — roman pagination
+%  TU IoST Research Regulation 2025, §10.1
+% ----------------------------------------------------------------
+
+% IoST §10.4(d): front matter uses Roman numerals; the title (cover) page is
+% counted as page i but the number is NOT printed; the inner cover number is
+% also NOT printed. Printed Roman numbering becomes visible from the Declaration.
+\pagenumbering{roman}
+
+% Front-matter section headings (Abstract, List of …, Table of Contents) at
+% 16pt per IoST appendix specifications. Restored to 14pt before Chapter 1.
+\titleformat{\chapter}[display]
+  {\normalfont\fontsize{16}{18}\bfseries\centering}
+  {\fontsize{16}{18}\selectfont Chapter~\thechapter}{0pt}
+  {\fontsize{16}{18}\bfseries\centering}
+
+%% Cover Page (outer cover — unnumbered, not counted)
+\input{front_pages/1_coverpage.tex}
+\thispagestyle{empty}
+
+%% Blank Page (unnumbered, not counted)
+\thispagestyle{empty}
+\mbox{}
+\newpage
+
+%% i. Inner Cover Page — Roman numbering starts here (i, number not printed)
+\setcounter{page}{1}
+\input{front_pages/3_innercoverpage.tex}
+
+%% iv. Declaration
+\input{front_pages/4_declaration.tex}
+
+%% v. Recommendation
+\input{front_pages/5_recommendation.tex}
+
+%% vi. Letter of Approval
+\input{front_pages/6_letter_of_approval.tex}
+
+%% vii. Acknowledgements
+\input{front_pages/7_acknowledgement.tex}
+
+%% viii. Abstract (English)
+\input{front_pages/8_abstract.tex}
+
+%% ix. सारांश (Nepali Abstract)
+\input{front_pages/9_sodhkar_nepali.tex}
+
+%% x. List of Abbreviations and Acronyms
+\input{front_pages/10_list_of_abb.tex}
+\clearpage
+%% xi. List of Symbols (omit file if unused)
+\input{front_pages/11_list_of_symbols.tex}
+\clearpage
+%% xii. List of Tables
+\input{front_pages/12_list_of_tables.tex}
+\clearpage
+%% xiii. List of Figures
+\input{front_pages/13_list_of_figures.tex}
+\clearpage
+%% xiv. Table of Contents (always last per IoST 2025 §10.1)
+\input{front_pages/14_table_of_contents.tex}
+\clearpage
+% ----------------------------------------------------------------
+%  Main matter — arabic pagination
+% ----------------------------------------------------------------
+\pagenumbering{arabic}
+\setcounter{page}{1}
+% Reset Table/Figure counters so main-matter numbering starts at 1
+% (front-matter longtables in the abbreviation/symbol lists otherwise
+% advance the table counter).
+\setcounter{table}{0}
+\setcounter{figure}{0}
+% Restore 14pt chapter headings for the main matter (IoST main headings).
+\titleformat{\chapter}[display]
+  {\normalfont\fontsize{14}{16}\bfseries\centering}
+  {\fontsize{14}{16}\selectfont Chapter~\thechapter}{0pt}
+  {\fontsize{14}{16}\bfseries\centering}
+%% Chapters
+\input{chapters/chapter1_introduction}
+\input{chapters/chapter2_literature_review}
+\input{chapters/chapter3_materials_methods}
+\input{chapters/chapter4_result_discussion}
+\input{chapters/chapter5_conclusion_recommandation}
+
+%% ── REFERENCES ──────────────────────────────────────────────────────
+\cleardoublepage
+\printbibliography[heading=bibintoc,title={References}]
+
+%% ── APPENDICES ──────────────────────────────────────────────────────
+\cleardoublepage
+\appendix
+\renewcommand{\chaptername}{Appendix}
+\addtocontents{toc}{\protect\contentsline{chapter}{\textbf{Appendices}}{}{}}
+\input{chapters/appendex.tex}
+
+\end{document}
