@@ -1,0 +1,110 @@
+\chapter{Conclusions and Recommendations}
+
+\section{Conclusions}
+
+This thesis presented a comprehensive, open-source end-to-end computational
+framework for the binary classification of EGFR inhibitor activity and the
+prospective virtual screening of novel lead compounds for drug-resistant NSCLC.
+The following principal conclusions can be drawn:
+
+\begin{enumerate}
+    \item \textbf{Data quality and curation are foundational.} Applying rigorous
+          ChEMBL curation---including filtering for exact IC$_{50}$ values, pIC$_{50}$
+          conversion, RDKit-based salt removal, canonicalisation, and molecular weight
+          filtering---produced a high-quality, unambiguous dataset of 10,523 unique
+          EGFR-bioactive compounds suitable for deep learning.
+
+    \item \textbf{Fingerprint baselines outperformed the graph neural networks.}
+          Under strict Bemis-Murcko scaffold evaluation, the Random Forest baseline
+          achieved the highest test AUROC (0.8827), ahead of the MLP on ECFP4
+          fingerprints (0.8547) and the five graph neural networks (0.8087--0.8454).
+          Among the GNNs, GCN was strongest at default settings, while
+          AttentiveFP---which natively exploits the 29-dimensional atom and
+          12-dimensional bond features---required Bayesian hyperparameter optimisation
+          to reach mid-field on the validation set (best validation AUROC 0.8632),
+          although its test AUROC (0.7970) remained the lowest of the GNNs. These
+          results show that, on a medium-sized scaffold-split EGFR dataset, well-tuned
+          fingerprint models remain more accurate than graph neural networks for
+          classification.
+
+    \item \textbf{Nepali medicinal plant virtual screening is model-sensitive but
+          converges on flavonoid leads.} Screening the 535-compound library with the
+          two best models gave sharply different funnels---the best classifier
+          (Random Forest) predicted 181 actives ($\hat{p} \geq 0.50$) but only one
+          compound above $\hat{p} \geq 0.90$, while the best graph network (GCN)
+          predicted 24 actives and none above $\hat{p} \geq 0.90$---exposing the
+          earlier tuned-AttentiveFP screen (71 compounds above $\hat{p} \geq 0.90$) as
+          over-confident. Despite this divergence, both best models enriched for the
+          same drug-like chemotype: the flavones \textbf{apigenin} (\textit{Ocimum
+          sanctum}; Random Forest $\hat{p} = 0.913$, QED $= 0.632$), \textbf{kaempferol},
+          and \textbf{luteolin}. Luteolin, predicted active by \emph{both} best models,
+          is the top cross-model consensus candidate for experimental validation.
+
+    \item \textbf{Consensus across models is essential for trustworthy natural-product
+          screening.} Because the predicted hit list depends strongly on the choice of
+          classifier and the models are not calibrated on out-of-distribution natural
+          products, no single model can be treated as authoritative. Prioritising
+          compounds endorsed by more than one strong model---and coupling activity
+          prediction with drug-likeness filtering, since the weaker models still
+          ranked large, non-drug-like \textit{Terminalia chebula} tannins and
+          \textit{Tinospora} triterpenoids among their highest scorers---is the key
+          methodological lesson of the screening campaign. The flavone leads that survive this scrutiny, combined
+          with the low cost and cultural accessibility of their source plants in Nepal,
+          make them valuable starting points for affordable NSCLC drug discovery.
+
+    \item \textbf{The pipeline is reproducible, scalable, and regionally relevant.}
+          The entire framework uses exclusively open-source Python tools (PyTorch
+          Geometric, RDKit, Optuna, scikit-learn, COCONUT 2.0) and public databases
+          (ChEMBL, COCONUT), runs on commodity CPU hardware, and is immediately
+          adaptable to other kinase targets or plant species without specialised
+          hardware or licensed software. This makes it directly accessible to academic
+          researchers in Nepal and other resource-limited South Asian settings.
+\end{enumerate}
+
+\section{Recommendations for Future Work}
+
+\begin{enumerate}
+    \item \textbf{Experimental validation of Nepali plant leads.} The top drug-like
+          natural-product leads---particularly the flavones apigenin
+          (\textit{Ocimum sanctum}), luteolin, and kaempferol, prioritised by the best
+          models and cross-model consensus---should be subjected to
+          \textit{in vitro} EGFR kinase inhibition assays and EGFR-mutant NSCLC cell
+          line proliferation assays (e.g., PC9, HCC827) to validate the computational
+          predictions empirically.
+
+    \item \textbf{Mutant-specific modelling.} As mutation-specific bioactivity datasets
+          for T790M and C797S EGFR grow in public databases, dedicated GNN models trained
+          specifically on these mutant targets should be developed to directly address
+          drug resistance.
+
+    \item \textbf{3D graph representation.} Incorporating three-dimensional molecular
+          conformations (e.g., through SchNet or DimeNet++ architectures) and protein
+          structure-aware approaches could improve the prediction of binding affinity
+          for specific EGFR mutant forms.
+
+    \item \textbf{Pre-training on large molecular datasets.} Applying self-supervised
+          graph pre-training on millions of unlabelled molecules (e.g., from ZINC or
+          PubChem) before fine-tuning on EGFR data could further improve scaffold
+          generalisation.
+
+    \item \textbf{Broader Nepali plant species survey.} The current study covered
+          seven ethnopharmacologically relevant species. A systematic expansion to the
+          full catalogue of 700+ documented Nepali medicinal plants, using COCONUT 2.0
+          and complementary databases (e.g., Dr.\ Duke's Phytochemical Database, NPACT),
+          could identify additional EGFR inhibitor candidates from the rich Himalayan
+          biodiversity.
+
+    \item \textbf{Extended ADMET profiling.} The current ADMET analysis used RDKit
+          physicochemical property proxies. Future work should incorporate dedicated
+          ADMET prediction tools such as SwissADME, pkCSM, or deep ADMET models for
+          comprehensive absorption, distribution, metabolism, excretion, and toxicity
+          profiling of the top leads.
+
+    \item \textbf{Collaboration with Nepal-based research institutions.} To translate
+          these computational predictions into experimental evidence, partnerships should
+          be established with Nepal-based pharmacology and oncology research institutions---such
+          as the B.P.\ Koirala Institute of Health Sciences (BPKIHS) and the National
+          Cancer Hospital and Research Centre (NCHRC)---for wet-lab assay, phytochemical
+          isolation, and clinical-translational validation of the top Nepali medicinal
+          plant lead compounds.
+\end{enumerate}

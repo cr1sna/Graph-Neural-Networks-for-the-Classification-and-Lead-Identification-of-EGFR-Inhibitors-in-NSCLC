@@ -1,0 +1,811 @@
+% ================================================================
+%  CHAPTER 2: LITERATURE REVIEW
+% ================================================================
+\chapter{Literature Review}
+\label{chap:lit_review}
+
+This chapter provides a comprehensive review of the scientific literature
+underpinning this thesis. Section~\ref{sec:egfr_bio} reviews the molecular
+biology of EGFR and its role in NSCLC oncogenesis. Section~\ref{sec:tki_gen}
+discusses the three generations of EGFR TKIs and their clinical limitations.
+Section~\ref{sec:chembl_db} describes the ChEMBL bioactivity database and
+associated data quality challenges. Section~\ref{sec:molrep} reviews molecular
+representation methods for machine learning. Section~\ref{sec:gnn_arch} surveys the GNN architectures employed in this study.
+Section~\ref{sec:nepali_plants} reviews the Nepali medicinal plants and natural
+product databases used for virtual screening.
+Section~\ref{sec:vs_lit} reviews virtual screening methodologies.
+Section~\ref{sec:research_gap} synthesises the identified research gaps
+that motivate this thesis.
+
+% ----------------------------------------------------------------
+\section{EGFR Kinase Biology and NSCLC}
+\label{sec:egfr_bio}
+% ----------------------------------------------------------------
+
+\subsection{Molecular Architecture of EGFR}
+
+The Epidermal Growth Factor Receptor (EGFR), also designated ErbB1 or HER1,
+is a 134 kDa single-pass transmembrane receptor tyrosine kinase (RTK) encoded
+by the \textit{EGFR} gene on chromosome 7p11.2. EGFR is the founding member of
+the ErbB receptor family (ErbB1--ErbB4), which collectively orchestrates
+fundamental cellular processes including proliferation, differentiation, survival,
+and motility \parencite{hynes2005erbb}. Structurally, EGFR is organised into
+four functional domains:
+\begin{enumerate}
+    \item \textbf{Extracellular domain} (domains I--IV): A glycosylated
+    ectodomain that binds EGF-family ligands (EGF, TGF-$\alpha$, amphiregulin,
+    epiregulin, betacellulin, and others) through domains I and III, while domain
+    II mediates receptor dimerisation.
+    \item \textbf{Transmembrane domain}: A single $\alpha$-helical segment
+    that anchors the receptor in the plasma membrane and transmits conformational
+    changes from the extracellular to the intracellular compartment.
+    \item \textbf{Juxtamembrane domain}: An intracellular regulatory segment that
+    modulates kinase activity through direct interaction with the kinase domain.
+    \item \textbf{Intracellular kinase domain}: A bilobed catalytic domain
+    (N-lobe and C-lobe) that binds ATP and catalyses phosphotransfer to substrate
+    tyrosine residues. The ATP-binding cleft lies at the interface of the two lobes
+    and contains the hinge region, the P-loop, the activation loop, and the DFG motif.
+    The kinase domain is followed by a carboxy-terminal tail bearing multiple
+    autophosphorylation sites (Tyr992, Tyr1045, Tyr1068, Tyr1086, Tyr1148, Tyr1173)
+    that recruit downstream effector proteins.
+\end{enumerate}
+
+Under normal physiological conditions, EGFR is maintained in an autoinhibited,
+inactive state characterised by an asymmetric kinase dimer configuration. Ligand
+binding induces receptor homo- or heterodimerisation with other ErbB family members
+(HER2, HER3, HER4), leading to relief of autoinhibition, \textit{trans}-autophosphorylation
+of key tyrosine residues on the carboxy-terminal tail, and recruitment of SH2- and
+PTB-domain-containing adaptor proteins \parencite{siegel2023cancer}. These
+phosphorylated docking sites initiate multiple downstream signalling cascades:
+
+\begin{itemize}
+    \item The \textbf{RAS-RAF-MEK-ERK (MAPK) pathway}: Activated by recruitment
+    of GRB2-SOS complex, driving G1-to-S cell cycle progression, cell proliferation,
+    and differentiation.
+    \item The \textbf{PI3K-AKT-mTOR pathway}: Activated via p85/p110 PI3K
+    recruitment, promoting cell survival, inhibiting apoptosis (via BAD
+    phosphorylation and FOXO suppression), and stimulating protein synthesis.
+    \item The \textbf{STAT3/5 signalling pathway}: Direct EGFR kinase-mediated
+    phosphorylation of STAT3 and STAT5, driving transcription of anti-apoptotic
+    (Bcl-xL) and proliferative (cyclin D1) genes.
+    \item The \textbf{PLC-$\gamma$ pathway}: Activation of phospholipase C-$\gamma$,
+    generating IP3 and diacylglycerol, which mobilise intracellular calcium and
+    activate PKC isoforms.
+\end{itemize}
+
+\subsection{Oncogenic EGFR Mutations in NSCLC}
+
+In non-small cell lung cancer (NSCLC), somatic gain-of-function mutations within
+the EGFR kinase domain render the receptor constitutively active in a
+ligand-independent manner, producing continuous, dysregulated stimulation of the
+pro-survival and proliferative pathways described above \parencite{rotow2023egfr}.
+This oncogenic signalling drives uncontrolled tumour growth, resistance to
+apoptosis, angiogenesis, and metastatic dissemination.
+
+The two most clinically prevalent sensitising EGFR mutations, which together
+account for 85--90\% of all EGFR-mutant NSCLC, are:
+
+\begin{itemize}
+    \item \textbf{Exon 19 deletions (Ex19del)}: A heterogeneous group of in-frame
+    deletions of 9--24 base pairs within exon 19, most commonly removing the
+    LREA motif (residues 747--750) from the $\alpha$C-helix of the kinase N-lobe.
+    These deletions stabilise the active conformation of the kinase domain by
+    repositioning the $\alpha$C-helix, reducing the activation energy for catalysis.
+    Ex19del accounts for approximately 45--50\% of EGFR-mutant NSCLC.
+    \item \textbf{L858R point mutation}: A leucine-to-arginine substitution at
+    position 858 within the activation loop (A-loop) of the kinase domain.
+    This mutation disrupts the autoinhibitory network involving Leu858, Asp855,
+    and Phe856 of the DFG motif, shifting the equilibrium from the inactive to
+    the active kinase conformation. L858R accounts for approximately 40\% of
+    EGFR-mutant NSCLC.
+\end{itemize}
+
+Rare sensitising mutations ($<$5\% combined) include exon 18 G719X, exon 20
+S768I, and exon 21 L861Q. These display differential sensitivity to approved
+TKIs and often require alternative treatment strategies.
+
+The prevalence of EGFR mutations in NSCLC exhibits a profound ethnic disparity.
+In Caucasian populations, EGFR mutations are found in approximately 10--15\% of
+NSCLC cases, whereas in East Asian populations (Chinese, Japanese, Korean, and
+related groups), the prevalence reaches 40--50\% \parencite{leonetti2019resistance}.
+This epidemiological pattern reflects underlying differences in the frequency of
+germline polymorphisms at the \textit{EGFR} locus that predispose to somatic
+mutation acquisition. Importantly, this disparity has direct clinical relevance
+for South and East Asia, including Nepal, where EGFR-targeted therapy represents
+the most impactful precision oncology intervention available, yet access to
+diagnostic testing and novel therapeutic agents remains significantly constrained.
+
+% ----------------------------------------------------------------
+\section{Three Generations of EGFR TKIs and Resistance Mechanisms}
+\label{sec:tki_gen}
+% ----------------------------------------------------------------
+
+\subsection{First-Generation Reversible TKIs}
+
+The clinical development of EGFR tyrosine kinase inhibitors began with the
+regulatory approval of gefitinib (Iressa, AstraZeneca) in 2003 and erlotinib
+(Tarceva, Genentech/Roche) in 2004. Both agents are reversible, ATP-competitive
+small molecule inhibitors that occupy the EGFR ATP-binding cleft through a
+combination of a hinge-region hydrogen bond (to the backbone amide nitrogen of
+Met793), hydrophobic contacts with the ribose pocket, and van der Waals interactions
+with the hydrophobic regions I and II of the binding site. Crystal structures of
+EGFR bound to gefitinib (PDB: 2ITY) and erlotinib (PDB: 1M17) have confirmed
+these binding modes at the atomic level \parencite{stamos2002egfr}.
+
+Landmark clinical trials established the superiority of first-generation TKIs
+over platinum-doublet chemotherapy in patients with sensitising EGFR mutations.
+The IPASS trial (gefitinib vs. carboplatin/paclitaxel) and EURTAC trial
+(erlotinib vs. platinum doublet) demonstrated objective response rates of
+55--75\% and median progression-free survival (PFS) of 9--13 months---unprecedented
+outcomes for a molecularly unselected metastatic NSCLC population.
+
+However, acquired resistance develops in virtually all patients within 9--13 months.
+The most common resistance mechanism (50--60\% of cases) is the \textbf{T790M
+gatekeeper mutation} (Thr790Met) in exon 20 of the EGFR kinase domain
+\parencite{leonetti2019resistance}. This methionine substitution acts through
+two complementary mechanisms: (i) steric clash with the quinazoline scaffold
+of first-generation inhibitors due to the bulkier methionine side chain, and
+(ii) a 100-fold increase in the binding affinity of the kinase for ATP, effectively
+out-competing the reversible TKI. Additional resistance mechanisms include MET
+amplification ($\sim$5--15\%), HER2 amplification ($\sim$5--10\%), PIK3CA
+mutation ($\sim$5\%), and histological transformation to small cell carcinoma
+($\sim$5\%) \parencite{leonetti2019resistance}.
+
+\subsection{Second-Generation Irreversible TKIs}
+
+The T790M-mediated resistance to first-generation TKIs motivated the development
+of second-generation irreversible inhibitors: afatinib (Gilotrif, Boehringer
+Ingelheim) and dacomitinib (Vizimpro, Pfizer). These agents form a covalent
+Michael addition bond with the thiol group of Cys797 at the rim of the ATP-binding
+cleft, providing kinetically stable, irreversible target engagement. As pan-ErbB
+inhibitors, they also inhibit HER2 and HER4 kinase activity.
+
+Afatinib demonstrated superiority over platinum-doublet chemotherapy in the LUX-Lung
+3 and LUX-Lung 6 trials, and superior PFS versus gefitinib in LUX-Lung 7, establishing
+it as a first-line option for EGFR-mutant NSCLC. Dacomitinib similarly improved
+PFS over gefitinib in the ARCHER 1050 trial. However, the irreversible
+pan-ErbB inhibition profile of second-generation agents produces significant
+dose-limiting on-target toxicity---primarily grade 3/4 diarrhoea, skin rash,
+stomatitis, and paronychia---arising from inhibition of wild-type EGFR in the
+gastrointestinal epithelium and skin \parencite{leonetti2019resistance}.
+This toxicity profile restricts clinical dosing to sub-therapeutic levels that
+are insufficient to overcome T790M-driven resistance in the majority of patients.
+
+\subsection{Third-Generation Covalent TKIs and the C797S Resistance Problem}
+
+The clinical unmet need created by T790M resistance drove the development of
+third-generation mutant-selective covalent TKIs, led by osimertinib (Tagrisso,
+AstraZeneca; AZD9291). Osimertinib was rationally designed through structure-based
+drug design to selectively engage T790M-mutant EGFR while sparing wild-type EGFR.
+Its indole-based acrylamide scaffold binds the EGFR ATP cleft and forms an
+irreversible covalent bond with Cys797 through a Michael addition, while its
+selectivity for mutant over wild-type EGFR is achieved through differential
+binding geometries and kinetics rather than steric exclusion
+\parencite{rotow2023egfr}.
+
+The AURA3 trial established osimertinib as the standard second-line therapy for
+T790M-positive NSCLC after first-generation TKI failure. Subsequently, the
+FLAURA trial demonstrated osimertinib's superiority over first-generation TKIs
+as first-line therapy (median PFS 18.9 vs. 10.2 months; overall survival 38.6
+vs. 31.8 months), establishing it as the unambiguous standard of care for
+EGFR-mutant NSCLC regardless of prior treatment. Additional advantages include
+excellent CNS penetration ($\sim$75\% brain metastasis response rate) and an
+improved safety profile compared to afatinib.
+
+Despite these remarkable clinical achievements, acquired resistance to osimertinib
+emerges in virtually all patients within 9--18 months \parencite{leonetti2019resistance}.
+The dominant resistance mechanism is the \textbf{C797S mutation} (Cys797Ser),
+which substitutes the cysteine residue required for covalent TKI binding with a
+serine, abolishing the Michael addition reaction. C797S is detected in 20--40\%
+of post-osimertinib biopsies and is of particular clinical importance when it
+occurs in \textit{cis} with T790M on the same allele, generating the
+\textbf{triple-mutant EGFR} (Ex19del/T790M/C797S and L858R/T790M/C797S) that is
+resistant to \textit{all three generations} of approved EGFR TKIs:
+\begin{itemize}
+    \item First-generation TKIs cannot overcome T790M.
+    \item Second-generation TKIs cannot overcome T790M steric clash at therapeutic doses.
+    \item Third-generation TKIs cannot bind due to loss of the Cys797 covalent anchor.
+\end{itemize}
+
+Additional post-osimertinib resistance mechanisms include acquired MET amplification
+($\sim$15\%), HER2 amplification ($\sim$5\%), RAS/RAF/MAP2K mutations ($\sim$10\%),
+EGFR amplification, EGFR C797 allosteric mutations (e.g., G796S, L792 mutations),
+and histological transformation to SCLC or squamous cell carcinoma
+\parencite{rotow2023egfr}. As of 2026, no approved therapeutic agent effectively
+addresses triple-mutant EGFR, making the discovery of fourth-generation EGFR
+inhibitors or non-covalent EGFR inhibitors the highest clinical priority in NSCLC
+drug development.
+
+% ----------------------------------------------------------------
+\section{Bioactivity Databases and the ChEMBL Database}
+\label{sec:chembl_db}
+% ----------------------------------------------------------------
+
+\subsection{Overview of the ChEMBL Database}
+
+The ChEMBL database, maintained by the European Molecular Biology
+Laboratory-European Bioinformatics Institute (EMBL-EBI), is the largest and most
+extensively curated public repository of bioactive small molecules and their
+quantitative biological activities \parencite{mendez2019chembl}. As of recent
+releases, the database contains approximately:
+\begin{itemize}
+    \item $>$2.37 million distinct bioactive compounds
+    \item $>$20.7 million bioactivity measurements
+    \item $>$14,000 therapeutic targets from multiple organisms
+    \item $>$85,000 document sources (primarily peer-reviewed publications)
+\end{itemize}
+
+ChEMBL is constructed primarily through systematic curation of bioactivity data
+from published medicinal chemistry and pharmacology literature, supplemented by
+direct data depositions from industry partners, academic consortia (e.g., CanSAR,
+SMACC), and high-throughput screening datasets (e.g., PubChem BioAssay, GSK
+PKIS). The EGFR kinase entry (target ID: CHEMBL203) is one of the most extensively
+annotated targets in the database, reflecting decades of intense drug discovery
+activity around this oncology target.
+
+\subsection{Bioactivity Endpoints and \texorpdfstring{pIC$_{50}$}{pIC50} Conversion}
+
+The primary bioactivity endpoint used in this study is the \textbf{half-maximal
+inhibitory concentration} (IC$_{50}$), defined as the concentration of a compound
+required to inhibit the target activity by 50\% under specified assay conditions.
+IC$_{50}$ values are expressed in molar concentration units (typically nanomolar,
+nM) and span many orders of magnitude across structurally diverse compounds.
+
+For machine learning purposes, IC$_{50}$ values are routinely converted to the
+logarithmic \textbf{pIC$_{50}$} scale by taking the negative base-ten logarithm of
+the molar concentration, so that higher pIC$_{50}$ values correspond to more potent
+compounds. This transformation compresses the large dynamic range of IC$_{50}$
+values (spanning 6--8 orders of magnitude) into a more tractable numerical range
+(approximately 4--11 for drug-like compounds), improves the normality of the
+activity distribution, and is the standard practice in QSAR modelling.
+A threshold of pIC$_{50} \geq 6.0$ (corresponding to an IC$_{50}$ of $\leq 1\,\mu$M)
+is the conventional medicinal chemistry criterion for classifying a compound as a
+``hit'' or ``active'' in kinase inhibitor discovery \parencite{wu2018moleculenet}.
+
+\subsection{Data Quality Challenges}
+
+Utilising ChEMBL data for machine learning presents several important quality
+challenges that must be addressed during data curation \parencite{wu2018moleculenet}:
+
+\begin{itemize}
+    \item \textbf{Assay heterogeneity}: IC$_{50}$ measurements originate from
+    hundreds of independent laboratories employing different assay formats
+    (biochemical kinase assay, cell-based viability assay, radiometric assay,
+    TR-FRET assay), cell lines, substrate concentrations, ATP concentrations,
+    temperature, and pH. These variations can shift absolute IC$_{50}$ values by
+    1--2 orders of magnitude, introducing systematic noise into the training labels.
+    \item \textbf{Censored measurements}: A significant proportion of reported
+    values are censored (greater-than or less-than, e.g., IC$_{50}$ $>$ 10,000 nM
+    or IC$_{50}$ $<$ 0.1 nM), indicating that the compound's activity exceeded
+    the assay's detection limits. Standard practice restricts training data to
+    exact (``='') measurements only.
+    \item \textbf{Replicate measurements}: The same compound may have been tested
+    multiple times across different publications. Aggregating multiple pIC$_{50}$
+    measurements using the median is the approach adopted in this study to reduce the
+    influence of outliers.
+    \item \textbf{Structural redundancy}: Different chemical databases may use
+    different SMILES notation conventions for the same compound (e.g., different
+    salt forms, stereochemistry assignments). Canonicalisation using RDKit and
+    salt stripping (retaining the largest fragment) are essential preprocessing
+    steps to remove duplicates.
+    \item \textbf{Activity cliff sensitivity}: Pairs of structurally similar
+    compounds with dramatically different activity values (activity cliffs) create
+    challenging regions of chemical space for both fingerprint-based and
+    graph-based models.
+\end{itemize}
+
+% ----------------------------------------------------------------
+\section{Molecular Representation for Machine Learning}
+\label{sec:molrep}
+% ----------------------------------------------------------------
+
+\subsection{Hand-Crafted Fingerprint Descriptors}
+
+Molecular fingerprints are fixed-length binary or integer vectors that encode
+the presence or count of predefined structural features within a molecule.
+They represent the dominant molecular representation paradigm in traditional
+cheminformatics and remain strong baselines for bioactivity prediction tasks.
+
+\subsubsection{Extended Connectivity Fingerprints (ECFP)}
+
+The Extended Connectivity Fingerprint (ECFP) \parencite{rogers2010ecfp}, also
+known as the Morgan fingerprint (after its algorithmic basis in the Morgan
+algorithm for canonical atom numbering), is the most widely used molecular
+fingerprint in cheminformatics. ECFP encodes circular atomic neighbourhoods
+through an iterative procedure:
+
+\begin{enumerate}
+    \item Each atom is assigned an initial integer identifier based on six atomic
+    invariants (atomic number, degree, number of hydrogens, charge, isotope,
+    and ring membership).
+    \item At each iteration $r$ (radius), each atom's identifier is updated by
+    hashing together its current identifier with the identifiers of its immediate
+    neighbours (corresponding to atoms within $r$ bonds).
+    \item All identifiers generated at each iteration up to radius $r$ are
+    collected and folded into a bit vector of specified length (typically 1024
+    or 2048 bits) using a hash function.
+\end{enumerate}
+
+ECFP4 (radius = 2, 2048 bits) is the de facto standard, encoding circular
+substructures up to 4 bonds in diameter. Its advantages include computational
+efficiency ($O(N)$ in molecular size), interpretability of individual bits as
+specific substructural features, and strong empirical performance across diverse
+QSAR benchmarks. Limitations include: (i) fixed-length encoding discards
+variable-size topological patterns not captured within the predefined radius;
+(ii) bit collisions in folded fingerprints reduce information content;
+(iii) bond-level information (bond type, conjugation, stereochemistry) is only
+coarsely encoded; and (iv) the representation is not differentiable, precluding
+end-to-end learning of task-optimal molecular representations.
+
+\subsubsection{Other Descriptor Types}
+
+Beyond fingerprints, molecular property prediction has traditionally relied on
+physicochemical descriptors (e.g., RDKit 2D and 3D descriptors, MACCS keys,
+DRAGON descriptors), shape-based 3D pharmacophore fingerprints, and continuous
+molecular embeddings derived from SMILES string language models.
+
+For the purposes of this study, ECFP4 fingerprints are used for both traditional
+machine learning baselines. \textbf{Random Forest (RF)} is an ensemble of 500
+decision trees with balanced class weighting and \texttt{max\_features='sqrt'},
+providing a well-calibrated, sample-efficient baseline for medium-sized bioactivity
+datasets. The \textbf{Multi-Layer Perceptron (MLP)} baseline is a three-layer
+neural network (2048$\to$512$\to$128$\to$1) operating on the same ECFP4 inputs,
+trained with BCEWithLogitsLoss and early stopping. The MLP bridges the gap between
+fingerprint-based and graph-based deep learning, allowing direct attribution of
+performance differences to the graph representation rather than to deep learning
+capacity in general.
+
+\subsection{Graph-Based Molecular Representations}
+
+The fundamental insight motivating the graph-based approach is that a molecule
+is inherently a labelled graph: atoms are nodes with associated chemical properties,
+and bonds are edges with associated chemical characteristics. This isomorphism
+allows molecules to be fed directly into graph processing algorithms without
+information-losing pre-encoding steps \parencite{gilmer2017neural}.
+
+A molecular graph is defined by three components:
+\begin{itemize}
+    \item A set of \textbf{nodes}, where each node represents one heavy atom and
+    carries a node feature vector describing that atom's chemical properties.
+    \item A set of \textbf{edges}, where each edge represents one chemical bond and
+    carries an edge feature vector describing that bond's properties.
+    \item The \textbf{bonding connectivity}, recording which atoms are bonded to
+    which.
+\end{itemize}
+
+The dimensionality and content of the node and edge feature vectors directly
+determine the chemical information available to the model. In this work, a
+comprehensive 29-dimensional node feature vector and 12-dimensional edge feature
+vector were designed to capture the chemical information most relevant to kinase
+inhibitor classification, as detailed in Chapter 3.
+
+\subsection{Graph Neural Networks: The Message-Passing Framework}
+
+The general message-passing neural network (MPNN) framework \parencite{gilmer2017neural}
+provides a unified description of most GNN architectures. In this framework, each
+atom maintains a hidden representation that is refined layer by layer through two
+operations, illustrated in Figure~\ref{fig:msgpass}:
+
+\textbf{Aggregation}: each atom collects ``messages'' from its bonded neighbours,
+where each message is a learned function of the central atom's representation, the
+neighbour's representation, and the connecting bond features. The messages are then
+combined using a permutation-invariant operator (sum, mean, or max) so that the
+result does not depend on the arbitrary ordering of neighbours.
+
+\textbf{Update}: each atom updates its own hidden representation by combining its
+previous state with the aggregated message, typically through a small multilayer
+perceptron or a gated recurrent unit.
+
+After several message-passing layers, a \textbf{readout function} aggregates all
+the atom-level representations into a single graph-level embedding, which is then
+passed to a task-specific head (for example, a fully connected classifier for
+binary activity prediction).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.62\textwidth]{gnn_message_passing.pdf}
+\caption{One step of graph neural network message passing. The central atom $v$
+         updates its representation by aggregating learned messages from its bonded
+         neighbours $u_1, u_2, u_3$. Repeating this over several layers lets each
+         atom's embedding incorporate progressively larger chemical neighbourhoods.}
+\label{fig:msgpass}
+\end{figure}
+
+The key advantages of the MPNN framework for molecular property prediction are:
+(i) the representation is learned end-to-end from bioactivity data, requiring
+no expert-designed feature engineering; (ii) arbitrary atom- and bond-level
+information can be incorporated via the node and edge feature vectors; (iii) the
+framework naturally handles molecules of varying size without fixed-length encoding;
+and (iv) the learned representations capture both local chemical environments
+(from lower layers) and global molecular topology (from higher layers through
+the readout).
+
+% ----------------------------------------------------------------
+\section{Graph Neural Network Architectures for Drug Discovery}
+\label{sec:gnn_arch}
+% ----------------------------------------------------------------
+
+\subsection{Graph Convolutional Network (GCN)}
+
+The Graph Convolutional Network (GCN) \parencite{kipf2017gcn} introduced the
+concept of spectral graph convolution through a computationally tractable
+first-order approximation. At each layer, every atom's representation is updated by
+taking a degree-normalised average of the (linearly transformed) representations of
+its bonded neighbours together with its own, followed by a non-linear activation.
+The normalisation uses the atom degrees (with self-loops added) so that atoms with
+many bonds do not dominate the aggregation.
+
+The GCN architecture has several notable limitations in the context of molecular
+property prediction. First, the degree-normalised aggregation weights all
+neighbouring atoms equally, without learning which chemical neighbours contribute
+most to a given property. Second, standard GCN implementations use node features
+only and do not incorporate edge features, discarding bond-level chemical
+information. Third, GCN is limited in its expressive power: it cannot distinguish
+certain pairs of non-isomorphic graph structures that differ only in their
+higher-order topology, limiting its ability to discriminate complex pharmacophoric
+patterns \parencite{xu2019gin}. Despite these limitations, GCN provides a strong
+and computationally efficient baseline and demonstrated competitive AUROC
+performance in the TDC ADMET benchmarks \parencite{huang2021therapeutics}.
+
+\subsection{Graph Attention Network (GAT)}
+
+The Graph Attention Network (GAT) \parencite{velickovic2018gat} addresses the
+uniform weighting limitation of GCN by introducing learnable, data-driven
+attention coefficients for each pair of connected atoms. For each atom, the GAT
+computes a normalised attention weight for every neighbour from a learnable scoring
+function applied to the two atoms' transformed representations. These weights, which
+sum to one across the neighbourhood, then determine how strongly each neighbour
+contributes to the atom's updated representation, replacing the fixed
+degree-based averaging of the GCN with a learned, data-driven weighting.
+
+To stabilise learning and capture diverse chemical interaction patterns, several
+parallel attention ``heads'' are typically used, with their outputs concatenated in
+intermediate layers and averaged in the final layer.
+
+The GATv2 extension \parencite{brody2022attentive} resolves an expressivity
+limitation of the original GAT formulation (the ``static attention'' problem),
+in which the ordering of attention coefficients is query-independent. GATv2
+modifies the attention scoring function to ensure that attention weights are
+dynamically conditioned on both the query and key node representations.
+
+The attention mechanism of GAT is of particular value in molecular property
+prediction because different atoms contribute unequally to a given chemical
+property: in EGFR inhibitors, for example, the hinge-binding nitrogen atoms
+of the quinazoline pharmacophore are far more critical to EGFR activity than
+peripheral solvent-exposed substituents. GAT's ability to learn and apply
+differential attention across atom pairs enables it to focus on pharmacophore-
+relevant atoms during representation learning.
+
+\subsection{Graph Isomorphism Network (GIN)}
+
+The Graph Isomorphism Network (GIN) \parencite{xu2019gin} was developed from
+a theoretical analysis of the representational limits of GNNs within the
+message-passing framework. Xu et al. proved that the expressive power of any
+message-passing GNN is bounded by the Weisfeiler-Leman (WL) graph isomorphism
+test, and demonstrated that GIN achieves this theoretical upper bound. The GIN
+layer updates each atom by \textit{summing} its neighbours' representations, adding
+the atom's own representation (scaled by a small learnable factor), and passing the
+result through a multilayer perceptron.
+
+The critical theoretical insight is that sum aggregation preserves multiset
+information about neighbour features (unlike mean or max aggregation, which
+can conflate distinct neighbourhood configurations), making GIN maximally
+expressive among message-passing GNNs.
+
+The GINEConv \parencite{hu2020strategies} extension incorporates edge features by
+adding a transformed bond feature vector to each neighbour's representation before
+the summation, so that bond-level chemistry informs the aggregation.
+
+Despite its theoretical superiority, GIN does not always outperform architecturally
+simpler GNNs on molecular property prediction benchmarks, suggesting that
+the WL-level expressivity gains are primarily relevant for highly symmetric
+graph structures that are uncommon in drug-like molecules. Empirically, GIN has
+shown strong performance on graph classification tasks in the TU graph benchmarks
+and MoleculeNet \parencite{wu2018moleculenet}.
+
+\subsection{AttentiveFP}
+
+AttentiveFP \parencite{xiong2020attentivefp} is a graph neural network architecture
+purpose-built for molecular property prediction, distinguishing itself from generic
+GNN architectures through two key innovations: \textbf{atom-level attention}
+and \textbf{molecule-level iterative readout}.
+
+\subsubsection{Atom-Level Attention}
+
+At each message-passing step, AttentiveFP computes context-dependent atom-level
+attention weights that modulate the contribution of each neighbour to the central
+atom's representation update. For each atom and neighbour pair, an attention score is
+computed from the two atoms' representations \textit{together with the connecting
+bond's feature vector}, and these scores are normalised across the neighbourhood to
+obtain the final attention weights.
+
+This attention formulation is distinguished by its \textit{native integration of
+edge features} in the attention computation: the bond feature vector is combined
+with the atom representations before the attention scoring step, allowing the model
+to condition attention weights on bond-level chemical information (for example,
+assigning higher attention to double bonds in aromatic systems).
+
+\subsubsection{Molecule-Level Iterative Readout}
+
+After atom-level message passing, AttentiveFP employs a novel iterative readout
+procedure that refines a single molecule-level embedding over several timesteps. A
+context vector is initialised from the mean of all the final atom representations.
+At each timestep, the context vector attends over all atoms (computing
+normalised attention weights from the context and each atom representation), forms a
+weighted summary of the atoms, and uses a Gated Recurrent Unit (GRU) to update
+itself from that summary.
+
+The use of a GRU enables the molecular embedding to be iteratively refined, allowing
+the model to capture increasingly global structural context with each timestep. The
+final context vector serves as the molecular embedding that is passed to the
+classification head.
+
+AttentiveFP has been shown to achieve state-of-the-art or near-state-of-the-art
+performance across multiple MoleculeNet benchmarks \parencite{xiong2020attentivefp,
+jiang2021gnn}, with the multi-step molecular attention mechanism and edge feature
+integration providing particularly significant advantages on property prediction
+tasks where long-range intramolecular interactions and bond-level chemistry are
+important. On this basis AttentiveFP was selected as the architecture on which
+this study focused its hyperparameter optimisation, although the benchmark in
+Chapter~4 ultimately found it to be the weakest of the five graph networks on the
+scaffold test set.
+
+
+\subsection{GraphSAGE}
+
+GraphSAGE (Graph SAmple and aggreGatE) \parencite{hamilton2017graphsage} is an
+inductive representation learning framework designed for graphs where new nodes
+must be embedded without retraining. Unlike GCN and GAT, which operate on the
+full graph adjacency matrix, GraphSAGE learns aggregation functions from
+\textit{sampled} local neighbourhoods, making it particularly suitable for
+large-scale graphs.
+
+The GraphSAGE update proceeds in two steps. First, each atom computes the mean of
+its neighbours' representations to form a neighbourhood summary. Second, this summary
+is concatenated with the atom's own previous representation and passed through a
+learnable transformation followed by a non-linear activation. The concatenation of
+the atom's own representation with its neighbourhood aggregate ensures that the
+atom's individual chemical identity is preserved alongside its local chemical
+context.
+
+GraphSAGE offers two advantages in the molecular property prediction context:
+(i) mean aggregation is robust to variable-degree atoms without the normalisation
+instability that can affect degree-normalised GCN in molecules with high-degree
+atoms (e.g., bridgehead atoms in polycyclic scaffolds); and (ii) the inductive
+framework generalises well to novel scaffolds not seen at training time, which is
+directly relevant under Bemis-Murcko scaffold evaluation. In this study, GraphSAGE
+uses mean aggregation with BatchNorm and concatenated mean+max global pooling,
+following the same readout strategy as GCN.
+
+% ----------------------------------------------------------------
+\section{Nepali Medicinal Plants and Natural Product Databases}
+\label{sec:nepali_plants}
+% ----------------------------------------------------------------
+
+\subsection{Traditional Medicinal Plants in Nepal}
+
+Nepal harbours remarkable biodiversity, hosting approximately 6,500 flowering plant
+species within a geographic transect spanning tropical lowlands ($\sim$60 m a.s.l.)
+to alpine zones ($>$5,000 m a.s.l.). Of these, over 700 species have documented
+medicinal uses in traditional Ayurvedic and Tibetan medical systems.
+Several Nepali medicinal plants have been
+ethnopharmacologically associated with anticancer activity and are candidates
+for systematic computational evaluation as potential EGFR inhibitor sources.
+
+Seven species were selected for this study on the basis of documented biological
+activity, accessibility in the COCONUT 2.0 database, and relevance to respiratory
+and oncological conditions:
+\begin{itemize}
+    \item \textbf{\textit{Swertia chirayita} (Chirayito)}: A bitter alpine herb
+    extensively used in Ayurvedic medicine for fever and liver conditions. Contains
+    xanthones and secoiridoids with documented kinase-modulatory activity.
+    \item \textbf{\textit{Rhododendron arboreum} (Lali Gurans)}: The national flower
+    of Nepal; rhododendron species contain pentacyclic triterpenoids and flavonoids
+    with anti-inflammatory and cytotoxic properties.
+    \item \textbf{\textit{Nardostachys jatamansi} (Jatamansi)}: A Himalayan valerian
+    species yielding nardosinone and patchouli-alcohol-type sesquiterpenes; used for
+    neurological and cardiovascular conditions.
+    \item \textbf{\textit{Terminalia chebula} (Haritaki)}: One of the three
+    constituents of the classical Ayurvedic formulation Triphala; contains hydrolysable
+    tannins (chebulinic acid, chebulagic acid) with antioxidant and antiproliferative
+    activity.
+    \item \textbf{\textit{Berberis aristata} (Chutro)}: Source of berberine, a
+    protoberberine isoquinoline alkaloid with established anticancer activity and
+    documented EGFR pathway modulation.
+    \item \textbf{\textit{Ocimum sanctum} (Tulsi)}: The sacred basil of the Indian
+    subcontinent; contains eugenol, ursolic acid, and rosmarinic acid, with documented
+    anticancer and EGFR-inhibitory properties.
+    \item \textbf{\textit{Tinospora cordifolia} (Giloy/Gurjo)}: A climbing shrub
+    yielding tinosporin, palmatine, and berberine; used for immunomodulation and
+    anti-inflammatory applications with documented cytotoxic activity.
+\end{itemize}
+
+\subsection{The COCONUT 2.0 Database}
+
+The \textbf{CO}llection of \textbf{O}pen \textbf{N}atural Prod\textbf{U}c\textbf{T}s
+(COCONUT) is the largest freely available database of natural product structures,
+curated and maintained by the Steinbeck group at Friedrich Schiller University Jena
+\parencite{sorokina2021coconut}. COCONUT 2.0 contains over 400,000 unique natural
+product structures drawn from more than 50 public natural product databases,
+each associated with organism taxonomy, literature references, and precomputed
+molecular descriptors. Structures are provided as canonical SMILES and InChI strings
+with CAS registry numbers where available.
+
+For this study, COCONUT 2.0 was used to retrieve SMILES for compounds annotated to
+the seven Nepali plant species of interest using organism taxonomy matching. Retrieved
+compounds were then subjected to the same preprocessing pipeline as the ChEMBL training
+data (salt removal, SMILES canonicalisation, MW $\leq$ 1000 Da, RDKit validation) to
+ensure featurisation consistency.
+
+% ----------------------------------------------------------------
+\section{Virtual Screening in Drug Discovery}
+\label{sec:vs_lit}
+% ----------------------------------------------------------------
+
+\subsection{Overview of Virtual Screening}
+
+Virtual screening (VS) is a computational strategy employed at the early stage
+of drug discovery to prioritise a large library of candidate compounds for
+experimental testing, based on predicted interaction with a biological target
+or predicted biological activity. VS substantially reduces the number of compounds
+that need to be synthesised and assayed experimentally, focusing experimental
+resources on the most promising candidates \parencite{walters2020generative}.
+
+Two principal paradigms of VS are distinguished:
+\begin{itemize}
+    \item \textbf{Structure-based virtual screening (SBVS)}: Requires a
+    three-dimensional crystal or cryo-EM structure of the target protein. Molecular
+    docking algorithms (AutoDock Vina, Glide, GOLD) predict the binding pose and
+    estimate the binding affinity of each candidate compound within the target's
+    binding site. SBVS is accurate but computationally intensive and requires
+    high-resolution structural data.
+    \item \textbf{Ligand-based virtual screening (LBVS)}: Does not require target
+    structural knowledge. A model trained on known active and inactive compounds
+    (e.g., from ChEMBL) is used to score and rank external compound libraries by
+    predicted activity probability. LBVS is computationally scalable to millions
+    of compounds and is particularly powerful when high-quality bioactivity training
+    data is available.
+\end{itemize}
+
+This thesis implements a \textbf{ligand-based virtual screening} pipeline using its
+two best-performing trained classifiers---the best graph neural network (GCN) and a
+Random Forest baseline---as the scoring functions, and prioritising leads by
+cross-model consensus rather than relying on any single model.
+
+\subsection{GNN-Based Virtual Screening}
+
+The landmark application of GNN-based virtual screening in drug discovery was
+the discovery of \textbf{halicin} by Stokes et al. \parencite{stokes2020deep}
+at the Collins Laboratory (MIT). A directed-message passing neural network (DMPNN)
+was trained on 2,335 compounds from the Drug Repurposing Hub to predict broad-spectrum
+antibiotic activity. The trained model was applied to score over 100 million compounds
+from the ZINC15 database; halicin (SU-3327, a c-Jun N-terminal kinase inhibitor)
+was identified as a top-ranked hit and subsequently validated as a potent,
+broad-spectrum antibiotic in mouse models of \textit{Acinetobacter baumannii}
+infection. This study demonstrated that GNN-based LBVS can identify structurally
+novel bioactive compounds that escape detection by conventional similarity searches.
+
+In the kinase inhibitor domain, GNN-based VS has been applied to several targets
+including EGFR, CDK2, and VEGFR2, typically achieving hit rates of 10--50\% in
+subsequent experimental validation---substantially higher than the 0.1--1\% hit
+rates typical of unguided high-throughput screening \parencite{sun2021gcn}.
+
+\subsection{Natural Product Libraries and Nepali Medicinal Plants}
+
+A key methodological choice in virtual screening is the source and composition of
+the screening library. This thesis employs a \textbf{natural product library} strategy:
+bioactive compounds from seven traditional Nepali medicinal plant species are retrieved
+from the COCONUT 2.0 database and used as the screening library. The biological and
+ethnopharmacological rationale is well-established: plants such as
+\textit{Swertia chirayita}, \textit{Berberis aristata}, and \textit{Ocimum sanctum}
+have centuries of documented use in the treatment of cancer-related symptoms and have
+yielded structurally diverse secondary metabolites---alkaloids, flavonoids, terpenes,
+and tannins---that represent structurally distinct chemotypes compared to synthetic
+kinase inhibitors, potentially offering novel scaffolds capable of engaging the EGFR
+ATP-binding pocket through unconventional binding modes. This strategy directly
+connects computational drug discovery to the biodiversity resources and traditional
+knowledge of Nepal, supporting affordable and regionally accessible cancer therapeutic
+research.
+
+\subsection{ADMET Properties and Lead Prioritisation}
+
+Virtual screening hit lists require secondary filtering by predicted ADMET
+(Absorption, Distribution, Metabolism, Excretion, Toxicity) properties to
+prioritise compounds with the greatest potential for clinical development
+\parencite{walters2020generative}. In this study, ADMET-proxy properties were
+computed using RDKit as physicochemical surrogates:
+
+\begin{itemize}
+    \item \textbf{Lipinski's Rule of Five (Ro5)}: MW $\leq$ 500 Da, LogP $\leq$ 5,
+    HBD $\leq$ 5, HBA $\leq$ 10 as necessary (not sufficient) conditions for
+    oral bioavailability \parencite{lipinski2001experimental}.
+    \item \textbf{Quantitative Estimate of Drug-likeness (QED)}: A composite
+    drug-likeness score (range 0--1) integrating MW, LogP, HBD, HBA, TPSA, number
+    of aromatic rings, number of rotatable bonds, and the presence of structural
+    alerts, calibrated to reflect the desirability profile of approved oral drugs
+    \parencite{bickerton2012quantifying}.
+    \item \textbf{Topological Polar Surface Area (TPSA)}: A molecular surface
+    area descriptor correlated with oral absorption and blood-brain barrier
+    permeability. Values $\leq$ 140 \AA$^2$ are associated with adequate
+    gastrointestinal absorption.
+\end{itemize}
+
+% ----------------------------------------------------------------
+\section{Research Gap}
+\label{sec:research_gap}
+% ----------------------------------------------------------------
+
+A systematic analysis of the reviewed literature reveals three persistent and
+interrelated methodological gaps in the application of Graph Neural Networks to
+EGFR inhibitor discovery. These gaps collectively limit the clinical utility and
+scientific rigour of existing computational approaches:
+
+\begin{enumerate}
+    \item \textbf{Evaluation Bias from Random Data Splitting.} The majority of
+    published GNN models for EGFR or related kinase bioactivity prediction employ
+    random train/test splitting \parencite{jiang2021gnn, malik2025deepegfr}.
+    This practice allows molecules with near-identical Bemis-Murcko scaffolds to
+    appear simultaneously in training and test partitions, creating an optimistic
+    bias in reported performance metrics. A model that achieves 0.90 AUROC under
+    random splitting may perform significantly worse when deployed on a genuinely
+    novel scaffold---precisely the scenario encountered in prospective virtual
+    screening. Scaffold-based splitting, which groups all molecules sharing the
+    same core framework into a single partition, provides a more realistic and
+    demanding assessment of model generalisation \parencite{wu2018moleculenet}.
+
+    \item \textbf{Incomplete Molecular Featurisation.} Published GNN models for
+    EGFR inhibitor classification frequently employ minimal node feature sets
+    (e.g., atom type only, or a small number of atomic properties) and rarely
+    incorporate explicit, multi-dimensional bond-level (edge) feature vectors
+    \parencite{malik2025deepegfr}. Bond features encoding stereochemistry,
+    conjugation, and aromaticity carry significant pharmacological information---for
+    example, the aromatic bonds of the quinazoline hinge-binder scaffold and the
+    acrylamide double bond of covalent inhibitors---that is discarded or only
+    coarsely approximated by node-only models or ECFP fingerprints.
+
+    \item \textbf{Lack of Prospective Screening on Natural Product and Regionally
+    Relevant Compound Libraries.} Most academic GNN papers in the EGFR and kinase
+    inhibitor domain report performance metrics on held-out test sets but do not
+    deploy the trained model in a prospective virtual screening pipeline applied
+    to natural product or ethnopharmacological compound collections
+    \parencite{sun2021gcn, malik2025deepegfr}. For South Asian research communities
+    where EGFR-mutant NSCLC is prevalent but novel targeted therapies are expensive
+    and inaccessible, virtual screening of traditional medicinal plant compounds
+    represents a high-impact translational application that is entirely absent from
+    the computational EGFR inhibitor literature.
+\end{enumerate}
+
+\noindent Table~\ref{tab:gap_compare} formally positions this thesis against
+representative published GNN studies for EGFR inhibitor prediction.
+
+\begin{table}[H]
+\centering
+\caption{Comparison of this thesis against representative published GNN-based
+         EGFR inhibitor classification studies across three methodological dimensions.
+         $\checkmark$\,= fully addressed; $\circ$\,= partially addressed;
+         $\times$\,= not addressed.}
+\label{tab:gap_compare}
+{\singlespacing
+\begin{tabular}{lccc}
+\toprule
+\multirow{2}{*}{\textbf{Study}} &
+\textbf{Scaffold} & \textbf{Rich} & \textbf{Natural Product} \\
+& \textbf{Split} & \textbf{Features} & \textbf{Screening} \\
+\midrule
+DeepEGFR \parencite{malik2025deepegfr}      & $\times$ & $\circ$ & $\times$ \\
+GCN QSAR \parencite{jiang2021gnn}           & $\times$ & $\circ$ & $\times$ \\
+AttentiveFP \parencite{xiong2020attentivefp} & $\times$ & $\checkmark$ & $\times$ \\
+Hu et al. \parencite{hu2020strategies}      & $\circ$  & $\checkmark$ & $\times$ \\
+\textbf{This Thesis}                        & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+This thesis directly and simultaneously addresses all three gaps through a single,
+cohesive, reproducible open-source computational pipeline combining:
+(i) Bemis-Murcko scaffold-aware data splitting;
+(ii) comprehensive 29-dimensional node and 12-dimensional edge featurisation;
+(iii) Bayesian hyperparameter optimisation via Optuna;
+and (iv) prospective virtual screening of Nepali medicinal plant compounds from
+COCONUT 2.0 with ADMET-proxy prioritisation.

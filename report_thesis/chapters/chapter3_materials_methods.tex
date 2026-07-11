@@ -1,0 +1,382 @@
+\chapter{Materials and Methods}
+
+\section{System Flow Diagram of the Computational Framework}
+
+\subsection{Overview of the Computational Framework}
+
+The overall methodology follows a systematic five-phase pipeline as illustrated in
+Figure~\ref{fig:workflow}. All code was implemented in Python 3.14 using
+exclusively open-source libraries and executed on a macOS system (CPU).
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  node distance=0.6cm,
+  phase/.style={rectangle, rounded corners=6pt, draw=black, thick,
+                fill=blue!20, minimum width=7cm, minimum height=0.75cm,
+                align=center, font=\bfseries\small},
+  proc/.style={rectangle, rounded corners=4pt, draw=black,
+               fill=cyan!12, minimum width=6.5cm, minimum height=0.5cm,
+               align=center, font=\small},
+  final/.style={rectangle, rounded corners=6pt, draw=black, very thick,
+                fill=green!25, minimum width=7cm, minimum height=0.75cm,
+                align=center, font=\bfseries},
+  arr/.style={->, thick, >=latex}
+]
+\node[phase] (ph1) {Phase 1: Data Acquisition \& Preprocessing};
+\node[proc, below=0.2cm of ph1] (p1a) {ChEMBL CHEMBL203 retrieval via REST API};
+\node[proc, below=of p1a] (p1b) {pIC$_{50}$ conversion, binary labelling, RDKit curation};
+\node[proc, below=of p1b] (p1c) {Exploratory data analysis (class balance, scaffold diversity)};
+\node[phase, below=0.55cm of p1c] (ph2) {Phase 2: Molecular Graph Construction};
+\node[proc, below=0.2cm of ph2] (p2a) {29-dim node features + 12-dim edge features};
+\node[proc, below=of p2a] (p2b) {Bemis-Murcko scaffold split (80/10/10)};
+\node[phase, below=0.55cm of p2b] (ph3) {Phase 3: Model Development \& Training};
+\node[proc, below=0.2cm of ph3] (p3a) {GCN, GAT, GIN, AttentiveFP, GraphSAGE vs. RF \& MLP};
+\node[proc, below=of p3a] (p3b) {Optuna Bayesian optimisation (AttentiveFP)};
+\node[phase, below=0.55cm of p3b] (ph4) {Phase 4: Evaluation \& Benchmarking};
+\node[proc, below=0.2cm of ph4] (p4a) {AUROC, AUPRC, F1, MCC on scaffold test set};
+\node[proc, below=of p4a] (p4b) {benchmark\_results.csv across 7 models};
+\node[phase, below=0.55cm of p4b] (ph5) {Phase 5: Nepali Plant Virtual Screening};
+\node[proc, below=0.2cm of ph5] (p5a) {COCONUT 2.0 — 7 Nepali plant species};
+\node[proc, below=of p5a] (p5b) {GCN + Random Forest consensus + Lipinski Ro5 + ADMET};
+\node[final, below=0.55cm of p5b] (out) {Ranked Nepali Natural-Product Lead Candidates};
+
+\foreach \a/\b in {ph1/p1a, p1a/p1b, p1b/p1c, p1c/ph2, ph2/p2a, p2a/p2b,
+                   p2b/ph3, ph3/p3a, p3a/p3b, p3b/ph4, ph4/p4a,
+                   p4a/p4b, p4b/ph5, ph5/p5a, p5a/p5b, p5b/out}
+  \draw[arr] (\a) -- (\b);
+\end{tikzpicture}
+\caption{Five-phase computational pipeline for GNN-based EGFR inhibitor classification
+         and Nepali medicinal plant virtual screening.}
+\label{fig:workflow}
+\end{figure}
+
+\section{Data Acquisition}
+
+\subsection{Target Selection}
+
+The primary target for bioactivity data retrieval was the Epidermal Growth Factor
+Receptor (EGFR), indexed in ChEMBL as target identifier \texttt{CHEMBL203}. EGFR
+was selected as the model target because it is a clinically validated oncology
+target in NSCLC, and CHEMBL203 aggregates the largest publicly available collection
+of quantitative EGFR inhibition bioactivity measurements.
+
+\subsection{Bioactivity Data Retrieval}
+
+Bioactivity data was retrieved programmatically from the ChEMBL database using the
+\texttt{chembl-webresource-client} Python library, which queries the then-current
+ChEMBL release through the REST API (retrieved May 2026). The query was
+restricted to compounds satisfying the following criteria:
+\begin{itemize}
+    \item \textbf{Standard type}: IC$_{50}$ (half-maximal inhibitory concentration)
+    \item \textbf{Standard relation}: Exact value only (\texttt{=})
+\end{itemize}
+
+Records with missing SMILES strings, missing IC$_{50}$ values, or non-exact
+relations ($>$, $<$, $\geq$, $\leq$) were excluded. IC$_{50}$ values reported
+in ChEMBL for this target are in nanomolar (nM) units, as assumed throughout
+the pIC$_{50}$ conversion. The raw dataset contained
+approximately 19,000 compound-activity pairs prior to deduplication and cleaning.
+
+\subsection{Data Cleaning and Labelling}
+
+The raw IC$_{50}$ values (in nanomolar units) were converted to the logarithmic
+pIC$_{50}$ scale by taking the negative base-ten logarithm of the molar
+concentration, so that more potent compounds receive higher pIC$_{50}$ scores.
+Binary activity labels were then assigned using the standard medicinal chemistry
+threshold: compounds with a pIC$_{50}$ of at least 6.0 were labelled \textit{active},
+and those below 6.0 were labelled \textit{inactive}. This threshold corresponds to
+an IC$_{50}$ of $\leq 1~\mu$M. For compounds with multiple reported measurements,
+the median pIC$_{50}$ was used to obtain a single robust value per molecule.
+
+\subsection{Molecular Standardisation and Filtering}
+
+Molecular standardisation was performed using RDKit (version 2026.3.2):
+\begin{itemize}
+    \item \textbf{Salt removal}: The largest fragment was retained for each compound.
+    \item \textbf{Canonicalisation}: SMILES strings were canonicalised to ensure
+          unique molecular representation.
+    \item \textbf{Molecular weight filter}: Compounds with MW $>$ 1000 Da
+          were excluded.
+    \item \textbf{Deduplication}: Duplicate canonical SMILES were collapsed using
+          the median pIC$_{50}$.
+\end{itemize}
+
+The final curated dataset comprised \textbf{10,523 unique compounds}, distributed
+as 7,792 actives (74.0\%) and 2,731 inactives (26.0\%).
+
+\subsection{Exploratory Data Analysis}
+
+Prior to molecular graph construction, an exploratory data analysis (EDA) step was
+performed on the cleaned dataset to characterise its statistical structure and inform
+modelling decisions. Using RDKit and pandas, the analysis quantified the class
+balance, the distribution of pIC$_{50}$ potency values, the ranges of the
+physicochemical properties (molecular weight, LogP), and the Bemis-Murcko scaffold
+diversity (number of unique scaffolds and the proportion of singleton scaffolds).
+This characterisation, reported in Chapter~4, both confirms the integrity of the
+curated dataset and motivates the use of scaffold-based splitting, given the
+long-tailed scaffold distribution observed.
+
+\section{Molecular Graph Construction}
+
+\subsection{Graph Representation}
+
+Each molecule was converted to an undirected graph using
+PyTorch Geometric (version 2.7.0), where every node represents an atom and every
+edge represents a chemical bond (the molecule-to-graph conversion is illustrated in
+Figure~\ref{fig:intro_mol2graph}). Each atom node carries a 29-dimensional feature
+vector and each bond edge a 12-dimensional feature vector, detailed below.
+
+\subsection{Node Features}
+
+Each atom was represented by a 29-dimensional feature vector encoding:
+\begin{itemize}
+    \item \textbf{Atom type} (one-hot, 10 dim): C, N, O, S, F, Cl, Br, I, P, Unknown
+    \item \textbf{Atom degree} (one-hot, 6 dim): 0, 1, 2, 3, 4, $\geq$5
+    \item \textbf{Formal charge} (1 dim): integer value
+    \item \textbf{Hydrogen count} (one-hot, 5 dim): 0, 1, 2, 3, $\geq$4
+    \item \textbf{Hybridisation} (one-hot, 5 dim): SP, SP2, SP3, SP3D, SP3D2
+    \item \textbf{Aromaticity} (binary, 1 dim)
+    \item \textbf{Ring membership} (binary, 1 dim)
+\end{itemize}
+
+\subsection{Edge Features}
+
+Each bond was represented by a 12-dimensional edge feature vector encoding:
+\begin{itemize}
+    \item \textbf{Bond type} (one-hot, 4 dim): Single, Double, Triple, Aromatic
+    \item \textbf{Conjugation} (binary, 1 dim)
+    \item \textbf{Ring membership} (binary, 1 dim)
+    \item \textbf{Stereochemistry} (one-hot, 6 dim): STEREONONE, STEREOANY,
+          STEREOZ, STEREOE, STEREOCIS, STEREOTRANS
+\end{itemize}
+
+\section{Data Splitting}
+
+To ensure rigorous evaluation on genuinely novel chemical scaffolds, a deterministic
+\textbf{Bemis-Murcko Scaffold Split} was implemented using RDKit. The Bemis-Murcko
+algorithm extracts the core macrocyclic framework of each molecule by retaining ring
+systems, linker atoms, and chain atoms connected to rings while removing side chains.
+Compounds sharing identical scaffold hashes were allocated exclusively to one split
+partition. The dataset was partitioned as follows:
+
+\begin{table}[H]
+\centering
+\caption{Dataset partitioning using the Bemis-Murcko scaffold split.}
+\label{tab:split}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Partition} & \textbf{Proportion} & \textbf{Compounds} & \textbf{Unique Scaffolds} \\
+\midrule
+Training   & 80\% & 8,418  & majority \\
+Validation & 10\% & 1,052  & held-out \\
+Test       & 10\% & 1,053  & held-out \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Machine Learning Model Development}
+
+\subsection{Traditional Baseline Models}
+
+Two traditional machine learning baselines were implemented using
+scikit-learn (version 1.8.0) trained on 2048-bit ECFP4 (Morgan) fingerprints
+(radius = 2) computed by RDKit:
+
+\begin{itemize}
+    \item \textbf{Random Forest (RF)}: An ensemble of 500 decision trees with
+          \texttt{class\_weight=} \texttt{'balanced'} to account for the 74:26 class imbalance.
+          Hyperparameters included \texttt{max\_features='sqrt'} and
+          \texttt{min\_samples\_leaf=1}.
+    \item \textbf{Multi-Layer Perceptron (MLP)}: A three-layer neural network
+          (2048$\to$512$\to$128$\to$1) with BatchNorm and Dropout(0.3) at each hidden
+          layer, trained on ECFP4 fingerprints with BCEWithLogitsLoss (pos\_weight),
+          Adam optimiser, and early stopping (patience = 10) on an internal 90/10
+          validation split. This evaluates whether deep learning on fingerprint features
+          alone offers benefits beyond the Random Forest ensemble.
+\end{itemize}
+
+\subsection{Graph Neural Network Architectures}
+
+Five GNN architectures were implemented using PyTorch Geometric:
+
+\subsubsection{Graph Convolutional Network (GCN)}
+
+The GCN propagates information using degree-normalised spectral convolution. At
+each layer, every atom embedding is updated by averaging the transformed
+embeddings of its bonded neighbours and itself, where the averaging weights are
+normalised by the degrees of the participating atoms (with added self-loops). This
+symmetric normalisation prevents high-degree atoms from dominating the
+representation. Three convolutional layers were stacked, each followed by batch
+normalisation, a ReLU non-linearity, and dropout.
+
+\subsubsection{Graph Attention Network (GAT)}
+
+The GAT replaces the fixed normalisation of the GCN with learnable attention
+weights: for each atom, the contribution of every neighbour is weighted by an
+attention coefficient computed from the two atoms' embeddings and the connecting
+bond features, then normalised across all neighbours. This lets the network learn
+which bonds and substructures are most relevant to activity. Four attention heads
+were used in the intermediate layers (their outputs concatenated) and a single
+averaged head in the final layer. Bond (edge) features were supplied directly to
+the attention mechanism through the GATv2 formulation.
+
+\subsubsection{Graph Isomorphism Network (GIN)}
+
+GIN is the most theoretically expressive message-passing scheme within the
+Weisfeiler--Lehman framework. Rather than averaging, each atom embedding is updated
+by summing its neighbours' embeddings (preserving multiset information that mean or
+max aggregation would discard), adding the atom's own embedding, and passing the
+result through a two-layer multilayer perceptron. The GINEConv variant used here
+extends this update to incorporate the 12-dimensional bond feature vectors.
+
+\subsubsection{GraphSAGE}
+
+GraphSAGE \parencite{hamilton2017graphsage} updates each atom by combining its own
+previous embedding with the mean of its neighbours' embeddings and passing the
+combination through a learnable transformation. Because the update depends only on
+local neighbourhood aggregation rather than the global graph structure, GraphSAGE
+is inherently inductive and generalises naturally to unseen molecules. Three
+SAGEConv layers with batch normalisation and ReLU activation are used, followed by
+concatenated global mean and max pooling and a linear classification head.
+GraphSAGE was included to provide an inductive neighbourhood-sampling baseline that
+is evaluated under the same scaffold split conditions as the attention-based models.
+
+\subsubsection{AttentiveFP}
+
+AttentiveFP implements a two-level attention mechanism. At the atom level, a graph
+attention layer aggregates neighbourhood information weighted by learned
+atom--atom attention scores. At the molecule level, a Gated Recurrent Unit
+(GRU)-based readout iteratively refines a single global molecular embedding over
+several timesteps, allowing the model to focus on the substructures most predictive
+of activity. Crucially, AttentiveFP natively accepts both the atom and bond feature
+vectors without preprocessing, making it uniquely suited to exploit the full
+29-dimensional node and 12-dimensional edge feature specification.
+
+\subsection{Training Protocol}
+
+All GNN models were trained with the following protocol:
+\begin{itemize}
+    \item \textbf{Loss function}: Binary cross-entropy with logits incorporating
+          a positive class weight (the ratio of negative to positive training
+          examples, approximately 0.34) to address the class imbalance.
+    \item \textbf{Optimiser}: Adam with its default momentum parameters.
+    \item \textbf{Scheduler}: \texttt{ReduceLROnPlateau} with reduction factor 0.5
+          and patience 10 epochs.
+    \item \textbf{Early stopping}: Training halted if validation AUROC did not
+          improve for 20 consecutive epochs (30 for the tuned AttentiveFP).
+    \item \textbf{Batch size}: 64 for default training; selected by Optuna for the
+          tuned AttentiveFP.
+    \item \textbf{Readout}: Global mean and max pooling were concatenated to form
+          the graph-level representation.
+\end{itemize}
+
+\subsection{Model Evaluation Metrics}
+
+Models were evaluated using the following metrics on the scaffold-held-out test set:
+
+\begin{itemize}
+    \item \textbf{AUROC}: Threshold-independent measure of discriminative ability
+          across the full range of classification thresholds.
+    \item \textbf{AUPRC}: Area under the precision-recall curve, more informative
+          than AUROC under class imbalance.
+    \item \textbf{F1-Score}: Harmonic mean of precision and recall at the 0.5
+          decision threshold.
+    \item \textbf{Matthews Correlation Coefficient (MCC)}: A balanced correlation
+          between predicted and true labels derived from all four confusion-matrix
+          counts (true/false positives and negatives), ranging from $-1$ (total
+          disagreement) through $0$ (random) to $+1$ (perfect prediction). It is
+          robust to class imbalance and is reported as the primary balanced metric.
+    \item \textbf{Accuracy}: Proportion of correctly classified compounds.
+\end{itemize}
+
+\subsection{Hyperparameter Tuning}
+
+Bayesian hyperparameter optimisation was performed for the AttentiveFP model using
+the Optuna framework (version 4.8.0) with the Tree-structured Parzen Estimator (TPE)
+sampler. The search space encompassed:
+
+\begin{table}[H]
+\centering
+\caption{Hyperparameter search space for AttentiveFP Optuna optimisation.}
+\label{tab:search}
+\begin{tabular}{lll}
+\toprule
+\textbf{Hyperparameter} & \textbf{Type} & \textbf{Range / Options} \\
+\midrule
+\texttt{hidden\_channels}  & Categorical   & \{64, 128, 256\}           \\
+\texttt{num\_layers}       & Integer       & 2--4                        \\
+\texttt{num\_timesteps}    & Integer       & 2--4                        \\
+\texttt{dropout}           & Float (log)   & 0.1--0.5                    \\
+\texttt{batch\_size}       & Categorical   & \{32, 64, 128\}             \\
+\texttt{learning\_rate}    & Float (log)   & $10^{-4}$--$10^{-2}$        \\
+\texttt{weight\_decay}     & Float (log)   & $10^{-5}$--$10^{-3}$        \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The objective function to maximise was validation AUROC. Pruning of unpromising
+trials was performed using the Optuna \texttt{MedianPruner}.
+
+\section{Nepali Medicinal Plant Virtual Screening}
+
+\subsection{Plant Species and Compound Library Curation}
+
+A virtual screening library was assembled from the COCONUT 2.0 natural product
+database \parencite{sorokina2021coconut} by filtering for compounds annotated to
+seven traditional Nepali medicinal plant species:
+
+\begin{table}[H]
+\centering
+\caption{Nepali medicinal plant species used for virtual screening.}
+\label{tab:plants}
+\begin{tabular}{llc}
+\toprule
+\textbf{Species} & \textbf{Common Name} & \textbf{Traditional Use} \\
+\midrule
+\textit{Swertia chirayita}     & Chirayito       & Fever, liver conditions \\
+\textit{Rhododendron arboreum} & Lali Gurans     & Anti-inflammatory        \\
+\textit{Nardostachys jatamansi}& Jatamansi       & Neurological, cardiac    \\
+\textit{Terminalia chebula}    & Haritaki        & Antioxidant, Triphala    \\
+\textit{Berberis aristata}     & Chutro          & Anticancer (berberine)   \\
+\textit{Ocimum sanctum}        & Tulsi           & Anticancer, anti-EGFR    \\
+\textit{Tinospora cordifolia}  & Giloy/Gurjo     & Immunomodulatory         \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Retrieved compounds were subjected to the same preprocessing pipeline as the
+ChEMBL training data: salt removal (largest fragment retained), SMILES
+canonicalisation, molecular weight filter (MW $\leq$ 1000 Da), removal of
+invalid SMILES, and deduplication by canonical SMILES. ADMET-proxy descriptors
+(MW, LogP, HBD, HBA, TPSA, QED) were computed using RDKit for all retained
+compounds.
+
+\subsection{Inference and Prioritisation}
+
+To avoid basing lead selection on any single model---and in particular to avoid the
+weakest classifier---the library was scored with the study's two best-performing
+models: the best graph neural network (GCN) and the best overall classifier (Random
+Forest). For the GCN, each compound was featurised using the identical 29-dimensional
+node and 12-dimensional edge graph specification as the training data and passed
+through a forward inference to produce $\hat{p}_i = P(\text{active} \mid G_i)$. For
+the Random Forest, each compound was encoded as a 2048-bit ECFP4 fingerprint and
+scored with the trained ensemble. Predictions from both models were retained so that
+consensus (agreement between the two best models) could be assessed. The tuned
+AttentiveFP screen was also computed for comparison, exposing its over-confidence
+relative to the two best-calibrated models.
+
+Compounds were ranked by predicted activity probability $\hat{p}_i$ under each model.
+The top leads were further assessed by:
+\begin{itemize}
+    \item \textbf{Lipinski Rule of Five compliance}: MW $\leq$ 500 Da, LogP $\leq$ 5,
+          HBD $\leq$ 5, HBA $\leq$ 10 (necessary condition for oral bioavailability).
+    \item \textbf{QED score}: A composite drug-likeness score targeting QED $\geq$ 0.40.
+    \item \textbf{TPSA}: Values $\leq$ 140 \AA$^2$ for adequate oral absorption.
+\end{itemize}
+
+The final outputs are prioritised ranked lists for each best model
+(\texttt{results/nepali\_leads\_rf.csv} and \texttt{results/nepali\_leads\_gcn.csv})
+of Nepali natural-product-derived compounds with computed ADMET-proxy properties,
+representing actionable candidates for experimental EGFR inhibition assays.
+
