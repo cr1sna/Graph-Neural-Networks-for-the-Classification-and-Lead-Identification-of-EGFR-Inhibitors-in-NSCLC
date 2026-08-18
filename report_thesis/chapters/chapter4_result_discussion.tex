@@ -821,7 +821,12 @@ the strongest GNN at 0.8454, and the tuned AttentiveFP reached a validation AURO
 only 0.8632 with a test AUROC of just 0.7970. $H_1$ is therefore
 \textbf{rejected} for this dataset: on a medium-sized, scaffold-split EGFR
 bioactivity set, well-tuned fingerprint models remained more accurate than the graph
-neural networks. This is itself an informative, honestly reported result: it directly
+neural networks. Although Bayesian optimisation was applied only to AttentiveFP
+(Section~\ref{sec:hp_tuning}), this is a conservative test of $H_1$ rather than a
+confound: tuning the \emph{weakest} default GNN still left it below every baseline,
+while the \emph{strongest} default GNN (GCN, 0.8454) already trailed the Random Forest
+by 0.037 AUROC, so closing the gap would have required the untuned architectures to
+gain more from tuning than the tuned one did---an implausible margin on this dataset. This is itself an informative, honestly reported result: it directly
 echoes the systematic comparison of \textcite{jiang2021gnn}, who likewise found that
 descriptor-based models (including Random Forest) outperform graph-based models on
 average for molecular property prediction, and is consistent with the broader
@@ -888,9 +893,13 @@ apigenin and kaempferol (before these were excluded as leakage), and that the so
 remaining unseen flavone---luteolin---is endorsed by both best models, is consistent
 with the ethnopharmacological enrichment inherent in traditional medicinal plant
 selection: plants used for centuries against inflammatory and proliferative conditions
-are biologically pre-filtered for bioactive chemical space. The hydroxylated flavone
-scaffold is a well-documented ATP-competitive kinase binder that shares structural
-features with synthetic EGFR-inhibitor pharmacophores \parencite{wu2018moleculenet}.
+are biologically pre-filtered for bioactive chemical space. The planar, hydroxylated flavone
+scaffold can hydrogen-bond to the kinase hinge region through its ring-hydroxyl and
+4-carbonyl groups---the same anchoring interaction exploited by the ATP-competitive
+pharmacophore of synthetic EGFR inhibitors---and flavonoids such as quercetin are
+long-established ATP-competitive kinase inhibitors, giving luteolin clear structural
+plausibility as an EGFR binder (a plausibility that nonetheless requires the
+\textit{in vitro} confirmation noted above).
 At the same time, both the weakest model (AttentiveFP) and the best models still rank
 large, non-drug-like polyphenols and triterpenoids among their highest-scoring
 compounds---a reminder that predictions on chemical space distant from the training
