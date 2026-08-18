@@ -84,8 +84,20 @@ def screen_multimodel(
     rf = RandomForestBaseline()
     rf.fit([d.smiles for d in train], [int(d.y.item()) for d in train])
 
-    # --- library ---
-    lib = pd.read_csv(plant_csv)
+    # --- library: exclude compounds already present in the ChEMBL data so the
+    #     screen is genuinely prospective (no train/screen leakage) ---
+    from rdkit import Chem
+    def _canon(s):
+        m = Chem.MolFromSmiles(str(s)); return Chem.MolToSmiles(m) if m else None
+    chembl = pd.read_csv(cleaned_csv)
+    csmi_col = [c for c in chembl.columns if "smile" in c.lower()][0]
+    chembl_canon = set(filter(None, (_canon(s) for s in chembl[csmi_col])))
+    lib_full = pd.read_csv(plant_csv)
+    lib_full["_canon"] = lib_full["smiles"].map(_canon)
+    lib = lib_full[~lib_full["_canon"].isin(chembl_canon)].drop(
+        columns=["_canon"]).reset_index(drop=True)
+    logger.info("De-duplication: %d COCONUT compounds; %d already in ChEMBL removed; "
+                "%d screened", len(lib_full), len(lib_full) - len(lib), len(lib))
     smiles = lib["smiles"].astype(str).tolist()
 
     # GCN inference on molecular graphs (dropping unparseable SMILES)

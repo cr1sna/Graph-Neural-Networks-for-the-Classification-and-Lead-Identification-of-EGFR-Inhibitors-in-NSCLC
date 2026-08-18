@@ -11,43 +11,44 @@ exclusively open-source libraries and executed on a macOS system (CPU).
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
-  node distance=0.6cm,
+  node distance=0.55cm,
   phase/.style={rectangle, rounded corners=6pt, draw=black, thick,
-                fill=blue!20, minimum width=7cm, minimum height=0.75cm,
+                fill=blue!20, minimum width=7.6cm, minimum height=0.7cm,
                 align=center, font=\bfseries\small},
   proc/.style={rectangle, rounded corners=4pt, draw=black,
-               fill=cyan!12, minimum width=6.5cm, minimum height=0.5cm,
+               fill=cyan!12, minimum width=7.2cm, minimum height=0.5cm,
                align=center, font=\small},
   final/.style={rectangle, rounded corners=6pt, draw=black, very thick,
-                fill=green!25, minimum width=7cm, minimum height=0.75cm,
-                align=center, font=\bfseries},
+                fill=green!25, minimum width=7.6cm, minimum height=0.7cm,
+                align=center, font=\bfseries\small},
   arr/.style={->, thick, >=latex}
 ]
 \node[phase] (ph1) {Phase 1: Data Acquisition \& Preprocessing};
 \node[proc, below=0.2cm of ph1] (p1a) {ChEMBL CHEMBL203 retrieval via REST API};
 \node[proc, below=of p1a] (p1b) {pIC$_{50}$ conversion, binary labelling, RDKit curation};
 \node[proc, below=of p1b] (p1c) {Exploratory data analysis (class balance, scaffold diversity)};
-\node[phase, below=0.55cm of p1c] (ph2) {Phase 2: Molecular Graph Construction};
+\node[phase, below=0.5cm of p1c] (ph2) {Phase 2: Molecular Graph Construction};
 \node[proc, below=0.2cm of ph2] (p2a) {29-dim node features + 12-dim edge features};
-\node[proc, below=of p2a] (p2b) {Bemis-Murcko scaffold split (80/10/10)};
-\node[phase, below=0.55cm of p2b] (ph3) {Phase 3: Model Development \& Training};
-\node[proc, below=0.2cm of ph3] (p3a) {GCN, GAT, GIN, AttentiveFP, GraphSAGE vs. RF \& MLP};
-\node[proc, below=of p3a] (p3b) {Optuna Bayesian optimisation (AttentiveFP)};
-\node[phase, below=0.55cm of p3b] (ph4) {Phase 4: Evaluation \& Benchmarking};
+\node[phase, below=0.5cm of p2a] (ph3) {Phase 3: Model Development \& Training};
+\node[proc, below=0.2cm of ph3] (p3a) {\textbf{5 GNNs} (GCN, GAT, GIN, AttentiveFP, GraphSAGE)\\\textbf{vs.\ 2 traditional ML baselines} (Random Forest, MLP)};
+\node[phase, below=0.5cm of p3a] (ph4) {Phase 4: Evaluation \& Benchmarking};
 \node[proc, below=0.2cm of ph4] (p4a) {AUROC, AUPRC, F1, MCC on scaffold test set};
-\node[proc, below=of p4a] (p4b) {benchmark\_results.csv across 7 models};
-\node[phase, below=0.55cm of p4b] (ph5) {Phase 5: Nepali Plant Virtual Screening};
-\node[proc, below=0.2cm of ph5] (p5a) {COCONUT 2.0 — 7 Nepali plant species};
-\node[proc, below=of p5a] (p5b) {GCN + Random Forest consensus + Lipinski Ro5 + ADMET};
-\node[final, below=0.55cm of p5b] (out) {Ranked Nepali Natural-Product Lead Candidates};
+\node[phase, below=0.5cm of p4a] (ph5) {Phase 5: Nepali Plant Virtual Screening};
+\node[proc, below=0.2cm of ph5] (p5a) {\textbf{Select 7 Nepali medicinal plant species}\\(documented anti-cancer / anti-inflammatory use $+$ COCONUT~2.0 coverage)};
+\node[proc, below=of p5a] (p5b) {COCONUT 2.0 retrieval + RDKit standardisation $\rightarrow$ 535 compounds};
+\node[proc, below=of p5b] (p5c) {Score with \textbf{best models} (GCN $+$ Random Forest consensus)\\$+$ Lipinski Ro5, QED, ADMET-proxy filtering};
+\node[final, below=0.5cm of p5c] (out) {Ranked Nepali Natural-Product Lead Candidates};
 
-\foreach \a/\b in {ph1/p1a, p1a/p1b, p1b/p1c, p1c/ph2, ph2/p2a, p2a/p2b,
-                   p2b/ph3, ph3/p3a, p3a/p3b, p3b/ph4, ph4/p4a,
-                   p4a/p4b, p4b/ph5, ph5/p5a, p5a/p5b, p5b/out}
+\foreach \a/\b in {ph1/p1a, p1a/p1b, p1b/p1c, p1c/ph2, ph2/p2a, p2a/ph3,
+                   ph3/p3a, p3a/ph4, ph4/p4a, p4a/ph5,
+                   ph5/p5a, p5a/p5b, p5b/p5c, p5c/out}
   \draw[arr] (\a) -- (\b);
 \end{tikzpicture}
-\caption{Five-phase computational pipeline for GNN-based EGFR inhibitor classification
-         and Nepali medicinal plant virtual screening.}
+\caption{Five-phase computational pipeline: benchmarking five GNN architectures
+         against traditional machine-learning baselines for EGFR inhibitor
+         classification, and deploying the best-performing models (GCN and Random
+         Forest) to screen a Nepali medicinal-plant compound library---whose seven
+         species were selected by documented anti-cancer use and COCONUT~2.0 coverage.}
 \label{fig:workflow}
 \end{figure}
 

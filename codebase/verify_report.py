@@ -100,9 +100,14 @@ for stage, v in zip(["lib", ">=.5", ">=.8", ">=.9", "drug-like"], _gcn):
     present(str(v), f"GCN funnel {stage}")
 for stage, v in zip(["lib", ">=.5", ">=.8", ">=.9", "drug-like"], _rf):
     present(str(v), f"RF funnel {stage}")
-# RF hit-rate percentages quoted in the text/appendix
-present("33.8", "RF hit rate >=0.5 (%)")
-present("4.5", "GCN hit rate >=0.5 (%)")
+# RF hit-rate percentages quoted in the text/appendix (de-duplicated 527-cpd library)
+present("34.0", "RF hit rate >=0.5 (%)")
+present("4.6", "GCN hit rate >=0.5 (%)")
+
+# COCONUT screening-library physicochemical distribution (vs ChEMBL training)
+present(f"{leads_rf['mw'].median():.1f}", "COCONUT MW median (341.4)")
+present(f"{leads_rf['tpsa'].median():.1f}", "COCONUT TPSA median (66.8)")
+present(f"{100 * leads_rf['ro5_compliant'].mean():.1f}", "COCONUT Lipinski % (53.7)")
 
 # per-species library counts (from the full RF screen of all 535 compounds)
 for sp, cnt in leads.groupby("plant_species").size().items():
@@ -124,9 +129,9 @@ present("47\\%", "Lipinski-compliant fraction")
 
 # ---------------------------------------------------------------- FLOW DIAGRAM
 present("Exploratory data analysis", "EDA node in flow diagram / methodology")
-present("benchmark\\_results.csv across 7 models", "benchmark node in flow diagram")
+present("traditional ML baselines", "GNN-vs-ML comparison node in flow diagram")
 present("29-dim node features + 12-dim edge features", "featurisation node")
-present("Bemis-Murcko scaffold split (80/10/10)", "split node")
+present("Select 7 Nepali medicinal plant species", "plant-selection node in flow diagram")
 
 # ---------------------------------------------------------------- FIGURE DATA
 # Guard against figure/table drift: the hard-coded data in the figure generator

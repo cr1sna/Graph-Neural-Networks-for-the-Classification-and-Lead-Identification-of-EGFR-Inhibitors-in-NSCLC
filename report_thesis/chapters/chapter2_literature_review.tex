@@ -29,49 +29,20 @@ is a 134 kDa single-pass transmembrane receptor tyrosine kinase (RTK) encoded
 by the \textit{EGFR} gene on chromosome 7p11.2. EGFR is the founding member of
 the ErbB receptor family (ErbB1--ErbB4), which collectively orchestrates
 fundamental cellular processes including proliferation, differentiation, survival,
-and motility \parencite{hynes2005erbb}. Structurally, EGFR is organised into
-four functional domains:
-\begin{enumerate}
-    \item \textbf{Extracellular domain} (domains I--IV): A glycosylated
-    ectodomain that binds EGF-family ligands (EGF, TGF-$\alpha$, amphiregulin,
-    epiregulin, betacellulin, and others) through domains I and III, while domain
-    II mediates receptor dimerisation.
-    \item \textbf{Transmembrane domain}: A single $\alpha$-helical segment
-    that anchors the receptor in the plasma membrane and transmits conformational
-    changes from the extracellular to the intracellular compartment.
-    \item \textbf{Juxtamembrane domain}: An intracellular regulatory segment that
-    modulates kinase activity through direct interaction with the kinase domain.
-    \item \textbf{Intracellular kinase domain}: A bilobed catalytic domain
-    (N-lobe and C-lobe) that binds ATP and catalyses phosphotransfer to substrate
-    tyrosine residues. The ATP-binding cleft lies at the interface of the two lobes
-    and contains the hinge region, the P-loop, the activation loop, and the DFG motif.
-    The kinase domain is followed by a carboxy-terminal tail bearing multiple
-    autophosphorylation sites (Tyr992, Tyr1045, Tyr1068, Tyr1086, Tyr1148, Tyr1173)
-    that recruit downstream effector proteins.
-\end{enumerate}
+and motility \parencite{hynes2005erbb}. Structurally, EGFR comprises a glycosylated \textbf{extracellular domain} (I--IV)
+that binds EGF-family ligands and mediates dimerisation, a single-pass
+\textbf{transmembrane} helix, a regulatory \textbf{juxtamembrane} segment, and a
+bilobed intracellular \textbf{kinase domain}. The ATP-binding cleft---formed at the
+N-/C-lobe interface and lined by the hinge, P-loop, activation loop, and DFG
+motif---is the target of all small-molecule EGFR inhibitors, and a carboxy-terminal
+tail bears the autophosphorylation sites (Tyr1068, Tyr1173, and others) that recruit
+downstream effectors.
 
-Under normal physiological conditions, EGFR is maintained in an autoinhibited,
-inactive state characterised by an asymmetric kinase dimer configuration. Ligand
-binding induces receptor homo- or heterodimerisation with other ErbB family members
-(HER2, HER3, HER4), leading to relief of autoinhibition, \textit{trans}-autophosphorylation
-of key tyrosine residues on the carboxy-terminal tail, and recruitment of SH2- and
-PTB-domain-containing adaptor proteins \parencite{siegel2023cancer}. These
-phosphorylated docking sites initiate multiple downstream signalling cascades:
-
-\begin{itemize}
-    \item The \textbf{RAS-RAF-MEK-ERK (MAPK) pathway}: Activated by recruitment
-    of GRB2-SOS complex, driving G1-to-S cell cycle progression, cell proliferation,
-    and differentiation.
-    \item The \textbf{PI3K-AKT-mTOR pathway}: Activated via p85/p110 PI3K
-    recruitment, promoting cell survival, inhibiting apoptosis (via BAD
-    phosphorylation and FOXO suppression), and stimulating protein synthesis.
-    \item The \textbf{STAT3/5 signalling pathway}: Direct EGFR kinase-mediated
-    phosphorylation of STAT3 and STAT5, driving transcription of anti-apoptotic
-    (Bcl-xL) and proliferative (cyclin D1) genes.
-    \item The \textbf{PLC-$\gamma$ pathway}: Activation of phospholipase C-$\gamma$,
-    generating IP3 and diacylglycerol, which mobilise intracellular calcium and
-    activate PKC isoforms.
-\end{itemize}
+Under normal conditions EGFR is autoinhibited; ligand binding drives homo- or
+heterodimerisation with other ErbB members (HER2--HER4), relieving autoinhibition and
+triggering \textit{trans}-autophosphorylation that activates the RAS--RAF--MEK--ERK
+(MAPK), PI3K--AKT--mTOR, STAT3/5, and PLC-$\gamma$ signalling cascades---collectively
+driving proliferation, survival, and differentiation \parencite{siegel2023cancer}.
 
 \subsection{Oncogenic EGFR Mutations in NSCLC}
 
@@ -223,25 +194,13 @@ drug development.
 
 \subsection{Overview of the ChEMBL Database}
 
-The ChEMBL database, maintained by the European Molecular Biology
-Laboratory-European Bioinformatics Institute (EMBL-EBI), is the largest and most
-extensively curated public repository of bioactive small molecules and their
-quantitative biological activities \parencite{mendez2019chembl}. As of recent
-releases, the database contains approximately:
-\begin{itemize}
-    \item $>$2.37 million distinct bioactive compounds
-    \item $>$20.7 million bioactivity measurements
-    \item $>$14,000 therapeutic targets from multiple organisms
-    \item $>$85,000 document sources (primarily peer-reviewed publications)
-\end{itemize}
-
-ChEMBL is constructed primarily through systematic curation of bioactivity data
-from published medicinal chemistry and pharmacology literature, supplemented by
-direct data depositions from industry partners, academic consortia (e.g., CanSAR,
-SMACC), and high-throughput screening datasets (e.g., PubChem BioAssay, GSK
-PKIS). The EGFR kinase entry (target ID: CHEMBL203) is one of the most extensively
-annotated targets in the database, reflecting decades of intense drug discovery
-activity around this oncology target.
+The ChEMBL database, maintained by EMBL-EBI, is the largest curated public repository
+of bioactive small molecules and their quantitative activities
+\parencite{mendez2019chembl}, comprising over 2.3 million compounds and 20 million
+bioactivity measurements across more than 14,000 targets, curated primarily from the
+medicinal-chemistry literature. The EGFR entry (target ID: CHEMBL203) is among its
+most extensively annotated targets, reflecting decades of drug-discovery activity
+around this oncology target.
 
 \subsection{Bioactivity Endpoints and \texorpdfstring{pIC$_{50}$}{pIC50} Conversion}
 
@@ -268,30 +227,17 @@ Utilising ChEMBL data for machine learning presents several important quality
 challenges that must be addressed during data curation \parencite{wu2018moleculenet}:
 
 \begin{itemize}
-    \item \textbf{Assay heterogeneity}: IC$_{50}$ measurements originate from
-    hundreds of independent laboratories employing different assay formats
-    (biochemical kinase assay, cell-based viability assay, radiometric assay,
-    TR-FRET assay), cell lines, substrate concentrations, ATP concentrations,
-    temperature, and pH. These variations can shift absolute IC$_{50}$ values by
-    1--2 orders of magnitude, introducing systematic noise into the training labels.
-    \item \textbf{Censored measurements}: A significant proportion of reported
-    values are censored (greater-than or less-than, e.g., IC$_{50}$ $>$ 10,000 nM
-    or IC$_{50}$ $<$ 0.1 nM), indicating that the compound's activity exceeded
-    the assay's detection limits. Standard practice restricts training data to
-    exact (``='') measurements only.
-    \item \textbf{Replicate measurements}: The same compound may have been tested
-    multiple times across different publications. Aggregating multiple pIC$_{50}$
-    measurements using the median is the approach adopted in this study to reduce the
-    influence of outliers.
-    \item \textbf{Structural redundancy}: Different chemical databases may use
-    different SMILES notation conventions for the same compound (e.g., different
-    salt forms, stereochemistry assignments). Canonicalisation using RDKit and
-    salt stripping (retaining the largest fragment) are essential preprocessing
-    steps to remove duplicates.
-    \item \textbf{Activity cliff sensitivity}: Pairs of structurally similar
-    compounds with dramatically different activity values (activity cliffs) create
-    challenging regions of chemical space for both fingerprint-based and
-    graph-based models.
+    \item \textbf{Assay heterogeneity}: IC$_{50}$ values from hundreds of laboratories
+    use different assay formats and conditions, which can shift absolute values by
+    1--2 orders of magnitude and add label noise.
+    \item \textbf{Censored measurements}: Many values are censored ($>$ or $<$);
+    standard practice retains only exact (``='') measurements.
+    \item \textbf{Replicate measurements}: Repeated tests of the same compound are
+    aggregated by the median pIC$_{50}$ to limit outlier influence.
+    \item \textbf{Structural redundancy}: Salt forms and notation differences are
+    resolved by RDKit canonicalisation and largest-fragment salt stripping.
+    \item \textbf{Activity cliffs}: Structurally similar compounds with very different
+    activities challenge both fingerprint- and graph-based models.
 \end{itemize}
 
 % ----------------------------------------------------------------
@@ -449,32 +395,16 @@ performance in the TDC ADMET benchmarks \parencite{huang2021therapeutics}.
 
 \subsection{Graph Attention Network (GAT)}
 
-The Graph Attention Network (GAT) \parencite{velickovic2018gat} addresses the
-uniform weighting limitation of GCN by introducing learnable, data-driven
-attention coefficients for each pair of connected atoms. For each atom, the GAT
-computes a normalised attention weight for every neighbour from a learnable scoring
-function applied to the two atoms' transformed representations. These weights, which
-sum to one across the neighbourhood, then determine how strongly each neighbour
-contributes to the atom's updated representation, replacing the fixed
-degree-based averaging of the GCN with a learned, data-driven weighting.
-
-To stabilise learning and capture diverse chemical interaction patterns, several
-parallel attention ``heads'' are typically used, with their outputs concatenated in
-intermediate layers and averaged in the final layer.
-
-The GATv2 extension \parencite{brody2022attentive} resolves an expressivity
-limitation of the original GAT formulation (the ``static attention'' problem),
-in which the ordering of attention coefficients is query-independent. GATv2
-modifies the attention scoring function to ensure that attention weights are
-dynamically conditioned on both the query and key node representations.
-
-The attention mechanism of GAT is of particular value in molecular property
-prediction because different atoms contribute unequally to a given chemical
-property: in EGFR inhibitors, for example, the hinge-binding nitrogen atoms
-of the quinazoline pharmacophore are far more critical to EGFR activity than
-peripheral solvent-exposed substituents. GAT's ability to learn and apply
-differential attention across atom pairs enables it to focus on pharmacophore-
-relevant atoms during representation learning.
+The Graph Attention Network (GAT) \parencite{velickovic2018gat} replaces the GCN's
+fixed degree-based averaging with learnable attention coefficients: each neighbour's
+contribution to an atom's update is weighted by a learned score computed from the two
+atoms' representations. Several parallel attention ``heads'' are used---concatenated
+in intermediate layers and averaged in the final one---and the GATv2 extension
+\parencite{brody2022attentive} fixes the ``static attention'' limitation of the
+original formulation by conditioning the weights dynamically on both the query and key
+nodes. This lets the network focus on the atoms most relevant to activity, such as the
+hinge-binding nitrogens of the quinazoline pharmacophore over solvent-exposed
+substituents.
 
 \subsection{Graph Isomorphism Network (GIN)}
 
@@ -505,77 +435,32 @@ and MoleculeNet \parencite{wu2018moleculenet}.
 
 \subsection{AttentiveFP}
 
-AttentiveFP \parencite{xiong2020attentivefp} is a graph neural network architecture
-purpose-built for molecular property prediction, distinguishing itself from generic
-GNN architectures through two key innovations: \textbf{atom-level attention}
-and \textbf{molecule-level iterative readout}.
-
-\subsubsection{Atom-Level Attention}
-
-At each message-passing step, AttentiveFP computes context-dependent atom-level
-attention weights that modulate the contribution of each neighbour to the central
-atom's representation update. For each atom and neighbour pair, an attention score is
-computed from the two atoms' representations \textit{together with the connecting
-bond's feature vector}, and these scores are normalised across the neighbourhood to
-obtain the final attention weights.
-
-This attention formulation is distinguished by its \textit{native integration of
-edge features} in the attention computation: the bond feature vector is combined
-with the atom representations before the attention scoring step, allowing the model
-to condition attention weights on bond-level chemical information (for example,
-assigning higher attention to double bonds in aromatic systems).
-
-\subsubsection{Molecule-Level Iterative Readout}
-
-After atom-level message passing, AttentiveFP employs a novel iterative readout
-procedure that refines a single molecule-level embedding over several timesteps. A
-context vector is initialised from the mean of all the final atom representations.
-At each timestep, the context vector attends over all atoms (computing
-normalised attention weights from the context and each atom representation), forms a
-weighted summary of the atoms, and uses a Gated Recurrent Unit (GRU) to update
-itself from that summary.
-
-The use of a GRU enables the molecular embedding to be iteratively refined, allowing
-the model to capture increasingly global structural context with each timestep. The
-final context vector serves as the molecular embedding that is passed to the
-classification head.
-
-AttentiveFP has been shown to achieve state-of-the-art or near-state-of-the-art
-performance across multiple MoleculeNet benchmarks \parencite{xiong2020attentivefp,
-jiang2021gnn}, with the multi-step molecular attention mechanism and edge feature
-integration providing particularly significant advantages on property prediction
-tasks where long-range intramolecular interactions and bond-level chemistry are
-important. On this basis AttentiveFP was selected as the architecture on which
-this study focused its hyperparameter optimisation, although the benchmark in
-Chapter~4 ultimately found it to be the weakest of the five graph networks on the
-scaffold test set.
+AttentiveFP \parencite{xiong2020attentivefp} is a GNN purpose-built for molecular
+property prediction, combining two mechanisms. At the \textbf{atom level}, attention
+weights modulating each neighbour's contribution are computed from the two atoms'
+representations \emph{together with the connecting bond's feature vector}, natively
+integrating edge chemistry into the attention. At the \textbf{molecule level}, an
+iterative readout refines a single molecular embedding: a context vector, initialised
+from the mean atom representation, repeatedly attends over all atoms and is updated by
+a Gated Recurrent Unit (GRU) over several timesteps, capturing progressively more
+global structure. AttentiveFP reaches near state-of-the-art performance on several
+MoleculeNet benchmarks \parencite{xiong2020attentivefp, jiang2021gnn}, which is why it
+was chosen as the architecture for hyperparameter optimisation here---although the
+benchmark in Chapter~4 ultimately found it the weakest of the five graph networks on
+the scaffold test set.
 
 
 \subsection{GraphSAGE}
 
 GraphSAGE (Graph SAmple and aggreGatE) \parencite{hamilton2017graphsage} is an
-inductive representation learning framework designed for graphs where new nodes
-must be embedded without retraining. Unlike GCN and GAT, which operate on the
-full graph adjacency matrix, GraphSAGE learns aggregation functions from
-\textit{sampled} local neighbourhoods, making it particularly suitable for
-large-scale graphs.
-
-The GraphSAGE update proceeds in two steps. First, each atom computes the mean of
-its neighbours' representations to form a neighbourhood summary. Second, this summary
-is concatenated with the atom's own previous representation and passed through a
-learnable transformation followed by a non-linear activation. The concatenation of
-the atom's own representation with its neighbourhood aggregate ensures that the
-atom's individual chemical identity is preserved alongside its local chemical
-context.
-
-GraphSAGE offers two advantages in the molecular property prediction context:
-(i) mean aggregation is robust to variable-degree atoms without the normalisation
-instability that can affect degree-normalised GCN in molecules with high-degree
-atoms (e.g., bridgehead atoms in polycyclic scaffolds); and (ii) the inductive
-framework generalises well to novel scaffolds not seen at training time, which is
-directly relevant under Bemis-Murcko scaffold evaluation. In this study, GraphSAGE
-uses mean aggregation with BatchNorm and concatenated mean+max global pooling,
-following the same readout strategy as GCN.
+inductive framework that learns aggregation functions from sampled local
+neighbourhoods rather than the full adjacency matrix. Each atom forms the mean of its
+neighbours' representations, concatenates this with its own previous representation,
+and passes the result through a learnable transformation---preserving the atom's
+identity alongside its local context. Mean aggregation is robust to high-degree atoms,
+and the inductive formulation generalises naturally to novel scaffolds, which is
+directly relevant under Bemis-Murcko evaluation. Here GraphSAGE uses BatchNorm and
+concatenated mean+max pooling, following the same readout as GCN.
 
 % ----------------------------------------------------------------
 \section{Nepali Medicinal Plants and Natural Product Databases}
@@ -592,33 +477,18 @@ Several Nepali medicinal plants have been
 ethnopharmacologically associated with anticancer activity and are candidates
 for systematic computational evaluation as potential EGFR inhibitor sources.
 
-Seven species were selected for this study on the basis of documented biological
-activity, accessibility in the COCONUT 2.0 database, and relevance to respiratory
-and oncological conditions:
+Seven species were selected on the basis of documented bioactivity, coverage in
+COCONUT 2.0, and relevance to oncological conditions:
 \begin{itemize}
-    \item \textbf{\textit{Swertia chirayita} (Chirayito)}: A bitter alpine herb
-    extensively used in Ayurvedic medicine for fever and liver conditions. Contains
-    xanthones and secoiridoids with documented kinase-modulatory activity.
-    \item \textbf{\textit{Rhododendron arboreum} (Lali Gurans)}: The national flower
-    of Nepal; rhododendron species contain pentacyclic triterpenoids and flavonoids
-    with anti-inflammatory and cytotoxic properties.
-    \item \textbf{\textit{Nardostachys jatamansi} (Jatamansi)}: A Himalayan valerian
-    species yielding nardosinone and patchouli-alcohol-type sesquiterpenes; used for
-    neurological and cardiovascular conditions.
-    \item \textbf{\textit{Terminalia chebula} (Haritaki)}: One of the three
-    constituents of the classical Ayurvedic formulation Triphala; contains hydrolysable
-    tannins (chebulinic acid, chebulagic acid) with antioxidant and antiproliferative
-    activity.
-    \item \textbf{\textit{Berberis aristata} (Chutro)}: Source of berberine, a
-    protoberberine isoquinoline alkaloid with established anticancer activity and
-    documented EGFR pathway modulation.
-    \item \textbf{\textit{Ocimum sanctum} (Tulsi)}: The sacred basil of the Indian
-    subcontinent; contains eugenol, ursolic acid, and rosmarinic acid, with documented
-    anticancer and EGFR-inhibitory properties.
-    \item \textbf{\textit{Tinospora cordifolia} (Giloy/Gurjo)}: A climbing shrub
-    yielding tinosporin, palmatine, and berberine; used for immunomodulation and
-    anti-inflammatory applications with documented cytotoxic activity.
+    \item \textbf{\textit{Swertia chirayita}} (Chirayito) --- xanthones and secoiridoids;
+    \item \textbf{\textit{Rhododendron arboreum}} (Lali Gurans) --- triterpenoids and flavonoids;
+    \item \textbf{\textit{Nardostachys jatamansi}} (Jatamansi) --- sesquiterpenes;
+    \item \textbf{\textit{Terminalia chebula}} (Haritaki) --- hydrolysable tannins, a Triphala constituent;
+    \item \textbf{\textit{Berberis aristata}} (Chutro) --- the alkaloid berberine, with reported EGFR-pathway modulation;
+    \item \textbf{\textit{Ocimum sanctum}} (Tulsi) --- eugenol and ursolic/rosmarinic acids, with reported EGFR-inhibitory activity;
+    \item \textbf{\textit{Tinospora cordifolia}} (Giloy) --- diterpenoids and isoquinoline alkaloids.
 \end{itemize}
+All seven have ethnopharmacologically documented anti-inflammatory or antiproliferative use.
 
 \subsection{The COCONUT 2.0 Database}
 
@@ -802,10 +672,11 @@ Hu et al. \parencite{hu2020strategies}      & $\circ$  & $\checkmark$ & $\times$
 }
 \end{table}
 
-This thesis directly and simultaneously addresses all three gaps through a single,
-cohesive, reproducible open-source computational pipeline combining:
-(i) Bemis-Murcko scaffold-aware data splitting;
-(ii) comprehensive 29-dimensional node and 12-dimensional edge featurisation;
-(iii) Bayesian hyperparameter optimisation via Optuna;
-and (iv) prospective virtual screening of Nepali medicinal plant compounds from
-COCONUT 2.0 with ADMET-proxy prioritisation.
+This thesis addresses all three gaps through its two objectives, within a single
+reproducible open-source pipeline. To close the evaluation and featurisation gaps
+(1--2), it \textbf{benchmarks graph neural networks}---built with comprehensive
+29-dimensional node and 12-dimensional edge features and tuned via Optuna---%
+\textbf{against traditional machine-learning baselines} under a strict Bemis-Murcko
+scaffold split. To close the screening gap (3), it \textbf{deploys the best-performing
+models} in a prospective virtual screen of Nepali medicinal plant compounds from
+COCONUT~2.0 with ADMET-proxy prioritisation.

@@ -34,98 +34,28 @@ for stage IV NSCLC remains below 10\% with conventional chemotherapy.
 
 \subsection{The Epidermal Growth Factor Receptor in NSCLC}
 
-The \textbf{Epidermal Growth Factor Receptor (EGFR)}, also designated as ErbB1
-or HER1, is a 134 kDa transmembrane receptor tyrosine kinase encoded by the
-\textit{EGFR} gene on chromosome 7p11.2. It is a founding member of the ErbB
-receptor tyrosine kinase family, which comprises four closely related receptors:
-EGFR (ErbB1), HER2 (ErbB2), HER3 (ErbB3), and HER4 (ErbB4). Structurally,
-EGFR consists of an extracellular ligand-binding domain (domains I--IV), a single
-hydrophobic transmembrane helix, an intracellular juxtamembrane region, a bilobed
-tyrosine kinase catalytic domain, and a carboxy-terminal regulatory tail containing
-multiple autophosphorylation sites \parencite{rotow2023egfr}.
+The \textbf{Epidermal Growth Factor Receptor (EGFR)} is a transmembrane receptor tyrosine kinase (RTK). Upon ligand binding, EGFR undergoes dimerization and intrinsic kinase activation, which initiates key intracellular downstream pathways—specifically \mbox{RAS–RAF–MEK–ERK}, \mbox{PI3K–AKT–mTOR}, STAT3/5, and \mbox{PLC-$\gamma$}—that orchestrate cellular proliferation, motility, and survival \parencite{rotow2023egfr}. In non-small cell lung cancer (NSCLC), somatic activating mutations within the EGFR kinase domain induce constitutive, ligand-independent receptor activation, thereby acting as primary oncogenic drivers. Two major sensitizing mutations account for 85–90\% of all EGFR-mutant NSCLC cases: \textbf{exon 19 deletions} (Ex19del; $\sim$45–50\%) and the \textbf{L858R} point mutation in the activation loop ($\sim$40\%).
 
-Under physiological conditions, EGFR is activated by the binding of cognate ligands,
-primarily Epidermal Growth Factor (EGF) and Transforming Growth Factor-alpha
-(TGF-$\alpha$). Ligand binding induces receptor homodimerisation or
-heterodimerisation with other ErbB family members, resulting in conformational
-rearrangement of the intracellular kinase domain, release of autoinhibition, and
-trans-autophosphorylation of specific tyrosine residues (e.g., Tyr1068, Tyr1148,
-Tyr1173). These phosphorylated residues serve as docking sites for adaptor proteins
-and signalling effectors, initiating downstream cascades including:
-\begin{itemize}
-    \item The \textbf{RAS-RAF-MEK-ERK} (MAPK) pathway, which promotes cell cycle
-          progression, proliferation, and differentiation.
-    \item The \textbf{PI3K-AKT-mTOR} pathway, which enhances cell survival,
-          inhibits apoptosis, and regulates protein synthesis.
-    \item The \textbf{STAT3/5} pathway, which drives transcription of pro-survival
-          and immunomodulatory genes.
-    \item The \textbf{PLC-$\gamma$} pathway, which regulates intracellular calcium
-          signalling and PKC activation.
-\end{itemize}
-
-In NSCLC, somatic activating mutations within the EGFR tyrosine kinase domain
-confer \textit{ligand-independent} constitutive receptor activity, resulting in
-the continuous, dysregulated stimulation of these pro-survival pathways and the
-driving of oncogenesis. The two most clinically prevalent sensitising mutations
-account for 85--90\% of all EGFR-mutant NSCLC:
-\begin{enumerate}
-    \item \textbf{Exon 19 deletions (Ex19del)}: In-frame deletions of 9--24
-          nucleotides removing four conserved residues (LREA) from the C-helix
-          of the kinase domain. These account for approximately 45--50\% of
-          EGFR-mutant NSCLC.
-    \item \textbf{L858R point mutation}: A leucine-to-arginine substitution at
-          position 858 in the activation loop of the kinase domain, accounting
-          for approximately 40\% of EGFR-mutant NSCLC.
-\end{enumerate}
-
-The prevalence of EGFR-activating mutations varies profoundly by ethnicity and
-geographic region. In Caucasian NSCLC patients, EGFR mutations are detected in
-10--15\% of cases, whereas in East Asian populations (including Chinese, Japanese,
-and Korean patients), the prevalence reaches 40--50\% \parencite{leonetti2019resistance}.
-This disparity has profound implications for Nepal and the broader South Asian
-region: given the rising NSCLC incidence and the genetically admixed population
-spanning South and East Asian ancestries, a significant and growing proportion of
-Nepali NSCLC patients harbour targetable EGFR mutations. However, access to
-molecular diagnostic testing and novel targeted therapies remains highly limited
-in Nepal, making computational drug discovery approaches particularly relevant
-for identifying affordable new candidate compounds.
+EGFR-mutation prevalence varies sharply by ethnicity---10--15\% in Caucasian NSCLC
+versus 40--50\% in East Asian populations \parencite{leonetti2019resistance}. Given
+Nepal's rising NSCLC incidence and its admixed South/East Asian population, a large
+and growing share of Nepali patients harbour targetable EGFR mutations, yet molecular
+diagnostics and novel targeted therapies remain scarce---making affordable
+computational drug discovery particularly relevant.
 
 \subsection{Generations of EGFR Tyrosine Kinase Inhibitors}
 
-The clinical development of EGFR tyrosine kinase inhibitors (TKIs) has proceeded
-in three successive generations, each designed to overcome the resistance mechanisms
-that emerged against its predecessor.
-
-\textbf{First-generation TKIs} (gefitinib, erlotinib) are reversible, competitive
-inhibitors of the EGFR ATP-binding pocket that bind preferentially to the mutant
-receptor over wild-type EGFR. Large randomised controlled trials, including IPASS
-(gefitinib) and EURTAC (erlotinib), demonstrated unprecedented response rates of
-55--75\% and progression-free survival of 9--13 months in patients harbouring
-sensitising EGFR mutations, revolutionising the treatment of EGFR-mutant NSCLC.
-Despite these remarkable initial responses, acquired resistance emerged in virtually
-all patients, most commonly (in 50--60\% of cases) through the \textbf{T790M
-gatekeeper mutation} in exon 20. This methionine substitution at Thr790 sterically
-occludes the binding of first-generation inhibitors and increases the binding
-affinity of the kinase for ATP, effectively out-competing reversible TKIs
-\parencite{leonetti2019resistance}.
-
-\textbf{Second-generation TKIs} (afatinib, dacomitinib) are irreversible,
-covalent inhibitors that form a Michael addition bond with Cys797 in the
-ATP-binding cleft, providing broader kinase inhibition and some activity against
-T790M-mutant EGFR in preclinical models. However, the irreversible inhibition of
-wild-type EGFR in skin, gut, and other normal tissues produces significant
-dose-limiting on-target toxicities (severe skin rash, diarrhoea, mucositis),
-which restrict clinical dosing to levels insufficient to overcome T790M resistance
-effectively.
-
-\textbf{Third-generation TKIs} (osimertinib, lazertinib, rociletinib) were
-rationally designed to selectively target T790M-mutant EGFR through covalent
-binding to Cys797, while achieving greater selectivity for mutant over wild-type
-EGFR. Osimertinib (AstraZeneca, AZD9291), approved by the FDA in 2015, has
-become the definitive standard of care for EGFR-mutant NSCLC, demonstrating
-superior efficacy (PFS 18.9 months vs. 10.2 months for comparators), excellent
-CNS penetration (addressing brain metastases), and an improved toxicity profile
-compared to earlier generations \parencite{rotow2023egfr}.
+EGFR TKIs have developed in three generations, each overcoming resistance to its
+predecessor. \textbf{First-generation} reversible inhibitors (gefitinib, erlotinib)
+achieved 55--75\% response rates and 9--13-month progression-free survival in
+sensitising-mutant NSCLC, but resistance emerged in nearly all patients---most often
+($\sim$50--60\%) via the \textbf{T790M} gatekeeper mutation.
+\textbf{Second-generation} covalent inhibitors (afatinib, dacomitinib) bind Cys797
+irreversibly but their wild-type EGFR inhibition causes dose-limiting toxicity.
+\textbf{Third-generation} covalent inhibitors, led by \textbf{osimertinib}
+(FDA-approved 2015), selectively target T790M-mutant over wild-type EGFR and, with
+superior efficacy (PFS 18.9 vs.\ 10.2 months) and CNS penetration, are now the
+standard of care \parencite{rotow2023egfr}.
 
 \textbf{The C797S resistance problem.} Despite osimertinib's superiority, acquired
 resistance emerges in virtually all patients within 9--18 months. The most common
@@ -201,6 +131,25 @@ practical drug discovery applications faces challenges, including the need for
 rigorous evaluation protocols, chemical interpretability, and extension to
 prospective screening pipelines---all of which are directly addressed by this thesis.
 
+\subsection{Nepali Medicinal Plants as a Natural-Product Resource}
+
+Nepal's Himalayan biodiversity spans roughly 6,500 flowering plant species, of which
+more than 700 have documented ethnopharmacological use in Ayurvedic and Tibetan
+medicine. Many are inexpensive, culturally familiar, and locally accessible, making
+them an attractive yet under-explored source of natural-product leads for
+resource-limited settings. The prospective screening dataset used in this thesis is
+drawn from \textbf{seven traditional Nepali medicinal plant species}---\textit{Swertia
+chirayita}, \textit{Rhododendron arboreum}, \textit{Nardostachys jatamansi},
+\textit{Terminalia chebula}, \textit{Berberis aristata}, \textit{Ocimum sanctum}, and
+\textit{Tinospora cordifolia}---selected for their documented anti-inflammatory and
+antiproliferative use and their coverage in the \textbf{COCONUT~2.0} open
+natural-product database \parencite{sorokina2021coconut}. After RDKit standardisation
+this yields a library of \textbf{535 unique natural-product compounds} (ranging from 9
+compounds for \textit{Ocimum sanctum} to 203 for \textit{Nardostachys jatamansi}) that
+is screened for EGFR inhibitor activity in Chapter~4. Screening this locally accessible
+chemical space directly connects computational drug discovery to Nepal's biodiversity
+and offers an affordable route to candidate anti-NSCLC compounds.
+
 % ----------------------------------------------------------------
 \section{Problem Statement}
 % ----------------------------------------------------------------
@@ -255,13 +204,18 @@ deficiencies that this thesis is designed to address:
     \parencite{malik2025deepegfr}.
 \end{enumerate}
 
-\noindent This thesis directly addresses all three computational gaps through an
-end-to-end pipeline combining rigorous scaffold-aware evaluation, rich
-multi-dimensional graph featurisation, and prospective virtual screening of Nepali
-medicinal plant compounds. Because large-scale triple-mutant bioactivity data are not
-yet available, the classifier is trained on aggregate EGFR data, and the
-natural-product scaffolds it surfaces are intended as candidate starting points for
-future experimental validation rather than as validated triple-mutant inhibitors.
+\noindent This thesis addresses these gaps through its two objectives. First, it
+\emph{builds graph neural network classifiers}---with rich 29-dimensional atom and
+12-dimensional bond featurisation, evaluated under a strict Bemis-Murcko scaffold
+split---and \emph{benchmarks them against traditional machine-learning baselines}
+(Random Forest and an MLP on ECFP4 fingerprints), directly testing whether the added
+complexity of GNNs is justified over simpler, well-established models (gaps~1--2).
+Second, it \emph{deploys the best-performing models to screen} a Nepali medicinal-plant
+compound library for drug-like EGFR inhibitor leads (gap~3). Because large-scale
+triple-mutant bioactivity data are not yet available, the models are trained on
+aggregate EGFR data, and the natural-product scaffolds they surface are intended as
+candidate starting points for future experimental validation rather than as validated
+triple-mutant inhibitors.
 
 % ----------------------------------------------------------------
 \section{Objectives}
@@ -269,9 +223,10 @@ future experimental validation rather than as validated triple-mutant inhibitors
 
 \subsection{General Objective}
 
-To develop and rigorously benchmark a Graph Neural Network framework for EGFR
-inhibitor classification, and to deploy the best-performing models for prospective
-virtual screening of Nepali medicinal plant compounds as candidate anti-NSCLC leads.
+To build and benchmark a Graph Neural Network framework for EGFR inhibitor
+classification against traditional machine-learning baselines, and to deploy the
+best-performing models for prospective virtual screening of Nepali medicinal plant
+compounds as candidate anti-NSCLC leads.
 
 \subsection{Specific Objectives}
 
@@ -292,22 +247,20 @@ Acquired resistance to EGFR TKIs---and ultimately the triple-mutant EGFR that fo
 osimertinib failure---continues to drive the search for structurally novel inhibitor
 chemotypes, yet bringing new therapies through conventional drug discovery takes years
 to decades. Computational virtual screening can accelerate the early stage of this
-search by pre-selecting the most promising candidates from large chemical libraries
-for experimental testing, reducing the number of compounds that must be synthesised
-and assayed. In Nepal and South Asia, where EGFR mutations are prevalent yet expensive
-targeted therapies remain inaccessible, a screening pipeline built only from
-open-source tools and public databases is a practical and scalable contribution
-\parencite{rotow2023egfr}.
+search by pre-selecting the most promising candidates for experimental testing,
+reducing the number of compounds that must be synthesised and assayed. In Nepal and
+South Asia, where EGFR mutations are prevalent yet targeted therapies remain expensive,
+this further motivates screening locally accessible, low-cost natural-product chemical
+space rather than costly synthetic libraries \parencite{rotow2023egfr}.
 
 \textbf{Scientific rationale.}
 Graph Neural Networks have demonstrated strong performance across molecular
 machine learning benchmarks \parencite{hu2020strategies}, yet their application
 to EGFR inhibitor discovery has been constrained by the three methodological
-shortcomings enumerated in Section 1.2. By addressing all three gaps simultaneously
-within a single, reproducible pipeline---scaffold splitting, rich featurisation, systematic multi-architecture comparison,
-and prospective Nepali plant compound screening---this thesis provides a
-methodologically complete framework that sets a higher standard for future GNN-based
-kinase inhibitor studies.
+shortcomings enumerated in Section~1.2. Addressing all three simultaneously within a
+single, reproducible pipeline---scaffold splitting, rich featurisation, systematic
+multi-architecture comparison, and prospective Nepali plant compound screening---is
+what motivates the design of this study.
 
 \textbf{Data science rationale.}
 This project integrates multiple core data science competencies within a single
@@ -319,11 +272,10 @@ prospective natural compound screening (COCONUT 2.0), and scientific visualisati
 of advanced data science methodology applied to a high-impact biomedical problem.
 
 \textbf{Practical rationale.}
-The entire pipeline is implemented using exclusively open-source Python libraries
-(RDKit v2026.3.2, PyTorch Geometric v2.7.0, Optuna v4.8.0, scikit-learn v1.8.0)
-and publicly available databases (ChEMBL, COCONUT 2.0), all executing on commodity CPU
-hardware. This ensures full reproducibility, zero licensing cost, and broad
-accessibility for researchers in academic settings.
+The pipeline was deliberately built from exclusively open-source Python libraries
+(RDKit, PyTorch Geometric, Optuna, scikit-learn) and public databases (ChEMBL,
+COCONUT~2.0), running on commodity CPU hardware, so that every reported result can be
+reproduced without licensed software or specialised computing resources.
 
 % ----------------------------------------------------------------
 \section{Research Hypotheses}
@@ -341,13 +293,14 @@ experimentation and are evaluated against the results presented in Chapter 4:
     under a strict Bemis-Murcko scaffold split on the ChEMBL EGFR bioactivity dataset.
 
     \item \textbf{$H_2$ (Virtual Screening Hypothesis):} The virtual screening
-    pipeline, employing the study's best-performing classifiers to score compounds
-    from seven traditional Nepali medicinal plant species retrieved from COCONUT 2.0,
-    will identify at least one fully Lipinski-compliant natural-product-derived lead
-    compound with a predicted activity probability $\hat{p} \geq 0.80$ and a
-    Quantitative Estimate of Drug-likeness (QED) score $\geq 0.40$, contributing a
-    viable experimental lead candidate for affordable NSCLC therapy development in the
-    South Asian context.
+    pipeline, employing the study's two best-performing models (the best graph network
+    and the best overall classifier) to score compounds from seven traditional Nepali
+    medicinal plant species retrieved from COCONUT 2.0, will identify---under
+    \emph{each} of these models---at least one fully Lipinski-compliant
+    natural-product-derived lead compound with a predicted activity probability
+    $\hat{p} \geq 0.80$ and a Quantitative Estimate of Drug-likeness (QED) score
+    $\geq 0.40$, contributing a viable experimental lead candidate for affordable NSCLC
+    therapy development in the South Asian context.
 \end{enumerate}
 
 % ----------------------------------------------------------------
@@ -357,13 +310,17 @@ experimentation and are evaluated against the results presented in Chapter 4:
 This research makes several original and complementary contributions to the
 intersection of computational data science and molecular drug discovery:
 
-\textbf{Methodological contribution.} This thesis provides the first systematic,
-side-by-side comparison of five GNN architectures (GCN, GAT, GIN, AttentiveFP, GraphSAGE)
-with a rich 29-dimensional atomic featurisation scheme and 12-dimensional bond
-feature encoding, evaluated under a rigorous Bemis-Murcko scaffold split for the
-binary classification of EGFR inhibitor bioactivity. The use of Bayesian
-hyperparameter optimisation (Optuna) provides a reproducible and statistically
-principled model selection procedure.
+\textbf{Methodological contribution.} Although systematic comparisons of GNN
+architectures on molecular benchmarks are well established
+\parencite{jiang2021gnn}, this thesis applies such a comparison, to our knowledge for
+the first time, \emph{specifically to EGFR inhibitor classification}: it evaluates
+five GNN architectures (GCN, GAT, GIN, AttentiveFP, GraphSAGE) against traditional
+fingerprint baselines (Random Forest and MLP) under a rigorous Bemis-Murcko scaffold
+split, using a rich 29-dimensional atom and 12-dimensional bond featurisation and
+Bayesian hyperparameter optimisation (Optuna) for reproducible model selection. The
+methodological novelty lies in this EGFR-specific, scaffold-aware, baseline-anchored
+evaluation---coupled directly to the prospective natural-product screen below---rather
+than in the architecture comparison in isolation.
 
 \textbf{Natural product screening contribution.} By curating bioactive compounds
 from seven traditional Nepali medicinal plant species (COCONUT 2.0) and applying the

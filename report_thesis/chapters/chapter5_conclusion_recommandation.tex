@@ -25,20 +25,25 @@ The following principal conclusions can be drawn:
           although its test AUROC (0.7970) remained the lowest of the GNNs. These
           results show that, on a medium-sized scaffold-split EGFR dataset, well-tuned
           fingerprint models remain more accurate than graph neural networks for
-          classification.
+          classification, and hypothesis $H_1$ is therefore \textbf{rejected}.
 
-    \item \textbf{Nepali medicinal plant virtual screening is model-sensitive but
-          converges on flavonoid leads.} Screening the 535-compound library with the
-          two best models gave sharply different funnels---the best classifier
-          (Random Forest) predicted 181 actives ($\hat{p} \geq 0.50$) but only one
-          compound above $\hat{p} \geq 0.90$, while the best graph network (GCN)
-          predicted 24 actives and none above $\hat{p} \geq 0.90$---exposing the
+    \item \textbf{Nepali medicinal plant virtual screening is model-sensitive and,
+          once leakage is removed, yields only moderate-confidence leads.} Of the 535
+          retrieved compounds, eight---including the apparent top hits \textbf{apigenin}
+          and \textbf{kaempferol}---were already present in the ChEMBL training data as
+          known actives; recovering them is a positive control, not a discovery, so they
+          were excluded, leaving 527 genuinely unseen compounds. On this de-duplicated
+          library the two best models gave sharply different funnels (Random Forest 179
+          vs.\ GCN 24 predicted actives at $\hat{p} \geq 0.50$), and \emph{neither}
+          produced a Lipinski-compliant lead at $\hat{p} \geq 0.90$---exposing the
           earlier tuned-AttentiveFP screen (71 compounds above $\hat{p} \geq 0.90$) as
-          over-confident. Despite this divergence, both best models enriched for the
-          same drug-like chemotype: the flavones \textbf{apigenin} (\textit{Ocimum
-          sanctum}; Random Forest $\hat{p} = 0.913$, QED $= 0.632$), \textbf{kaempferol},
-          and \textbf{luteolin}. Luteolin, predicted active by \emph{both} best models,
-          is the top cross-model consensus candidate for experimental validation.
+          over-confident. The strongest prospective candidates are the xanthone
+          \textbf{isogentisin} (Random Forest $\hat{p} = 0.728$) and the flavone
+          \textbf{luteolin}, the top cross-model consensus lead (both models
+          $\hat{p} \geq 0.50$), both at moderate confidence. Because no best model
+          reaches the $\hat{p} \geq 0.80$ bar, hypothesis $H_2$ is \textbf{rejected},
+          and the leads are consensus-supported starting points for experimental
+          validation rather than high-confidence hits.
 
     \item \textbf{Consensus across models is essential for trustworthy natural-product
           screening.} Because the predicted hit list depends strongly on the choice of
@@ -64,13 +69,14 @@ The following principal conclusions can be drawn:
 \section{Recommendations for Future Work}
 
 \begin{enumerate}
-    \item \textbf{Experimental validation of Nepali plant leads.} The top drug-like
-          natural-product leads---particularly the flavones apigenin
-          (\textit{Ocimum sanctum}), luteolin, and kaempferol, prioritised by the best
-          models and cross-model consensus---should be subjected to
-          \textit{in vitro} EGFR kinase inhibition assays and EGFR-mutant NSCLC cell
-          line proliferation assays (e.g., PC9, HCC827) to validate the computational
-          predictions empirically.
+    \item \textbf{Experimental validation of Nepali plant leads.} The top genuinely
+          unseen, cross-model-consensus leads---particularly the flavone luteolin
+          (\textit{Terminalia chebula}) and the xanthone isogentisin
+          (\textit{Swertia chirayita})---should be subjected to \textit{in vitro} EGFR
+          kinase inhibition assays and EGFR-mutant NSCLC cell line proliferation assays
+          (e.g., PC9, HCC827) to validate the computational predictions empirically.
+          The known actives recovered by the screen (apigenin, kaempferol) can serve as
+          assay positive controls.
 
     \item \textbf{Mutant-specific modelling.} As mutation-specific bioactivity datasets
           for T790M and C797S EGFR grow in public databases, dedicated GNN models trained

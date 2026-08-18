@@ -346,37 +346,43 @@ The selected hyperparameters are nonetheless informative:
 The Nepali medicinal plant screening library was assembled from the COCONUT 2.0
 database by filtering for compounds annotated to seven traditional Nepali plant
 species, then applying the same RDKit standardisation pipeline as the ChEMBL training
-data. After salt removal, canonicalisation, the molecular-weight filter, and
-deduplication by canonical SMILES, the final library comprised \textbf{535 unique
-natural product compounds} distributed across the seven species as summarised in
-Table~\ref{tab:library_comp}.
+data. Filtering and standardisation returned \textbf{535 unique natural product
+compounds}. Crucially, to ensure a genuinely \emph{prospective} screen, the library
+was then de-duplicated against the ChEMBL bioactivity data: \textbf{eight compounds
+whose canonical SMILES already appear in the ChEMBL EGFR training data} (including the flavones
+\textbf{apigenin} and \textbf{kaempferol}, and \textbf{quercetin}, ellagic acid,
+pyrogallol, and pyrocatechol) were removed, since these are not novel natural-product
+candidates but known compounds the classifiers may already have seen during training.
+This leaves \textbf{527 genuinely unseen compounds} that were screened, distributed
+across the seven species as summarised in Table~\ref{tab:library_comp}.
 
 \begin{table}[H]
 \centering
-\caption{Composition of the Nepali medicinal plant screening library from COCONUT 2.0.}
+\caption{Composition of the screened Nepali medicinal plant library (COCONUT 2.0),
+         after removing eight compounds already present in the ChEMBL data.}
 \label{tab:library_comp}
 {\singlespacing
 \begin{tabular}{lcc}
 \toprule
 \textbf{Plant Species} & \textbf{Compound Class} & \textbf{Compounds} \\
 \midrule
-\textit{Nardostachys jatamansi} & Sesquiterpenes, coumarins    & 203 \\
-\textit{Terminalia chebula}     & Hydrolysable tannins         & 195 \\
+\textit{Nardostachys jatamansi} & Sesquiterpenes, coumarins    & 199 \\
+\textit{Terminalia chebula}     & Hydrolysable tannins         & 192 \\
 \textit{Tinospora cordifolia}   & Diterpenes, alkaloids        & 71 \\
 \textit{Swertia chirayita}      & Xanthones, secoiridoids      & 23 \\
 \textit{Berberis aristata}      & Isoquinoline alkaloids       & 19 \\
 \textit{Rhododendron arboreum}  & Triterpenoids, flavonoids    & 15 \\
-\textit{Ocimum sanctum}         & Phenylpropanoids, terpenoids & 9  \\
+\textit{Ocimum sanctum}         & Phenylpropanoids, terpenoids & 8  \\
 \midrule
-\textbf{Total} & --- & \textbf{535} \\
+\textbf{Total} & --- & \textbf{527} \\
 \bottomrule
 \end{tabular}
 }
 \end{table}
 
-The library is dominated by \textit{Nardostachys jatamansi} (203 compounds) and
-\textit{Terminalia chebula} (195), reflecting their extensive phytochemical
-characterisation in COCONUT, whereas \textit{Ocimum sanctum} (9) and
+The library is dominated by \textit{Nardostachys jatamansi} (199 compounds) and
+\textit{Terminalia chebula} (192), reflecting their extensive phytochemical
+characterisation in COCONUT, whereas \textit{Ocimum sanctum} (8) and
 \textit{Rhododendron arboreum} (15) are comparatively under-represented---an
 illustration of the uneven database coverage of Nepali medicinal flora. The
 distribution across the seven species is shown in Figure~\ref{fig:library_comp}.
@@ -384,9 +390,78 @@ distribution across the seven species is shown in Figure~\ref{fig:library_comp}.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.9\textwidth]{screening_library_composition.pdf}
-\caption{Composition of the Nepali medicinal plant screening library by species,
-         totalling 535 unique natural product compounds retrieved from COCONUT 2.0.}
+\caption{Composition of the screened Nepali medicinal plant library by species,
+         totalling 527 genuinely unseen natural product compounds (535 retrieved from
+         COCONUT 2.0, minus eight already present in ChEMBL).}
 \label{fig:library_comp}
+\end{figure}
+
+\subsection{Physicochemical Distribution of the Screening Library}
+\label{sec:coconut_dist}
+
+Before scoring, the physicochemical property distribution of the 527-compound COCONUT
+library was characterised and compared against the ChEMBL EGFR training set of
+Section~\ref{sec:data_dist}, because the two distributions determine how far the
+classifiers must \emph{extrapolate}. The comparison is summarised in
+Table~\ref{tab:coconut_physchem} and visualised in Figure~\ref{fig:coconut_dist}.
+
+\begin{table}[H]
+\centering
+\caption{Physicochemical profile of the Nepali plant screening library (527 COCONUT
+         compounds) against the ChEMBL EGFR training set (10,523 compounds). The
+         natural-product library is markedly smaller and less lipophilic---it occupies
+         a chemical space shifted away from the synthetic kinase-inhibitor training
+         distribution.}
+\label{tab:coconut_physchem}
+{\singlespacing
+\begin{tabular}{lcc}
+\toprule
+\textbf{Property (median)} & \textbf{COCONUT library (527)} & \textbf{ChEMBL training (10,523)} \\
+\midrule
+Molecular weight (Da) & 341.4 & 478.0 \\
+LogP                  & 2.5   & 4.5   \\
+H-bond donors         & 2     & 2     \\
+H-bond acceptors      & 4     & 7     \\
+TPSA (\AA$^{2}$)      & 66.8  & 96.3  \\
+QED                   & 0.4   & 0.4   \\
+\midrule
+Lipinski-compliant (\%) & 53.7 & 46.6 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+The natural-product library is chemically distinct from the training data on every
+size- and polarity-related axis. Its median molecular weight (341.4~Da) is
+\textbf{137~Da lighter} than the ChEMBL median (478.0~Da), its median LogP (2.5) is a
+\textbf{full two log-units less lipophilic} (4.5), and its median TPSA (66.8~\AA$^2$)
+is substantially lower (96.3~\AA$^2$). A larger fraction of the natural products are
+fully Lipinski-compliant (53.7\% vs.\ 46.6\%), consistent with the generally lower
+molecular weight of plant secondary metabolites relative to optimised synthetic
+inhibitors. Figure~\ref{fig:coconut_dist} shows that the two molecular-weight and
+lipophilicity distributions overlap only partially: the COCONUT library carries a
+pronounced low-mass, low-LogP shoulder (small terpenoids and phenylpropanoids) that is
+essentially absent from the training set, while also retaining a tail of very large
+(MW $>900$~Da) hydrolysable tannins from \textit{Terminalia chebula}.
+
+This distribution shift is the mechanistic explanation for the over-confidence
+documented later in this section: the classifiers were trained almost entirely on
+heavier, more lipophilic quinazoline-type inhibitors and must \emph{extrapolate} to
+score the lighter, more polar natural products, so their predicted probabilities on
+this library are not calibrated and must be treated as rankings rather than
+calibrated likelihoods.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.98\textwidth]{coconut_distribution.pdf}
+\caption{Physicochemical distributions of the Nepali plant screening library (527
+         COCONUT compounds, blue) overlaid on the ChEMBL EGFR training set (10,523
+         compounds, grey), for molecular weight, LogP, TPSA, and QED. Dashed lines
+         mark the respective medians; the red dotted lines mark the Lipinski MW = 500~Da
+         and LogP = 5 thresholds. The natural-product library is systematically
+         lighter and less lipophilic, occupying a chemical space only partially
+         overlapping the training distribution.}
+\label{fig:coconut_dist}
 \end{figure}
 
 \subsection{Multi-Model Screening Funnel and Hit Identification}
@@ -397,8 +472,8 @@ AttentiveFP was in fact the \emph{weakest} classifier on the scaffold test set
 the prospective screen was re-run and deployed with the study's two
 \emph{best-performing} models---the strongest graph neural network (GCN, test AUROC
 0.8454) and the strongest overall classifier (Random Forest, test AUROC 0.8827)---applied
-to the identical 535-compound library. Table~\ref{tab:vs_summary} compares the
-progressive screening funnel obtained under all three models.
+to the identical 527-compound de-duplicated library. Table~\ref{tab:vs_summary}
+compares the progressive screening funnel obtained under all three models.
 
 \begin{table}[H]
 \centering
@@ -412,39 +487,40 @@ progressive screening funnel obtained under all three models.
 \textbf{Filter Stage} & \textbf{AttentiveFP} & \textbf{GCN} & \textbf{Random Forest} \\
                       & \textbf{(0.81)}      & \textbf{(0.85)} & \textbf{(0.88)} \\
 \midrule
-Full plant compound library                     & 535 & 535 & 535 \\
-Predicted active ($\hat{p} \geq 0.50$)          & 144 &  24 & 181 \\
-Predicted active ($\hat{p} \geq 0.80$)          &  83 &   1 &   6 \\
-Predicted active ($\hat{p} \geq 0.90$)          &  71 &   0 &   1 \\
-Drug-like leads ($\hat{p} \geq 0.90$, Ro5, QED $\geq 0.40$) & 11 & 0 & 1 \\
+Screened compound library (de-duplicated)       & 527 & 527 & 527 \\
+Predicted active ($\hat{p} \geq 0.50$)          & 143 &  24 & 179 \\
+Predicted active ($\hat{p} \geq 0.80$)          &  83 &   1 &   4 \\
+Predicted active ($\hat{p} \geq 0.90$)          &  71 &   0 &   0 \\
+Drug-like leads ($\hat{p} \geq 0.90$, Ro5, QED $\geq 0.40$) & 11 & 0 & 0 \\
 \bottomrule
 \end{tabular}
 }
 \end{table}
 
 The three funnels differ dramatically, and this divergence is itself a central
-result. The tuned AttentiveFP predicts 144 actives at $\hat{p} \geq 0.50$ and an
+result. The tuned AttentiveFP predicts 143 actives at $\hat{p} \geq 0.50$ and an
 implausible 71 compounds at $\hat{p} \geq 0.90$; the best graph network (GCN)
 predicts only 24 actives and \emph{not a single} compound at $\hat{p} \geq 0.90$;
-and the best overall classifier (Random Forest) predicts 181 actives but only one
-compound at $\hat{p} \geq 0.90$. The abundance of apparently high-confidence hits in
-the AttentiveFP screen is therefore an artefact of poor probability calibration on
-out-of-distribution natural products by the weakest model, and is \emph{not}
-reproduced by either best-calibrated model. This model-sensitivity is the principal
-caution of the screening campaign: virtual-screening hit lists on natural-product
-chemical space depend strongly on the choice of classifier, and the most trustworthy
-leads are those nominated by the strongest models---ideally by more than one. A
-second, related artefact---over-confidence on large, non-drug-like natural
-products---is also model-dependent in its severity: the weakest model (AttentiveFP)
-scored large hydrolysable \textit{Terminalia chebula} tannins (e.g.,
-pentagalloylglucose, MW $\approx 941$~Da) at $\hat{p} \approx 1.0$, and the best GNN
-(GCN) assigned its highest scores to large \textit{Swertia} and \textit{Tinospora}
-triterpenoids, all of which violate the Rule of Five. Only the best classifier
-(Random Forest) placed drug-like compounds---the flavones apigenin and kaempferol---at
-the very top of its ranking, relegating the tannins below them ($\hat{p} \approx
-0.82$). In every case, non-drug-like large compounds still appear among the high
-scorers, reinforcing the need to couple activity prediction with drug-likeness
-filtering. The three funnels are compared in Figure~\ref{fig:funnel}.
+and the best overall classifier (Random Forest) predicts 179 actives but, on the
+genuinely unseen library, likewise \emph{no} compound at $\hat{p} \geq 0.90$.
+Consequently, once the eight ChEMBL-overlapping compounds are removed, \emph{neither}
+best model yields a high-confidence ($\hat{p} \geq 0.90$) drug-like lead---the single
+Random Forest hit above $\hat{p} \geq 0.90$ in a preliminary run was apigenin, a
+compound already present in the training data (see Section~\ref{sec:disc}). The
+abundance of apparently high-confidence hits in the AttentiveFP screen is therefore an
+artefact of poor probability calibration on out-of-distribution natural products by
+the weakest model, and is \emph{not} reproduced by either best-calibrated model. This
+model-sensitivity is the principal caution of the screening campaign: virtual-screening
+hit lists on natural-product chemical space depend strongly on the choice of
+classifier, and the most trustworthy leads are those nominated by the strongest
+models---ideally by more than one. A second, related artefact---over-confidence on
+large, non-drug-like natural products---persists across models: AttentiveFP scored
+large hydrolysable \textit{Terminalia chebula} tannins (e.g., pentagalloylglucose,
+MW $\approx 941$~Da) at $\hat{p} \approx 1.0$, and both the GCN and the Random Forest
+assigned their highest raw scores to large \textit{Swertia} and \textit{Tinospora}
+triterpenoids that violate the Rule of Five, reinforcing the need to couple activity
+prediction with drug-likeness filtering. The three funnels are compared in
+Figure~\ref{fig:funnel}.
 
 \begin{figure}[htbp]
 \centering
@@ -453,7 +529,7 @@ filtering. The three funnels are compared in Figure~\ref{fig:funnel}.
          three models (tuned AttentiveFP, best GNN = GCN, best classifier = Random
          Forest), showing the number of compounds retained at each prioritisation
          stage. The sharp disagreement between models---AttentiveFP retaining 71
-         compounds at $\hat{p} \geq 0.90$ versus 0 for GCN and 1 for Random
+         compounds at $\hat{p} \geq 0.90$ versus 0 for both GCN and Random
          Forest---illustrates the model-sensitivity of the screen.}
 \label{fig:funnel}
 \end{figure}
@@ -468,9 +544,10 @@ Table~\ref{tab:leads_rf}, and those nominated by the GCN in Table~\ref{tab:leads
 \begin{table}[H]
 \small
 \centering
-\caption{Top drug-like (Lipinski-compliant) Nepali plant leads nominated by the
-         best overall classifier (Random Forest), ranked by predicted activity.
-         Listed compounds are those bearing common (trivial) names.}
+\caption{Top drug-like (Lipinski-compliant) \emph{genuinely unseen} Nepali plant leads
+         nominated by the best overall classifier (Random Forest), ranked by predicted
+         activity. No compliant compound reaches $\hat{p} \geq 0.80$. Listed compounds
+         bear common (trivial) names.}
 \label{tab:leads_rf}
 {\singlespacing
 \begin{tabular}{clcccccc}
@@ -479,14 +556,12 @@ Table~\ref{tab:leads_rf}, and those nominated by the GCN in Table~\ref{tab:leads
               & \textbf{MW (Da)} & \textbf{LogP} & \textbf{QED}
               & \textbf{Ro5} & \textbf{Plant} \\
 \midrule
-1 & Apigenin       & 0.9127 & 270.2 & 2.58 & 0.632 & $\checkmark$ & \textit{O.~sanctum}    \\
-2 & Kaempferol     & 0.8340 & 286.2 & 2.28 & 0.546 & $\checkmark$ & \textit{N.~jatamansi}  \\
-3 & Isogentisin    & 0.7282 & 258.2 & 2.37 & 0.655 & $\checkmark$ & \textit{S.~chirayita}  \\
-4 & Luteolin       & 0.6789 & 286.2 & 2.28 & 0.511 & $\checkmark$ & \textit{T.~chebula}    \\
-5 & Tinosporaside  & 0.6607 & 492.5 & 0.63 & 0.440 & $\checkmark$ & \textit{T.~cordifolia} \\
-6 & Columbin       & 0.6180 & 358.4 & 2.53 & 0.613 & $\checkmark$ & \textit{T.~cordifolia} \\
-7 & Palmarin       & 0.6042 & 374.4 & 1.74 & 0.591 & $\checkmark$ & \textit{T.~cordifolia} \\
-8 & Nardostachysin & 0.5836 & 430.5 & 2.95 & 0.526 & $\checkmark$ & \textit{N.~jatamansi}  \\
+1 & Isogentisin    & 0.7282 & 258.2 & 2.37 & 0.655 & $\checkmark$ & \textit{S.~chirayita}  \\
+2 & Luteolin       & 0.6789 & 286.2 & 2.28 & 0.511 & $\checkmark$ & \textit{T.~chebula}    \\
+3 & Tinosporaside  & 0.6607 & 492.5 & 0.63 & 0.440 & $\checkmark$ & \textit{T.~cordifolia} \\
+4 & Columbin       & 0.6180 & 358.4 & 2.53 & 0.613 & $\checkmark$ & \textit{T.~cordifolia} \\
+5 & Palmarin       & 0.6042 & 374.4 & 1.74 & 0.591 & $\checkmark$ & \textit{T.~cordifolia} \\
+6 & Nardostachysin & 0.5836 & 430.5 & 2.95 & 0.526 & $\checkmark$ & \textit{N.~jatamansi}  \\
 \bottomrule
 \end{tabular}
 }
@@ -517,30 +592,34 @@ Table~\ref{tab:leads_rf}, and those nominated by the GCN in Table~\ref{tab:leads
 }
 \end{table}
 
-Two observations stand out. First, the best models converge on \emph{flavones}---%
-apigenin, luteolin and kaempferol---as the most drug-like predicted-active scaffolds
-(Table~\ref{tab:flavones}). Flavones are a chemically coherent and literature-supported
-class of natural ATP-competitive kinase binders, lending biological plausibility that
-the AttentiveFP depside/coumarin hits lacked. Second, although the best classifier
-(Random Forest) is comparatively well calibrated---its two highest-scoring compounds
-are the drug-like flavones apigenin and kaempferol---the best GNN (GCN) still assigns
-its highest raw probabilities to large, non-drug-like \textit{Swertia} and
-\textit{Tinospora} triterpenoids, so drug-likeness filtering remains essential.
+Two observations stand out. First, the flavone scaffold is prominent among the
+predicted actives, but this signal is strongly confounded by the training-set leakage
+identified above (Table~\ref{tab:flavones}): the two highest-scoring flavones under the
+Random Forest---apigenin ($\hat{p} = 0.913$) and kaempferol ($\hat{p} = 0.834$)---are
+precisely the compounds already present in the ChEMBL training data (both labelled
+active), so their high scores reflect \emph{memorisation}, not prospective prediction.
+Once these are removed, \textbf{luteolin} is the only flavone that remains, and it is
+predicted active ($\hat{p} \geq 0.50$) by \emph{both} best models (RF 0.679, GCN
+0.514)---a genuinely unseen, consensus-supported candidate. Second, on the
+de-duplicated library both the GCN and the Random Forest assign their highest raw
+probabilities to large, non-drug-like \textit{Swertia} and \textit{Tinospora}
+triterpenoids, so drug-likeness filtering remains essential.
 
 \begin{table}[H]
 \centering
-\caption{Predicted activity of the flavone scaffolds under the two best models. Only
-         luteolin is predicted active ($\hat{p} \geq 0.50$) by \emph{both} models.}
+\caption{Flavone scaffolds under the two best models, with ChEMBL status. The two
+         highest-scoring flavones were already in the training data and were removed as
+         leakage; luteolin is genuinely unseen and is the cross-model consensus lead.}
 \label{tab:flavones}
 {\singlespacing
-\begin{tabular}{lcccccl}
+\begin{tabular}{llccl}
 \toprule
-\textbf{Flavone} & \textbf{RF $\hat{p}$} & \textbf{GCN $\hat{p}$}
-                 & \textbf{MW (Da)} & \textbf{QED} & \textbf{Ro5} & \textbf{Plant} \\
+\textbf{Flavone} & \textbf{ChEMBL status} & \textbf{RF $\hat{p}$}
+                 & \textbf{GCN $\hat{p}$} & \textbf{Retained?} \\
 \midrule
-Apigenin   & 0.913 & 0.410 & 270.2 & 0.632 & $\checkmark$ & \textit{O.~sanctum}   \\
-Luteolin   & 0.679 & 0.514 & 286.2 & 0.511 & $\checkmark$ & \textit{T.~chebula}   \\
-Kaempferol & 0.834 & 0.320 & 286.2 & 0.546 & $\checkmark$ & \textit{N.~jatamansi} \\
+Apigenin   & in training (active)     & 0.913 & 0.410 & removed (leakage)        \\
+Kaempferol & in training (active)     & 0.834 & 0.320 & removed (leakage)        \\
+Luteolin   & not in training set      & 0.679 & 0.514 & retained (consensus lead) \\
 \bottomrule
 \end{tabular}
 }
@@ -556,50 +635,170 @@ predicted-activity versus drug-likeness plane.
          predicted-activity versus drug-likeness (QED) plane. All shown candidates are
          Lipinski-compliant and marker size is proportional to molecular weight.
          Dashed lines mark the $H_2$ thresholds ($\hat{p}$~$\geq$~0.80,
-         QED~$\geq$~0.40); apigenin and kaempferol clear both.}
+         QED~$\geq$~0.40); on the de-duplicated library no candidate clears the
+         $\hat{p} \geq 0.80$ threshold, with isogentisin and luteolin the highest.}
 \label{fig:leads_scatter}
 \end{figure}
 
-\subsubsection{Highest-Confidence Drug-Like Lead: Apigenin (\textit{Ocimum sanctum})}
+\subsubsection{Recovered Known Actives, and the Highest-Confidence Prospective Lead}
 
-The single highest-confidence Lipinski-compliant lead is \textbf{apigenin} from
-\textit{Ocimum sanctum} (holy basil, Tulsi), scored by the best overall classifier
-(Random Forest) at $\hat{p} = 0.913$:
-\begin{itemize}
-    \item \textbf{Predicted activity}: $\hat{p} = 0.913$ (Random Forest; the single
-          library compound exceeding $\hat{p} \geq 0.90$)
-    \item \textbf{Molecular weight}: 270.2 Da (well within the Ro5 limit of 500 Da)
-    \item \textbf{LogP}: 2.58 (favourable lipophilicity)
-    \item \textbf{QED}: 0.632 (clearly drug-like)
-    \item \textbf{Lipinski Ro5}: Fully compliant --- no violations
-    \item \textbf{Source}: \textit{Ocimum sanctum} (Tulsi) --- a sacred and widely
-          used plant in Nepali and South Asian traditional medicine
-\end{itemize}
-Apigenin is a well-characterised dietary flavone with documented anti-proliferative
-and kinase-modulating activity, providing biological plausibility for further
-investigation. It is, however, a \emph{model-dependent} lead: the best graph network
-scores the same compound at only $\hat{p} = 0.410$, illustrating the model-sensitivity
-established above.
+A preliminary screen of the full 535-compound library ranked two flavones
+highest---apigenin ($\hat{p} = 0.913$) and kaempferol ($\hat{p} = 0.834$). Both,
+however, are already present in the ChEMBL training data as known EGFR-active
+compounds, so their high scores reflect the model \emph{recovering} known actives
+rather than discovering new ones. Their correct recovery is a useful positive control
+---the classifier does identify established EGFR-active flavones---but they are not
+prospective natural-product leads, and they were removed from the screening library.
 
-\subsubsection{Top Consensus Lead: Luteolin}
+On the de-duplicated (genuinely unseen) library, \emph{no} Lipinski-compliant compound
+reaches $\hat{p} \geq 0.80$ under either best model. The highest-confidence unseen
+drug-like lead is \textbf{isogentisin} from \textit{Swertia chirayita}, a xanthone
+scored by the Random Forest at $\hat{p} = 0.728$ (MW $= 258.2$~Da, LogP $= 2.37$,
+QED $= 0.655$; fully Ro5-compliant). Isogentisin is therefore a
+\emph{moderate}-confidence candidate only, and---like all leads reported here---requires
+experimental validation.
 
-The most robust nomination is \textbf{luteolin}, the only small, drug-like flavone
-predicted active ($\hat{p} \geq 0.50$) by \emph{both} best models---Random Forest
-($\hat{p} = 0.679$) and GCN ($\hat{p} = 0.514$)---with MW $= 286.2$~Da and QED
-$= 0.511$. Because it is endorsed independently by the best fingerprint model and the
-best graph model, luteolin represents the highest-priority \emph{consensus} candidate
-for experimental EGFR inhibition assays, notwithstanding its sub-0.80 probabilities.
+\subsubsection{Cross-Model Consensus Leads and Their Plant Sources}
+
+Because the two best models disagree so strongly, the most defensible lead-selection
+criterion is \emph{cross-model consensus}: compounds predicted drug-like \emph{and}
+active ($\hat{p} \geq 0.50$, Lipinski-compliant, QED $\geq 0.40$) by \emph{both} the
+Random Forest and the GCN. This intersection is deliberately conservative---it discards
+any lead that only one model favours, and is therefore robust to the model-sensitivity
+and out-of-distribution over-confidence documented above. As Figure~\ref{fig:consensus}
+shows, of the 25 drug-like actives nominated by the Random Forest and the four by the
+GCN, only \textbf{three} are endorsed by both.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.78\textwidth]{screening_consensus_venn.pdf}
+\caption{Cross-model consensus. Drug-like predicted-active leads ($\hat{p} \geq 0.50$,
+         Lipinski-compliant, QED $\geq 0.40$) nominated by the Random Forest (25) and
+         the GCN (4); only three compounds---luteolin, palmarin and
+         nardostachysin---lie in the intersection and constitute the prioritised
+         consensus leads.}
+\label{fig:consensus}
+\end{figure}
+
+These three consensus leads are drawn from three \emph{different} Nepali species
+(Table~\ref{tab:consensus}), each with centuries of ethnopharmacological use against
+inflammatory and proliferative conditions.
+
+\begin{table}[H]
+\centering
+\caption{Cross-model consensus leads: the genuinely unseen compounds predicted
+         drug-like and active by \emph{both} best models, with their Nepali plant
+         sources.}
+\label{tab:consensus}
+{\singlespacing
+\begin{tabular}{llcccl}
+\toprule
+\textbf{Compound} & \textbf{Plant (common name)} & \textbf{RF $\hat{p}$}
+                  & \textbf{GCN $\hat{p}$} & \textbf{QED} & \textbf{Chemotype} \\
+\midrule
+Luteolin       & \textit{T.~chebula} (Haritaki)    & 0.679 & 0.514 & 0.511 & Flavone \\
+Palmarin       & \textit{T.~cordifolia} (Giloy)    & 0.604 & 0.553 & 0.591 & Furanoditerpenoid \\
+Nardostachysin & \textit{N.~jatamansi} (Jatamansi) & 0.584 & 0.592 & 0.526 & Sesquiterpenoid ester \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\textbf{Luteolin} (\textit{Terminalia chebula}, Haritaki)\footnote{All
+compound-to-plant attributions in this section follow the organism annotations
+recorded in COCONUT~2.0; luteolin is a widely distributed flavone reported across
+many taxa, and is here associated with \textit{Terminalia chebula} through that
+database rather than as a species-exclusive constituent.} is the top consensus lead
+(RF $\hat{p} = 0.679$, GCN $\hat{p} = 0.514$; MW $= 286.2$~Da, QED $= 0.511$). It is a
+3$'$,4$'$,5,7-tetrahydroxyflavone---a planar, hydroxylated flavone of exactly the class
+documented as ATP-competitive kinase binder, giving it clear biological plausibility.
+Crucially, luteolin is \emph{not} present in the ChEMBL training data, so, unlike the
+recovered apigenin and kaempferol, it is a genuinely prospective prediction.
+\textbf{Palmarin} (\textit{Tinospora cordifolia}, Giloy; RF 0.604, GCN 0.553) and
+\textbf{nardostachysin} (\textit{Nardostachys jatamansi}, Jatamansi; RF 0.584, GCN
+0.592) contribute a furanoditerpenoid and a sesquiterpenoid-ester scaffold
+respectively---chemotypes structurally distinct from luteolin and from the synthetic
+quinazoline inhibitors of the training set, and therefore distinct binding-mode
+hypotheses.
+
+That the consensus set spans three traditional species---\textit{Terminalia chebula},
+\textit{Tinospora cordifolia}, and \textit{Nardostachys jatamansi}, all inexpensive and
+locally accessible in Nepal---makes it an attractive, diversified starting point for
+experimental testing. \textbf{Luteolin} is the single highest-priority candidate,
+being both the top-ranked consensus compound and a mechanistically plausible flavone,
+though its moderate ($<0.80$) probabilities mean it remains a computational hypothesis
+requiring \textit{in vitro} confirmation. The three source species are shown in
+Figure~\ref{fig:consensus_plants}, the corresponding compound structures in
+Figure~\ref{fig:consensus_struct}, and their model predictions and physicochemical
+profiles in Figure~\ref{fig:consensus_data}.
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}[b]{0.32\textwidth}
+  \centering
+  \includegraphics[height=3.2cm]{plant_terminalia.jpg}\\[2pt]
+  {\small\textit{Terminalia chebula}}\\
+  {\small({\nepalifont हर्रो}, Harro)}\\
+  {\footnotesize\itshape luteolin}
+\end{minipage}\hfill
+\begin{minipage}[b]{0.32\textwidth}
+  \centering
+  \includegraphics[height=3.2cm]{plant_tinospora.jpg}\\[2pt]
+  {\small\textit{Tinospora cordifolia}}\\
+  {\small({\nepalifont गुर्जो}, Gurjo)}\\
+  {\footnotesize\itshape palmarin}
+\end{minipage}\hfill
+\begin{minipage}[b]{0.32\textwidth}
+  \centering
+  \includegraphics[height=3.2cm]{plant_nardostachys.jpg}\\[2pt]
+  {\small\textit{Nardostachys jatamansi}}\\
+  {\small({\nepalifont जटामसी}, Jatamasi)}\\
+  {\footnotesize\itshape nardostachysin}
+\end{minipage}
+\caption{The three Nepali medicinal plants contributing the cross-model consensus
+         leads, labelled with their Nepali (Devanagari) common names. Photographs
+         via Wikimedia Commons: \textit{Terminalia chebula} (source of luteolin)
+         \textcopyright{} Delonix, CC~BY-SA~3.0; \textit{Tinospora cordifolia}
+         (palmarin) \textcopyright{} Gurnavinder Sidhu, CC~BY-SA~4.0;
+         \textit{Nardostachys jatamansi} (nardostachysin) \textcopyright{}
+         Plantagenet, CC~BY-SA~4.0.}
+\label{fig:consensus_plants}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{consensus_structures.png}
+\caption{Chemical structures of the three cross-model consensus leads, drawn with RDKit
+         from their COCONUT~2.0 canonical SMILES \parencite{sorokina2021coconut}: the
+         flavone \textbf{luteolin}, the furanoditerpenoid \textbf{palmarin}, and the
+         sesquiterpenoid ester \textbf{nardostachysin}.}
+\label{fig:consensus_struct}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.98\textwidth]{consensus_data.pdf}
+\caption{Data representation of the three cross-model consensus leads. Left: the
+         Random Forest and GCN predicted activity probabilities ($\hat{p}$) alongside
+         the quantitative estimate of drug-likeness (QED); the dotted line marks the
+         $\hat{p}=0.5$ decision threshold. Right: their physicochemical /
+         ADMET-proxy descriptors---molecular weight (MW), lipophilicity (LogP),
+         topological polar surface area (TPSA), and hydrogen-bond donor/acceptor
+         counts (HBD/HBA), all RDKit-computed from the COCONUT~2.0 SMILES. All three
+         compounds satisfy Lipinski's rule of five.}
+\label{fig:consensus_data}
+\end{figure}
 
 \subsection{Structural Diversity of Plant-Derived Leads}
 
-Across the two best models the drug-like leads span several distinct chemotypes:
-flavones (apigenin, luteolin, kaempferol), xanthones (isogentisin), clerodane
+Across the two best models the genuinely unseen drug-like leads span several distinct
+chemotypes: xanthones (isogentisin), the flavone luteolin, clerodane
 furanoditerpenoids (columbin, palmarin, tinosporaside), iridoid esters
 (jatamanvaltrate~H, nardostachysin), and sesquiterpenoids (rulepidadiene~A). This
 diversity suggests that several distinct binding modes to the EGFR ATP cleft may be
-accessible from Nepali plant compounds; the recurrence of the planar, hydroxylated
-flavone scaffold across the independent predictions of both best models is the
-strongest single structural signal, and a richer starting point than a structurally
+accessible from Nepali plant compounds; luteolin---the one flavone endorsed by both
+best models---is the strongest single structural signal, and a richer starting point
+than a structurally
 homogeneous synthetic inhibitor library.
 
 % ----------------------------------------------------------------
@@ -622,25 +821,29 @@ the strongest GNN at 0.8454, and the tuned AttentiveFP reached a validation AURO
 only 0.8632 with a test AUROC of just 0.7970. $H_1$ is therefore
 \textbf{rejected} for this dataset: on a medium-sized, scaffold-split EGFR
 bioactivity set, well-tuned fingerprint models remained more accurate than the graph
-neural networks. This is itself an informative, honestly reported result, consistent
-with prior observations that ECFP4-based models are strong baselines on datasets of
-this scale.
+neural networks. This is itself an informative, honestly reported result: it directly
+echoes the systematic comparison of \textcite{jiang2021gnn}, who likewise found that
+descriptor-based models (including Random Forest) outperform graph-based models on
+average for molecular property prediction, and is consistent with the broader
+observation that ECFP4-based fingerprints are strong baselines on datasets of this
+scale.
 
-\textbf{$H_2$ (Virtual Screening Hypothesis) --- partially supported.} $H_2$ predicted
-that the screening pipeline would identify at least one fully Lipinski-compliant
-natural-product lead with predicted activity $\hat{p} \geq 0.80$ and QED $\geq 0.40$.
-The verdict is \emph{model-dependent}. The best overall classifier (Random Forest)
-identifies two such compounds---apigenin ($\hat{p} = 0.913$, QED $= 0.632$) and
-kaempferol ($\hat{p} = 0.834$, QED $= 0.546$)---so $H_2$ is \textbf{supported by the
-best classifier}. However, the best graph network (GCN) identifies \emph{no}
-Lipinski-compliant compound above $\hat{p} = 0.80$, so $H_2$ is \textbf{not supported
-by the best GNN} at that confidence. Only when the threshold is relaxed to
-$\hat{p} \geq 0.50$ do the two best models produce a consensus drug-like lead
-(luteolin). $H_2$ is therefore reported as \textbf{partially supported}: the pipeline
-does surface actionable, drug-like natural-product leads (flavones), but their
-predicted confidence and their identity depend strongly on the model, and the
-inflated confidence of the earlier AttentiveFP screen is not reproduced by the
-best-calibrated models.
+\textbf{$H_2$ (Virtual Screening Hypothesis) --- not supported.} $H_2$ predicted
+that, under \emph{each} of the study's two best models, the screening pipeline would
+identify at least one fully Lipinski-compliant natural-product lead with predicted
+activity $\hat{p} \geq 0.80$ and QED $\geq 0.40$. A preliminary screen appeared to
+satisfy this for the Random Forest (apigenin, $\hat{p} = 0.913$; kaempferol,
+$\hat{p} = 0.834$), but both compounds were found to be present in the ChEMBL training
+data---so their high scores are memorised known actives, not prospective predictions,
+and they were removed. On the resulting genuinely unseen library, \emph{neither} best
+model identifies a Lipinski-compliant compound at $\hat{p} \geq 0.80$ (Random Forest
+and GCN both yield zero such leads); the highest prospective drug-like scores are
+isogentisin (RF $\hat{p} = 0.728$) and luteolin (RF $0.679$, GCN $0.514$). $H_2$ is
+therefore \textbf{rejected} at its stated $\hat{p} \geq 0.80$ threshold. The pipeline
+does still surface \emph{moderate}-confidence, drug-like, cross-model consensus
+candidates (luteolin foremost) that are worth experimental follow-up, but it does not
+deliver the high-confidence prospective lead that $H_2$ posited---an honestly reported
+outcome once training-set leakage is properly excluded.
 
 \subsection{Performance of Graph Neural Networks Relative to Baselines}
 
@@ -679,34 +882,33 @@ ability to generalise to genuinely novel chemical matter.
 \subsection{Ethnopharmacological Rationale for Natural Product Screening}
 
 The hit rate observed in the Nepali plant screening was itself model-dependent,
-ranging from 4.5\% (GCN) through 33.8\% (Random Forest) at $\hat{p} \geq 0.50$. Even
-so, both best models enrich for the same drug-like chemotype---the \emph{flavones}
-apigenin, luteolin and kaempferol---which reflects the ethnopharmacological
-enrichment inherent in traditional medicinal plant selection: plants used for
-centuries in the treatment of inflammatory and proliferative conditions are
-biologically pre-filtered for bioactive chemical space. The prominence of the
-hydroxylated flavone scaffold among the top compliant hits is consistent with the
-established literature on plant-derived kinase modulators, as planar polyphenolic
-flavones are well documented ATP-competitive kinase binders that share structural
-features with the core pharmacophores of synthetic EGFR inhibitors
-\parencite{wu2018moleculenet}. At the same time, both the weakest model (AttentiveFP)
-and the best GNN (GCN) still rank large, non-drug-like polyphenols and triterpenoids
-among their highest-scoring compounds---a reminder that predictions on chemical space
-distant from the training distribution must be interpreted with caution and coupled
-with drug-likeness filtering.
+ranging from 4.6\% (GCN) through 34.0\% (Random Forest) at $\hat{p} \geq 0.50$ on the
+de-duplicated library. That the models recovered the known EGFR-active flavones
+apigenin and kaempferol (before these were excluded as leakage), and that the sole
+remaining unseen flavone---luteolin---is endorsed by both best models, is consistent
+with the ethnopharmacological enrichment inherent in traditional medicinal plant
+selection: plants used for centuries against inflammatory and proliferative conditions
+are biologically pre-filtered for bioactive chemical space. The hydroxylated flavone
+scaffold is a well-documented ATP-competitive kinase binder that shares structural
+features with synthetic EGFR-inhibitor pharmacophores \parencite{wu2018moleculenet}.
+At the same time, both the weakest model (AttentiveFP) and the best models still rank
+large, non-drug-like polyphenols and triterpenoids among their highest-scoring
+compounds---a reminder that predictions on chemical space distant from the training
+distribution must be interpreted with caution and coupled with drug-likeness filtering.
 
 \subsection{Lead Compound Prioritisation Strategy}
 
-The prioritisation strategy applied three criteria---high predicted activity,
-Lipinski Rule of Five compliance, and consensus between the two best models---reflecting
-target engagement potential, oral bioavailability, and robustness to the
-model-sensitivity documented above. Under this strategy apigenin emerges as the
-highest-confidence single-model lead and luteolin as the top cross-model consensus
-lead. Critically, these compounds are derived from plants (\textit{Ocimum sanctum},
-\textit{Terminalia chebula}) that are inexpensive, culturally familiar, and locally
-accessible throughout Nepal, offering a potential pathway to affordable
-EGFR-targeted therapy candidates without the high synthesis costs of novel synthetic
-compounds.
+The prioritisation strategy applied four criteria---exclusion of compounds already in
+the training data (to keep the screen prospective), predicted activity, Lipinski Rule
+of Five compliance, and consensus between the two best models---reflecting novelty,
+target-engagement potential, oral bioavailability, and robustness to the
+model-sensitivity documented above. Under this strategy \textbf{luteolin} is the top
+cross-model consensus lead and \textbf{isogentisin} the highest-confidence
+single-model prospective lead, both at moderate confidence. Critically, these
+compounds are derived from plants (\textit{Terminalia chebula}, \textit{Swertia
+chirayita}) that are inexpensive, culturally familiar, and locally accessible
+throughout Nepal, offering a potential pathway to affordable candidate compounds
+without the high synthesis costs of novel synthetic scaffolds.
 
 It is important to note that the prioritisation in this study represents an
 \textit{in silico} hypothesis, not experimental confirmation. The identified leads
@@ -721,12 +923,20 @@ Several limitations of the results presented in this chapter should be acknowled
 \begin{itemize}
     \item \textbf{Model-sensitivity of the screen}: The single most important
           limitation is that the virtual-screening hit list depends strongly on the
-          choice of classifier (144 predicted actives for AttentiveFP versus 24 for
-          GCN and 181 for Random Forest at $\hat{p} \geq 0.50$; 71 versus 0 versus 1
+          choice of classifier (143 predicted actives for AttentiveFP versus 24 for
+          GCN and 179 for Random Forest at $\hat{p} \geq 0.50$; 71 versus 0 versus 0
           at $\hat{p} \geq 0.90$). No single model can be treated as authoritative,
           and the predicted probabilities are not calibrated on out-of-distribution
           natural products. Consensus across the best models mitigates but does not
           eliminate this uncertainty; only experimental assay can resolve it.
+    \item \textbf{Train/screen overlap (leakage)}: Eight of the 535 retrieved
+          COCONUT compounds---including the apparent top hits apigenin and
+          kaempferol---were already present in the ChEMBL training data as known
+          actives. These were excluded so that the reported screen is genuinely
+          prospective, but their presence shows that natural-product libraries can
+          overlap curated bioactivity databases, and that such overlap must be removed
+          before any prospective claim; a screen that omits this step would badly
+          overstate its ``discoveries.''
     \item \textbf{Validation AUROC vs.\ Test AUROC}: The tuned AttentiveFP's
           validation AUROC (0.8632) exceeded its scaffold test AUROC ($\approx$0.80),
           a gap that reflects optimisation against the validation partition. Future
