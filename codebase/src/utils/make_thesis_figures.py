@@ -296,24 +296,23 @@ FUNNEL_STAGES = [
     "Drug-like\nleads",
 ]
 FUNNEL_MODELS = {
-    "AttentiveFP (0.81)":   [535, 144, 83, 71, 11],
-    "GCN (0.85)":           [535,  24,  1,  0,  0],
-    "Random Forest (0.88)": [535, 181,  6,  1,  1],
+    "AttentiveFP (0.81)":   [527, 143, 83, 71, 11],
+    "GCN (0.85)":           [527,  24,  1,  0,  0],
+    "Random Forest (0.88)": [527, 179,  4,  0,  0],
 }
 
-# Library composition (chapter 4, tab:library_comp) — real COCONUT per-species counts.
+# Library composition (chapter 4, tab:library_comp) — COCONUT per-species counts
+# after removing 8 compounds already present in the ChEMBL data (535 -> 527).
 LIBRARY = [
-    ("Nardostachys jatamansi", 203), ("Terminalia chebula", 195),
+    ("Nardostachys jatamansi", 199), ("Terminalia chebula", 192),
     ("Tinospora cordifolia", 71), ("Swertia chirayita", 23),
     ("Berberis aristata", 19), ("Rhododendron arboreum", 15),
-    ("Ocimum sanctum", 9),
+    ("Ocimum sanctum", 8),
 ]
 
-# Random Forest (best model) drug-like leads (chapter 4, tab:leads_rf):
-# name, P_active, MW, LogP, QED, Ro5.
+# Random Forest (best model) drug-like leads (chapter 4, tab:leads_rf), on the
+# de-duplicated library: name, P_active, MW, LogP, QED, Ro5.
 LEADS = [
-    ("Apigenin", 0.9127, 270.2, 2.58, 0.632, True),
-    ("Kaempferol", 0.8340, 286.2, 2.28, 0.546, True),
     ("Isogentisin", 0.7282, 258.2, 2.37, 0.655, True),
     ("Luteolin", 0.6789, 286.2, 2.28, 0.511, True),
     ("Tinosporaside", 0.6607, 492.5, 0.63, 0.440, True),
@@ -407,6 +406,54 @@ def fig_leads_scatter() -> None:
     _save(fig, "screening_leads_scatter.pdf")
 
 
+# Consensus of drug-like predicted-active leads (p>=0.5, Ro5, QED>=0.4) between the
+# two best models on the de-duplicated library (chapter 4, fig:consensus).
+CONSENSUS = {
+    "rf_only": 22, "gcn_only": 1, "both": 3,
+    "leads": [
+        ("Luteolin",       "\\textit{T.~chebula}",    0.679, 0.514),
+        ("Palmarin",       "\\textit{T.~cordifolia}", 0.604, 0.553),
+        ("Nardostachysin", "\\textit{N.~jatamansi}",  0.584, 0.592),
+    ],
+}
+
+
+def fig_consensus_venn() -> None:
+    """Two-set Venn of drug-like predicted-active leads (Random Forest vs GCN),
+    with the consensus (intersection) leads named."""
+    from matplotlib.patches import Circle
+    C_RF, C_GCN = C_ACTIVE, "#55A868"
+    fig, ax = plt.subplots(figsize=(7.8, 5.0))
+    ax.add_patch(Circle((-0.5, 0), 1.5, facecolor=C_RF, alpha=0.28,
+                        edgecolor=C_RF, lw=1.8))
+    ax.add_patch(Circle((1.05, 0), 1.1, facecolor=C_GCN, alpha=0.30,
+                        edgecolor=C_GCN, lw=1.8))
+    # set titles
+    ax.text(-1.55, 1.7, "Random Forest", color=C_RF, fontsize=12,
+            fontweight="bold", ha="center")
+    ax.text(1.65, 1.35, "GCN", color="#3d7a4e", fontsize=12,
+            fontweight="bold", ha="center")
+    # region counts
+    ax.text(-1.15, 0.05, str(CONSENSUS["rf_only"]), fontsize=17, ha="center", va="center")
+    ax.text(-1.15, -0.45, "RF-only\ndrug-like actives", fontsize=8, ha="center",
+            va="top", color=C_GREY)
+    ax.text(1.62, 0.05, str(CONSENSUS["gcn_only"]), fontsize=15, ha="center", va="center")
+    ax.text(1.62, -0.4, "GCN-only", fontsize=8, ha="center", va="top", color=C_GREY)
+    ax.text(0.32, 0.35, str(CONSENSUS["both"]), fontsize=18, fontweight="bold",
+            ha="center", va="center", color="#222")
+    ax.text(0.32, -0.2, "consensus", fontsize=8.5, ha="center", va="top", color="#222")
+    # named consensus leads below the diagram
+    leads_txt = "Consensus leads:  " + ";  ".join(
+        f"{n} ({rf:.2f}/{gc:.2f})" for n, _, rf, gc in CONSENSUS["leads"])
+    leads_txt += "\n(marker: Random Forest $\\hat{p}$ / GCN $\\hat{p}$)"
+    ax.text(0.0, -2.15, leads_txt, fontsize=8.5, ha="center", va="top")
+    ax.set_xlim(-3.0, 2.9); ax.set_ylim(-2.9, 2.1)
+    ax.set_aspect("equal"); ax.axis("off")
+    ax.set_title("Drug-like predicted-active leads: cross-model consensus "
+                 "(Random Forest $\\cap$ GCN)", fontsize=11.5)
+    _save(fig, "screening_consensus_venn.pdf")
+
+
 def main() -> None:
     """Generate the complete figure set."""
     if not CLEANED_CSV.exists():
@@ -432,6 +479,7 @@ def main() -> None:
     fig_screening_funnel()
     fig_library_composition()
     fig_leads_scatter()
+    fig_consensus_venn()
 
     logger.info("All thesis figures generated in %s", FIG_DIR)
 

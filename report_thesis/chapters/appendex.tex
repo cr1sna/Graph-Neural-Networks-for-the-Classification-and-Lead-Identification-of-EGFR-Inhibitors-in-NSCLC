@@ -100,22 +100,24 @@ generalisation to novel chemical matter.
 
 \subsection*{B.1 Screening Library Source}
 
-The virtual screening library comprises 535 natural product
-compounds curated from seven traditional Nepali medicinal
+The virtual screening library was curated from seven traditional Nepali medicinal
 plant species---\textit{Swertia chirayita}, \textit{Rhododendron
 arboreum}, \textit{Nardostachys jatamansi}, \textit{Terminalia
 chebula}, \textit{Berberis aristata}, \textit{Ocimum sanctum},
 and \textit{Tinospora cordifolia}---retrieved from the
 COCONUT~2.0 natural product database \parencite{sorokina2021coconut}
 and standardised with the same RDKit pipeline as the training data.
-These ethnomedicinal species are traditionally used for inflammatory
-and proliferative conditions, enriching the library for bioactive
-chemical space relative to random chemical libraries. The composition
-of the library by species is given in Table~\ref{tab:app_nepali_lib}.
+Retrieval returned 535 compounds; \textbf{eight already present in the ChEMBL data}
+(including apigenin and kaempferol) were removed as train/screen leakage, leaving
+\textbf{527 genuinely unseen compounds} screened. These ethnomedicinal species are
+traditionally used for inflammatory and proliferative conditions, enriching the
+library for bioactive chemical space relative to random chemical libraries. The
+composition of the screened library by species is given in
+Table~\ref{tab:app_nepali_lib}.
 
 \begin{table}[H]
-\caption{Composition of the Nepali medicinal plant screening
-         library retrieved from COCONUT 2.0, by species.}
+\caption{Composition of the screened Nepali medicinal plant library (COCONUT 2.0),
+         after removing eight compounds already present in ChEMBL, by species.}
 \label{tab:app_nepali_lib}
 \centering
 \begin{tabular}{@{}llc@{}}
@@ -123,31 +125,32 @@ of the library by species is given in Table~\ref{tab:app_nepali_lib}.
 \textbf{Plant Species} & \textbf{Major Compound Class}
                        & \textbf{Compounds} \\
 \midrule
-\textit{Nardostachys jatamansi} & Sesquiterpenes, coumarins    & 203 \\
-\textit{Terminalia chebula}     & Hydrolysable tannins         & 195 \\
+\textit{Nardostachys jatamansi} & Sesquiterpenes, coumarins    & 199 \\
+\textit{Terminalia chebula}     & Hydrolysable tannins         & 192 \\
 \textit{Tinospora cordifolia}   & Diterpenes, alkaloids        & 71  \\
 \textit{Swertia chirayita}      & Xanthones, secoiridoids      & 23  \\
 \textit{Berberis aristata}      & Isoquinoline alkaloids       & 19  \\
 \textit{Rhododendron arboreum}  & Triterpenoids, flavonoids    & 15  \\
-\textit{Ocimum sanctum}         & Phenylpropanoids, terpenoids & 9   \\
+\textit{Ocimum sanctum}         & Phenylpropanoids, terpenoids & 8   \\
 \midrule
-\textbf{Total} & --- & \textbf{535} \\
+\textbf{Total} & --- & \textbf{527} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-All 535 compounds were scored by the study's two best-performing models---the best
-graph network (GCN) and the best overall classifier (Random Forest). The best
-classifier predicted \textbf{181 compounds} active at $\hat{p} \geq 0.50$ and a
-single compound (\textbf{apigenin}) above $\hat{p} \geq 0.90$; the best graph network
-was far more conservative (24 actives, none above $\hat{p} \geq 0.90$). Only
-\textbf{luteolin} was predicted active ($\hat{p} \geq 0.50$) by both models.
+All 527 unseen compounds were scored by the study's two best-performing models---the
+best graph network (GCN) and the best overall classifier (Random Forest). The best
+classifier predicted \textbf{179 compounds} active at $\hat{p} \geq 0.50$; on the
+de-duplicated library \emph{neither} best model produced a Lipinski-compliant lead
+above $\hat{p} \geq 0.80$. The highest-confidence unseen drug-like lead is
+\textbf{isogentisin} (Random Forest $\hat{p} = 0.728$), and \textbf{luteolin} is the
+top cross-model consensus lead (predicted active by both models).
 
-\subsection*{B.2 Top Lipinski-Compliant Lead}
+\subsection*{B.2 Top Prospective Lipinski-Compliant Lead}
 
 \begin{table}[H]
 \caption{Canonical SMILES and physicochemical properties of the highest-confidence
-         Lipinski-compliant lead (Random Forest).}
+         \emph{genuinely unseen} Lipinski-compliant lead (Random Forest).}
 \label{tab:app_smiles}
 \centering
 \small
@@ -156,27 +159,27 @@ was far more conservative (24 actives, none above $\hat{p} \geq 0.90$). Only
 \textbf{Property} & \textbf{Value} \\
 \midrule
 Compound
-  & Apigenin \\
+  & Isogentisin \\
 Source species
-  & \textit{Ocimum sanctum} \\
+  & \textit{Swertia chirayita} \\
 Predicted probability ($\hat{p}$, Random Forest)
-  & 0.9127 \\
+  & 0.7282 \\
 Predicted probability ($\hat{p}$, GCN)
-  & 0.4100 \\
+  & 0.4600 \\
 Canonical SMILES
-  & \texttt{O=c1cc(-c2ccc(O)cc2)oc2cc(O)cc(O)c12} \\
+  & \texttt{COc1ccc2oc3cc(O)cc(O)c3c(=O)c2c1} \\
 Molecular Weight (Da)
-  & 270.2 \\
+  & 258.2 \\
 LogP
-  & 2.58 \\
+  & 2.37 \\
 QED
-  & 0.632 \\
+  & 0.655 \\
 TPSA (\AA$^2$)
-  & 90.9 \\
+  & 79.9 \\
 Lipinski Ro5 violations
   & 0 \\
 Compound class
-  & Flavone (polyphenolic) \\
+  & Xanthone (polyphenolic) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -185,18 +188,18 @@ Compound class
 
 \begin{table}[H]
 \caption{Summary of virtual screening results from the two best models applied to the
-         535-compound Nepali medicinal plant library (COCONUT 2.0).}
+         527-compound de-duplicated Nepali medicinal plant library (COCONUT 2.0).}
 \label{tab:app_vs_summary}
 \centering
 \begin{tabular}{@{}lcc@{}}
 \toprule
 \textbf{Metric} & \textbf{Random Forest} & \textbf{GCN} \\
 \midrule
-Total compounds screened          & 535 & 535 \\
-Predicted active ($\hat{p} \geq 0.50$) & 181 (33.8\%) & 24 (4.5\%) \\
-Predicted active ($\hat{p} \geq 0.75$) & 34 (6.4\%)   &  2 (0.4\%) \\
-Predicted active ($\hat{p} \geq 0.90$) &  1 (0.2\%)   &  0 (0.0\%) \\
-Highest-confidence compliant lead & Apigenin & Rulepidadiene~A \\
+Total compounds screened          & 527 & 527 \\
+Predicted active ($\hat{p} \geq 0.50$) & 179 (34.0\%) & 24 (4.6\%) \\
+Predicted active ($\hat{p} \geq 0.75$) & 32 (6.1\%)   &  2 (0.4\%) \\
+Predicted active ($\hat{p} \geq 0.90$) &  0 (0.0\%)   &  0 (0.0\%) \\
+Highest-confidence compliant lead & Isogentisin & Rulepidadiene~A \\
 Top consensus lead (both models)  & \multicolumn{2}{c}{Luteolin} \\
 \bottomrule
 \end{tabular}

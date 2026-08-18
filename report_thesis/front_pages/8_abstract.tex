@@ -45,32 +45,32 @@ scaffold-split dataset of this size.
 \noindent
 The two best-performing models---the best graph network (GCN) and
 the best overall classifier (Random Forest)---were then applied to a
-virtual screening library of 535 natural product compounds curated
-from seven traditional Nepali medicinal plant species
+virtual screening library of natural product compounds curated from
+seven traditional Nepali medicinal plant species
 (\textit{Swertia chirayita}, \textit{Rhododendron arboreum},
 \textit{Nardostachys jatamansi}, \textit{Terminalia chebula},
 \textit{Berberis aristata}, \textit{Ocimum sanctum}, and
-\textit{Tinospora cordifolia}) via the COCONUT~2.0 database.
-Compounds were ranked by predicted activity and assessed for
-drug-likeness using Lipinski's Rule of Five and ADMET-proxy
-descriptors (QED, TPSA). The screening hit list proved strongly
-model-dependent---the Random Forest predicted 181 actives and the
-GCN only 24---exposing the earlier tuned-AttentiveFP screen as
-over-confident. Despite this, both best models converged on the same
-drug-like chemotype, the flavones: \textbf{apigenin}
-(\textit{Ocimum sanctum}) was the single highest-confidence
-Lipinski-compliant lead (Random Forest predicted probability 0.913,
-QED 0.632), while \textbf{luteolin}, predicted active by both models,
-was the top cross-model consensus candidate.
+\textit{Tinospora cordifolia}) via the COCONUT~2.0 database. Of the
+535 retrieved compounds, eight already present in the ChEMBL training
+data---including the apparent top hits apigenin and kaempferol---were
+excluded as leakage, leaving 527 genuinely unseen compounds. The
+screening hit list proved strongly model-dependent (Random Forest 179
+predicted actives versus GCN 24), and on the de-duplicated library
+\emph{neither} best model produced a Lipinski-compliant lead at a
+predicted probability $\geq 0.80$. The strongest prospective
+candidates are the xanthone \textbf{isogentisin} (Random Forest 0.728)
+and the flavone \textbf{luteolin}, the top cross-model consensus lead
+(both models $\geq 0.50$)---both at moderate confidence.
 
 \vspace{0.3cm}
 \noindent
-This work shows that model-consensus virtual screening can identify
-actionable, drug-like flavonoid lead candidates from Nepali
-ethnomedicinal compound libraries using an entirely open-source,
-CPU-only pipeline, while underscoring that natural-product screening
-predictions are strongly model-dependent and require cross-model
-consensus and experimental validation.
+This work shows that model-consensus virtual screening can surface
+drug-like natural-product candidates from Nepali ethnomedicinal
+libraries using an entirely open-source, CPU-only pipeline, while
+underscoring that such screens are strongly model-dependent, must
+exclude compounds already seen in training to remain genuinely
+prospective, and yield only moderate-confidence leads requiring
+experimental validation.
 \end{onehalfspace}
 
 \vspace{0.5cm}
