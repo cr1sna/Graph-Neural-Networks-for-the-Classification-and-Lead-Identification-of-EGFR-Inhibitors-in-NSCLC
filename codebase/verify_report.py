@@ -18,7 +18,7 @@ import pandas as pd
 
 PROJECT = pathlib.Path(__file__).resolve().parent
 RESULTS = PROJECT / "results"
-REPORT = pathlib.Path("/Users/krishnagaire/Desktop/Reports/report_thesis")
+REPORT = PROJECT.parent / "report"
 TEX_DIRS = [REPORT / "chapters", REPORT / "front_pages"]
 
 # Concatenate every .tex source into one searchable blob.

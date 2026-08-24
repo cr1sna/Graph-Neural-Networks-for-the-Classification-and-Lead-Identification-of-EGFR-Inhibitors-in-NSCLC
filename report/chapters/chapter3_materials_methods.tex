@@ -44,11 +44,7 @@ exclusively open-source libraries and executed on a macOS system (CPU).
                    ph5/p5a, p5a/p5b, p5b/p5c, p5c/out}
   \draw[arr] (\a) -- (\b);
 \end{tikzpicture}
-\caption{Five-phase computational pipeline: benchmarking five GNN architectures
-         against traditional machine-learning baselines for EGFR inhibitor
-         classification, and deploying the best-performing models (GCN and Random
-         Forest) to screen a Nepali medicinal-plant compound library---whose seven
-         species were selected by documented anti-cancer use and COCONUT~2.0 coverage.}
+\caption{Five-phase pipeline: benchmarking five GNNs against traditional ML baselines, then screening Nepali medicinal-plant compounds with the best models.}
 \label{fig:workflow}
 \end{figure}
 
@@ -199,7 +195,15 @@ scikit-learn (version 1.8.0) trained on 2048-bit ECFP4 (Morgan) fingerprints
 
 \subsection{Graph Neural Network Architectures}
 
-Five GNN architectures were implemented using PyTorch Geometric:
+Five GNN architectures were implemented using PyTorch Geometric. Each learns atom
+embeddings by repeatedly aggregating information from bonded neighbours, pools them
+into a single molecular vector, and outputs an activity probability through a final
+sigmoid layer,
+\begin{equation}
+\hat{p} = \sigma(z) = \frac{1}{1+e^{-z}} \in (0,1).
+\end{equation}
+The architectures differ only in how each atom aggregates information from its
+neighbours, described below.
 
 \subsubsection{Graph Convolutional Network (GCN)}
 
@@ -274,22 +278,28 @@ All GNN models were trained with the following protocol:
 
 \subsection{Model Evaluation Metrics}
 
-Models were evaluated using the following metrics on the scaffold-held-out test set:
-
-\begin{itemize}
-    \item \textbf{AUROC}: Threshold-independent measure of discriminative ability
-          across the full range of classification thresholds.
-    \item \textbf{AUPRC}: Area under the precision-recall curve, more informative
-          than AUROC under class imbalance.
-    \item \textbf{F1-Score}: Harmonic mean of precision and recall at the 0.5
-          decision threshold.
-    \item \textbf{Matthews Correlation Coefficient (MCC)}: A balanced correlation
-          between predicted and true labels derived from all four confusion-matrix
-          counts (true/false positives and negatives), ranging from $-1$ (total
-          disagreement) through $0$ (random) to $+1$ (perfect prediction). It is
-          robust to class imbalance and is reported as the primary balanced metric.
-    \item \textbf{Accuracy}: Proportion of correctly classified compounds.
-\end{itemize}
+Models were evaluated on the scaffold-held-out test set with five complementary
+metrics. Four derive from the confusion-matrix counts of true positives (TP), false
+positives (FP), true negatives (TN), and false negatives (FN) at the $\hat{p}=0.5$
+decision threshold:
+\begin{equation}
+\text{Accuracy}=\frac{TP+TN}{TP+TN+FP+FN},\quad
+\text{Precision}=\frac{TP}{TP+FP},\quad
+\text{Recall}=\frac{TP}{TP+FN},
+\end{equation}
+\begin{equation}
+\text{F1}=\frac{2\,TP}{2\,TP+FP+FN},\qquad
+\text{MCC}=\frac{TP\cdot TN-FP\cdot FN}{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}} .
+\end{equation}
+F1 is the harmonic mean of precision and recall, while the Matthews correlation
+coefficient (MCC) $\in[-1,1]$ uses all four counts and is robust to class imbalance;
+it is reported as the primary balanced metric. The two threshold-independent metrics
+are the area under the receiver-operating-characteristic curve (AUROC) of the
+true-positive rate $\mathrm{TPR}=TP/(TP+FN)$ against the false-positive rate
+$\mathrm{FPR}=FP/(FP+TN)$---equivalently, the probability that a random active is
+ranked above a random inactive, $\mathrm{AUROC}=\Pr(\hat{p}_{+}>\hat{p}_{-})$---and
+the area under the precision--recall curve (AUPRC), which is more informative than
+AUROC under the 74:26 class imbalance.
 
 \subsection{Hyperparameter Tuning}
 

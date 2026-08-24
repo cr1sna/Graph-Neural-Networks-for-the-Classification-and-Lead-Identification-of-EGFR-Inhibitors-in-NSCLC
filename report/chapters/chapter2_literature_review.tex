@@ -354,10 +354,7 @@ binary activity prediction).
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.62\textwidth]{gnn_message_passing.pdf}
-\caption{One step of graph neural network message passing. The central atom $v$
-         updates its representation by aggregating learned messages from its bonded
-         neighbours $u_1, u_2, u_3$. Repeating this over several layers lets each
-         atom's embedding incorporate progressively larger chemical neighbourhoods.}
+\caption{One step of GNN message passing: atom $v$ aggregates learned messages from its bonded neighbours $u_1,u_2,u_3$.}
 \label{fig:msgpass}
 \end{figure}
 
@@ -654,10 +651,7 @@ representative published GNN studies for EGFR inhibitor prediction.
 
 \begin{table}[H]
 \centering
-\caption{Comparison of this thesis against representative published GNN-based
-         EGFR inhibitor classification studies across three methodological dimensions.
-         $\checkmark$\,= fully addressed; $\circ$\,= partially addressed;
-         $\times$\,= not addressed.}
+\caption{This thesis versus representative GNN-based EGFR studies across three methodological dimensions ($\checkmark$ addressed; $\circ$ partial; $\times$ absent).}
 \label{tab:gap_compare}
 {\singlespacing
 \begin{tabular}{lccc}

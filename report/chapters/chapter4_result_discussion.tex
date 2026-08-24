@@ -84,10 +84,7 @@ are shown in Figure~\ref{fig:pic50}.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.82\textwidth]{eda_pic50_distribution.pdf}
-\caption{Distribution of EGFR bioactivity (pIC$_{50}$) for the curated dataset,
-         coloured by activity label. The active and inactive subpopulations form
-         two modes separated by the pIC$_{50} = 6.0$ decision threshold (dashed
-         line, IC$_{50} = 1~\mu$M).}
+\caption{Distribution of pIC$_{50}$ for the curated dataset; the two activity modes are split by the pIC$_{50}=6.0$ (1~$\mu$M) threshold (dashed).}
 \label{fig:pic50}
 \end{figure}
 
@@ -129,10 +126,7 @@ Figure~\ref{fig:properties}.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.95\textwidth]{eda_property_distributions.pdf}
-\caption{Distributions of molecular weight (left) and calculated LogP (right) for a
-         random sample of the curated dataset. Dashed lines mark the Lipinski
-         thresholds (MW = 500 Da, LogP = 5); most compounds cluster near these
-         thresholds, characteristic of kinase inhibitors.}
+\caption{Molecular weight (left) and LogP (right) distributions for the curated dataset; dashed lines mark the Lipinski thresholds (500~Da, 5).}
 \label{fig:properties}
 \end{figure}
 
@@ -154,11 +148,7 @@ use of scaffold-based data splitting.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.95\textwidth]{eda_scaffold_diversity.pdf}
-\caption{Bemis-Murcko scaffold diversity of the curated dataset. Left: number of
-         compounds sharing each of the most frequent scaffolds. Right: the split
-         between singleton scaffolds (a single compound) and multi-compound
-         scaffolds, illustrating the long-tailed scaffold distribution that
-         necessitates scaffold-based splitting.}
+\caption{Bemis-Murcko scaffold diversity: most frequent scaffolds (left) and the singleton vs.\ multi-compound split (right).}
 \label{fig:scaffold}
 \end{figure}
 
@@ -204,10 +194,7 @@ metrics, making the relative ordering of the seven models directly comparable.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.98\textwidth]{results_model_comparison.pdf}
-\caption{Performance of all seven models on the scaffold-held-out test set across
-         AUROC, AUPRC, F1-score, and MCC. The Random Forest and MLP fingerprint
-         baselines lead on AUROC, while the graph neural networks form a competitive
-         cluster led by GCN.}
+\caption{Performance of all seven models on the scaffold test set; fingerprint baselines lead, with GCN strongest among the GNNs.}
 \label{fig:model_comparison}
 \end{figure}
 
@@ -358,8 +345,7 @@ across the seven species as summarised in Table~\ref{tab:library_comp}.
 
 \begin{table}[H]
 \centering
-\caption{Composition of the screened Nepali medicinal plant library (COCONUT 2.0),
-         after removing eight compounds already present in the ChEMBL data.}
+\caption{Composition of the screened Nepali plant library after removing eight ChEMBL-overlapping compounds (COCONUT~2.0).}
 \label{tab:library_comp}
 {\singlespacing
 \begin{tabular}{lcc}
@@ -390,9 +376,7 @@ distribution across the seven species is shown in Figure~\ref{fig:library_comp}.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.9\textwidth]{screening_library_composition.pdf}
-\caption{Composition of the screened Nepali medicinal plant library by species,
-         totalling 527 genuinely unseen natural product compounds (535 retrieved from
-         COCONUT 2.0, minus eight already present in ChEMBL).}
+\caption{Screened Nepali plant library by species (527 genuinely unseen compounds; 535 retrieved minus eight in ChEMBL).}
 \label{fig:library_comp}
 \end{figure}
 
@@ -407,11 +391,7 @@ Table~\ref{tab:coconut_physchem} and visualised in Figure~\ref{fig:coconut_dist}
 
 \begin{table}[H]
 \centering
-\caption{Physicochemical profile of the Nepali plant screening library (527 COCONUT
-         compounds) against the ChEMBL EGFR training set (10,523 compounds). The
-         natural-product library is markedly smaller and less lipophilic---it occupies
-         a chemical space shifted away from the synthetic kinase-inhibitor training
-         distribution.}
+\caption{Physicochemical profile of the 527-compound Nepali library versus the 10,523-compound ChEMBL training set.}
 \label{tab:coconut_physchem}
 {\singlespacing
 \begin{tabular}{lcc}
@@ -454,13 +434,7 @@ calibrated likelihoods.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.98\textwidth]{coconut_distribution.pdf}
-\caption{Physicochemical distributions of the Nepali plant screening library (527
-         COCONUT compounds, blue) overlaid on the ChEMBL EGFR training set (10,523
-         compounds, grey), for molecular weight, LogP, TPSA, and QED. Dashed lines
-         mark the respective medians; the red dotted lines mark the Lipinski MW = 500~Da
-         and LogP = 5 thresholds. The natural-product library is systematically
-         lighter and less lipophilic, occupying a chemical space only partially
-         overlapping the training distribution.}
+\caption{Physicochemical distributions (MW, LogP, TPSA, QED) of the Nepali library (blue) versus the ChEMBL training set (grey); dashed lines mark medians.}
 \label{fig:coconut_dist}
 \end{figure}
 
@@ -477,9 +451,7 @@ compares the progressive screening funnel obtained under all three models.
 
 \begin{table}[H]
 \centering
-\caption{Nepali plant virtual screening funnel under the three models, showing the
-         number of compounds retained at each activity and drug-likeness stage. The
-         three models disagree sharply, revealing the model-sensitivity of the screen.}
+\caption{Nepali plant screening funnel under the three models, showing compounds retained at each activity and drug-likeness stage.}
 \label{tab:vs_summary}
 {\singlespacing
 \begin{tabular}{lccc}
@@ -525,12 +497,7 @@ Figure~\ref{fig:funnel}.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.9\textwidth]{screening_funnel.pdf}
-\caption{Virtual screening funnel for the Nepali medicinal plant library under the
-         three models (tuned AttentiveFP, best GNN = GCN, best classifier = Random
-         Forest), showing the number of compounds retained at each prioritisation
-         stage. The sharp disagreement between models---AttentiveFP retaining 71
-         compounds at $\hat{p} \geq 0.90$ versus 0 for both GCN and Random
-         Forest---illustrates the model-sensitivity of the screen.}
+\caption{Screening funnel under the three models (tuned AttentiveFP, GCN, Random Forest); the sharp disagreement shows the screen's model-sensitivity.}
 \label{fig:funnel}
 \end{figure}
 
@@ -544,10 +511,7 @@ Table~\ref{tab:leads_rf}, and those nominated by the GCN in Table~\ref{tab:leads
 \begin{table}[H]
 \small
 \centering
-\caption{Top drug-like (Lipinski-compliant) \emph{genuinely unseen} Nepali plant leads
-         nominated by the best overall classifier (Random Forest), ranked by predicted
-         activity. No compliant compound reaches $\hat{p} \geq 0.80$. Listed compounds
-         bear common (trivial) names.}
+\caption{Top drug-like genuinely-unseen Nepali leads under the Random Forest, ranked by predicted activity; none reaches $\hat{p}\geq0.80$.}
 \label{tab:leads_rf}
 {\singlespacing
 \begin{tabular}{clcccccc}
@@ -570,10 +534,7 @@ Table~\ref{tab:leads_rf}, and those nominated by the GCN in Table~\ref{tab:leads
 \begin{table}[H]
 \small
 \centering
-\caption{Top drug-like (Lipinski-compliant) Nepali plant leads nominated by the best
-         graph neural network (GCN), ranked by predicted activity. The GCN is
-         markedly more conservative: no compliant compound exceeds $\hat{p} = 0.66$,
-         and none reaches the $\hat{p} \geq 0.80$ threshold.}
+\caption{Top drug-like Nepali leads under the GCN, ranked by predicted activity; none reaches $\hat{p}\geq0.80$.}
 \label{tab:leads_gcn}
 {\singlespacing
 \begin{tabular}{clcccccc}
@@ -607,9 +568,7 @@ triterpenoids, so drug-likeness filtering remains essential.
 
 \begin{table}[H]
 \centering
-\caption{Flavone scaffolds under the two best models, with ChEMBL status. The two
-         highest-scoring flavones were already in the training data and were removed as
-         leakage; luteolin is genuinely unseen and is the cross-model consensus lead.}
+\caption{Flavone scaffolds under the two best models with ChEMBL status; apigenin and kaempferol are leakage, luteolin the consensus lead.}
 \label{tab:flavones}
 {\singlespacing
 \begin{tabular}{llccl}
@@ -631,12 +590,7 @@ predicted-activity versus drug-likeness plane.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.92\textwidth]{screening_leads_scatter.pdf}
-\caption{Random Forest drug-like Nepali plant lead candidates in the
-         predicted-activity versus drug-likeness (QED) plane. All shown candidates are
-         Lipinski-compliant and marker size is proportional to molecular weight.
-         Dashed lines mark the $H_2$ thresholds ($\hat{p}$~$\geq$~0.80,
-         QED~$\geq$~0.40); on the de-duplicated library no candidate clears the
-         $\hat{p} \geq 0.80$ threshold, with isogentisin and luteolin the highest.}
+\caption{Random Forest drug-like leads in the predicted-activity versus QED plane; dashed lines mark the $H_2$ thresholds (0.80, 0.40), which none clears.}
 \label{fig:leads_scatter}
 \end{figure}
 
@@ -672,11 +626,7 @@ GCN, only \textbf{three} are endorsed by both.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.78\textwidth]{screening_consensus_venn.pdf}
-\caption{Cross-model consensus. Drug-like predicted-active leads ($\hat{p} \geq 0.50$,
-         Lipinski-compliant, QED $\geq 0.40$) nominated by the Random Forest (25) and
-         the GCN (4); only three compounds---luteolin, palmarin and
-         nardostachysin---lie in the intersection and constitute the prioritised
-         consensus leads.}
+\caption{Cross-model consensus: drug-like actives from the Random Forest (25) and GCN (4); three (luteolin, palmarin, nardostachysin) fall in the intersection.}
 \label{fig:consensus}
 \end{figure}
 
@@ -686,9 +636,7 @@ inflammatory and proliferative conditions.
 
 \begin{table}[H]
 \centering
-\caption{Cross-model consensus leads: the genuinely unseen compounds predicted
-         drug-like and active by \emph{both} best models, with their Nepali plant
-         sources.}
+\caption{Cross-model consensus leads predicted drug-like and active by both best models, with their Nepali plant sources.}
 \label{tab:consensus}
 {\singlespacing
 \begin{tabular}{llcccl}
@@ -755,37 +703,21 @@ profiles in Figure~\ref{fig:consensus_data}.
   {\small({\nepalifont जटामसी}, Jatamasi)}\\
   {\footnotesize\itshape nardostachysin}
 \end{minipage}
-\caption{The three Nepali medicinal plants contributing the cross-model consensus
-         leads, labelled with their Nepali (Devanagari) common names. Photographs
-         via Wikimedia Commons: \textit{Terminalia chebula} (source of luteolin)
-         \textcopyright{} Delonix, CC~BY-SA~3.0; \textit{Tinospora cordifolia}
-         (palmarin) \textcopyright{} Gurnavinder Sidhu, CC~BY-SA~4.0;
-         \textit{Nardostachys jatamansi} (nardostachysin) \textcopyright{}
-         Plantagenet, CC~BY-SA~4.0.}
+\caption{Consensus-lead source plants with Nepali names. Photos via Wikimedia Commons: \textit{T.~chebula} \textcopyright{} Delonix CC~BY-SA~3.0; \textit{T.~cordifolia} \textcopyright{} Gurnavinder Sidhu CC~BY-SA~4.0; \textit{N.~jatamansi} \textcopyright{} Plantagenet CC~BY-SA~4.0.}
 \label{fig:consensus_plants}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.95\textwidth]{consensus_structures.png}
-\caption{Chemical structures of the three cross-model consensus leads, drawn with RDKit
-         from their COCONUT~2.0 canonical SMILES \parencite{sorokina2021coconut}: the
-         flavone \textbf{luteolin}, the furanoditerpenoid \textbf{palmarin}, and the
-         sesquiterpenoid ester \textbf{nardostachysin}.}
+\caption{Chemical structures of the three consensus leads (luteolin, palmarin, nardostachysin), drawn with RDKit from COCONUT~2.0 SMILES \parencite{sorokina2021coconut}.}
 \label{fig:consensus_struct}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.98\textwidth]{consensus_data.pdf}
-\caption{Data representation of the three cross-model consensus leads. Left: the
-         Random Forest and GCN predicted activity probabilities ($\hat{p}$) alongside
-         the quantitative estimate of drug-likeness (QED); the dotted line marks the
-         $\hat{p}=0.5$ decision threshold. Right: their physicochemical /
-         ADMET-proxy descriptors---molecular weight (MW), lipophilicity (LogP),
-         topological polar surface area (TPSA), and hydrogen-bond donor/acceptor
-         counts (HBD/HBA), all RDKit-computed from the COCONUT~2.0 SMILES. All three
-         compounds satisfy Lipinski's rule of five.}
+\caption{Model predictions and physicochemical descriptors of the three consensus leads; all satisfy Lipinski's rule of five.}
 \label{fig:consensus_data}
 \end{figure}
 

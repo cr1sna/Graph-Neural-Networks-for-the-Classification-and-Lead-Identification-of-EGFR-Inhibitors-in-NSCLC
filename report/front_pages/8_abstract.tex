@@ -1,0 +1,53 @@
+% ════════════════════════════════════════════════════════════════════
+%  front_pages/abstract.tex
+%  Abstract Page
+% ════════════════════════════════════════════════════════════════════
+
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+\thispagestyle{plain}
+
+{\singlespacing
+\noindent
+Non-small cell lung cancer (NSCLC) accounts for about 85\% of lung cancer cases, and
+EGFR mutations are among its most significant oncogenic drivers. EGFR-targeted tyrosine
+kinase inhibitors have transformed treatment, yet acquired resistance and high therapy
+cost remain major challenges, especially in resource-limited South Asian settings. This
+study presents a graph neural network (GNN) framework for EGFR-inhibitor classification
+and the prospective virtual screening of compounds from traditional Nepali medicinal
+plants.
+
+\vspace{0.18cm}
+\noindent
+A curated dataset of 10,523 compounds with validated EGFR bioactivity (74\% active) was
+assembled from ChEMBL, standardised with RDKit, and represented as molecular graphs with
+29-dimensional atom and 12-dimensional bond features. Seven models were benchmarked under
+a Bemis-Murcko scaffold split: five GNNs (GCN, GAT, GIN, AttentiveFP, GraphSAGE) and two
+ECFP4 baselines (Random Forest, MLP). The baselines led (Random Forest AUROC 0.8827, MLP
+0.8547) ahead of the GNNs (0.8087--0.8454, GCN strongest); Optuna tuning raised
+AttentiveFP's validation AUROC to 0.8632 but did not surpass them---well-tuned fingerprint
+models remain highly competitive at this dataset size.
+
+\vspace{0.18cm}
+\noindent
+The two best models (GCN and Random Forest) were applied to a natural-product library of
+seven Nepali plant species from COCONUT~2.0. Of 535 retrieved compounds, eight already in
+the ChEMBL training data---including the apparent top hits apigenin and kaempferol---were
+excluded as leakage, leaving 527 genuinely unseen compounds. The hit list was strongly
+model-dependent (Random Forest 179 predicted actives versus GCN 24), and neither best
+model gave a Lipinski-compliant lead at probability $\geq 0.80$. The strongest candidates
+are the xanthone \textbf{isogentisin} (Random Forest 0.728) and the flavone
+\textbf{luteolin}, the top cross-model consensus lead---both at moderate confidence.
+
+\vspace{0.18cm}
+\noindent
+Model-consensus screening can thus surface drug-like natural-product candidates from
+Nepali ethnomedicinal libraries using an open-source, CPU-only pipeline, while showing
+that such screens are model-dependent, must exclude training-set compounds to stay
+prospective, and yield only moderate-confidence leads requiring experimental validation.
+
+\vspace{0.3cm}
+\noindent{\fontsize{10}{12}\selectfont\textit{\textbf{Keywords:}
+EGFR inhibitors, graph neural networks, virtual screening,
+Nepali medicinal plants, drug discovery.}}
+\par}

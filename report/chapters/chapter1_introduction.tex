@@ -108,11 +108,7 @@ classifier or regression head.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.95\textwidth]{molecule_to_graph.pdf}
-\caption{Representation of a molecule as an attributed graph for graph neural
-         network learning. The 2D structure of the EGFR inhibitor gefitinib (a) is
-         converted into a molecular graph (b) in which each atom becomes a node and
-         each bond an edge. Aromatic atoms are shown in green and non-aromatic atoms
-         in blue; each atom and bond is encoded by a fixed-length feature vector.}
+\caption{A molecule (the EGFR inhibitor gefitinib) represented as an attributed graph of atom nodes and bond edges.}
 \label{fig:intro_mol2graph}
 \end{figure}
 
@@ -282,25 +278,27 @@ reproduced without licensed software or specialised computing resources.
 % ----------------------------------------------------------------
 
 The following two testable research hypotheses were formulated prior to
-experimentation and are evaluated against the results presented in Chapter 4:
+experimentation and are evaluated against the results presented in Chapter 4. Each is
+stated as a null hypothesis ($H_0$) and an alternative hypothesis ($H_1$).
 
 \begin{enumerate}
-    \item \textbf{$H_1$ (Performance Hypothesis):} Graph Neural Network architectures
-    incorporating comprehensive multi-dimensional atomic node features and bond-level
-    edge features, when optimised via Bayesian hyperparameter search, will achieve
-    measurably superior scaffold test-set AUROC compared to traditional machine learning
-    baselines (Random Forest and MLP on 2048-bit ECFP4 fingerprints)
-    under a strict Bemis-Murcko scaffold split on the ChEMBL EGFR bioactivity dataset.
+    \item \textbf{$H_1$ (Performance Hypothesis).}
+    \begin{itemize}
+        \item $H_0$: the best graph neural network does \emph{not} achieve a higher
+        scaffold test-set AUROC than the best fingerprint baseline (Random Forest or MLP).
+        \item $H_1$: the best graph neural network achieves a higher scaffold test-set
+        AUROC than the best fingerprint baseline.
+    \end{itemize}
 
-    \item \textbf{$H_2$ (Virtual Screening Hypothesis):} The virtual screening
-    pipeline, employing the study's two best-performing models (the best graph network
-    and the best overall classifier) to score compounds from seven traditional Nepali
-    medicinal plant species retrieved from COCONUT 2.0, will identify---under
-    \emph{each} of these models---at least one fully Lipinski-compliant
-    natural-product-derived lead compound with a predicted activity probability
-    $\hat{p} \geq 0.80$ and a Quantitative Estimate of Drug-likeness (QED) score
-    $\geq 0.40$, contributing a viable experimental lead candidate for affordable NSCLC
-    therapy development in the South Asian context.
+    \item \textbf{$H_2$ (Virtual Screening Hypothesis).}
+    \begin{itemize}
+        \item $H_0$: no genuinely unseen, Lipinski-compliant Nepali plant compound is
+        predicted active (predicted probability $\hat{p} \geq 0.80$ and QED $\geq 0.40$)
+        by \emph{both} best models.
+        \item $H_1$: at least one genuinely unseen, Lipinski-compliant Nepali plant
+        compound is predicted active ($\hat{p} \geq 0.80$ and QED $\geq 0.40$) by
+        \emph{both} best models, providing a candidate lead for affordable NSCLC therapy.
+    \end{itemize}
 \end{enumerate}
 
 % ----------------------------------------------------------------
@@ -312,7 +310,7 @@ intersection of computational data science and molecular drug discovery:
 
 \textbf{Methodological contribution.} Although systematic comparisons of GNN
 architectures on molecular benchmarks are well established
-\parencite{jiang2021gnn}, this thesis applies such a comparison, to our knowledge for
+\parencite{jiang2021gnn}, this thesis applies such a comparison, to the author's knowledge for
 the first time, \emph{specifically to EGFR inhibitor classification}: it evaluates
 five GNN architectures (GCN, GAT, GIN, AttentiveFP, GraphSAGE) against traditional
 fingerprint baselines (Random Forest and MLP) under a rigorous Bemis-Murcko scaffold
